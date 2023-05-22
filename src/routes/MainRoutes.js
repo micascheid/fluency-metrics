@@ -1,10 +1,14 @@
-import { lazy } from 'react';
+import {lazy} from 'react';
 
 // project import
 import Loadable from 'components/Loadable';
 import MainLayout from 'layout/MainLayout';
 import Support from '../pages/extra-pages/Support';
 import { getAuth } from 'firebase/auth';
+import userContext from "../context/UserContext";
+import UserContext from "../context/UserContext";
+import {useNavigate} from "react-router-dom";
+import AuthGuard from "../pages/authentication/AuthGuard";
 
 // render - dashboard
 const DashboardDefault = Loadable(lazy(() => import('pages/dashboard')));
@@ -20,7 +24,7 @@ const SupportPage = Loadable(lazy(() => import('pages/extra-pages/Support')));
 const MainRoutes = {
     path: '/',
     element: (
-        <MainLayout/>
+        <MainLayout />
     ),
     children: [
         {
