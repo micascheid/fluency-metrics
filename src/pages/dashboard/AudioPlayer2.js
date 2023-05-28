@@ -8,16 +8,17 @@ import React, {
 } from "react";
 import ReactDOM from "react-dom";
 import styled from "styled-components";
-import { WaveSurfer, WaveForm, Region, Marker } from "wavesurfer-react";
+import {WaveSurfer, WaveForm, Region, Marker} from "wavesurfer-react";
 import "./styles.css";
 import RegionsPlugin from "wavesurfer.js/dist/plugin/wavesurfer.regions.min";
 import TimelinePlugin from "wavesurfer.js/dist/plugin/wavesurfer.timeline.min";
 import MarkersPlugin from "wavesurfer.js/src/plugin/markers";
-import {Button, Stack} from "@mui/material";
+import {Box, Button, Slider, Stack} from "@mui/material";
+import MainCard from "../../components/MainCard";
 
-const Buttons = styled.div`
-  display: inline-block;
-`;
+// const Buttons = styled.div`
+//   display: inline-block;
+// `;
 
 // const Button = styled.button``;
 
@@ -46,16 +47,16 @@ function generateTwoNumsWithDistance(distance, min, max) {
     return generateTwoNumsWithDistance(distance, min, max);
 }
 
-function AudioPlayer2() {
+const AudioPlayer2 = ({ss, nss, setSS, setNSS}) => {
     const [timelineVis, setTimelineVis] = useState(true);
-
+    const [playbackSpeed, setPlaybackSpeed] = useState(1);
 
 
     const plugins = useMemo(() => {
         return [
             {
                 plugin: RegionsPlugin,
-                options: { dragSelection: true }
+                options: {dragSelection: true}
             },
             timelineVis && {
                 plugin: TimelinePlugin,
@@ -65,7 +66,7 @@ function AudioPlayer2() {
             },
             {
                 plugin: MarkersPlugin,
-                options: { draggable: true }
+                options: {draggable: true}
             },
         ].filter(Boolean);
     }, [timelineVis]);
@@ -73,78 +74,17 @@ function AudioPlayer2() {
     const toggleTimeline = useCallback(() => {
         setTimelineVis(prevTimelineVis => !prevTimelineVis);
     }, []);
-    const [markers, setMarkers] = useState([
-        {
-            time: 5.5,
-            label: "V1",
-            color: "#ff990a",
-            draggable: true
-        },
-        {
-            time: 10,
-            label: "V2",
-            color: "#00ffcc",
-            position: "top"
-        },
-        {
-            time: 90,
-            label: "V3",
-            color: "#00ffcc",
-            position: "top",
-            draggable: true
-        }
-    ]);
-    const [regions, setRegions] = useState([
-        {
-            id: "region-1",
-            start: 0.5,
-            end: 10,
-            color: "rgba(0, 0, 0, .5)",
-            data: {
-                systemRegionId: 31
-            }
-        },
-        {
-            id: "region-2",
-            start: 5,
-            end: 25,
-            color: "rgba(225, 195, 100, .5)",
-            data: {
-                systemRegionId: 32
-            }
-        },
-        {
-            id: "region-3",
-            start: 15,
-            end: 35,
-            color: "rgba(25, 95, 195, .5)",
-            data: {
-                systemRegionId: 33
-            }
-        }
-    ]);
-
+    const [markers, setMarkers] = useState([]);
+    const [regions, setRegions] = useState([]);
+    const waveformProps = {
+        id: "waveform",
+        cursorColor: "#000000",
+        cursorWidth: 2,
+    }
     // use regions ref to pass it inside useCallback
     // so it will use always the most fresh version of regions list
     // const regionsRef = useRef(regions);
 
-    // useEffect(() => {
-    //     regionsRef.current = regions;
-    // }, [regions]);
-
-    // const regionCreatedHandler = useCallback(
-    //     (region) => {
-    //         console.log("region-created --> region:", region);
-    //
-    //         if (region.data.systemRegionId) return;
-    //         console.log("BEING CALLED?");
-    //         setRegions([
-    //             ...regionsRef.current,
-    //             { ...region, data: { ...region.data, systemRegionId: -1 } }
-    //         ]);
-    //     },
-    //     [regionsRef]
-    // );
 
     const wavesurferRef = useRef();
     const handleWSMount = useCallback(
@@ -156,7 +96,7 @@ function AudioPlayer2() {
             wavesurferRef.current = waveSurfer;
 
             if (wavesurferRef.current) {
-                // wavesurferRef.current.load("");
+                wavesurferRef.current.load("/test_audio.mp3");
 
                 // wavesurferRef.current.on("region-created", regionCreatedHandler);
 
@@ -206,24 +146,15 @@ function AudioPlayer2() {
     }, [regions, wavesurferRef]);
     const generateMarker = useCallback(() => {
         if (!wavesurferRef.current) return;
-        const minTimestampInSeconds = 0;
-        const maxTimestampInSeconds = wavesurferRef.current.getDuration();
-        const distance = generateNum(0, 10);
-        const [min] = generateTwoNumsWithDistance(
-            distance,
-            minTimestampInSeconds,
-            maxTimestampInSeconds
-        );
 
+        const time = wavesurferRef.current.getCurrentTime();
         const r = generateNum(0, 255);
         const g = generateNum(0, 255);
         const b = generateNum(0, 255);
-        console.log(wavesurferRef.current.getDuration());
-
         setMarkers((prevMarkers) => {
             const newMarker = {
                 label: `custom-${generateNum(0, 9999)}`,
-                time: min,
+                time: time,
                 color: `rgba(${r}, ${g}, ${b}, 0.5)`
             }
             return [...prevMarkers, newMarker];
@@ -231,12 +162,12 @@ function AudioPlayer2() {
     }, [wavesurferRef]);
 
     const removeLastRegion = useCallback(() => {
-        setRegions(prevRegions => {
-            let nextRegions = [...prevRegions];
-            nextRegions.pop();
-            return nextRegions;
-        });
-    }, []);
+        let nextRegions = [...regions];
+
+        nextRegions.pop();
+
+        setRegions(nextRegions);
+    }, [regions]);
     const removeLastMarker = useCallback(() => {
         setMarkers(prevMarkers => {
             let nextMarkers = [...prevMarkers];
@@ -245,40 +176,18 @@ function AudioPlayer2() {
         });
     }, []);
 
-    const shuffleLastMarker = useCallback(() => {
-        setMarkers((prev) => {
-            const next = [...prev];
-            let lastIndex = next.length - 1;
-
-            const minTimestampInSeconds = 0;
-            const maxTimestampInSeconds = wavesurferRef.current.getDuration();
-            const distance = generateNum(0, 10);
-            const [min] = generateTwoNumsWithDistance(
-                distance,
-                minTimestampInSeconds,
-                maxTimestampInSeconds
-            );
-
-            next[lastIndex] = {
-                ...next[lastIndex],
-                time: min
-            };
-
-            return next;
-        });
-    }, []);
-
     const play = useCallback(() => {
         wavesurferRef.current.playPause();
-    }, []);
+        wavesurferRef.current.setPlaybackRate(playbackSpeed);
+        if (wavesurferRef.current) {
+            wavesurferRef.current.setPlaybackRate(playbackSpeed);
+        }
+    }, [playbackSpeed]);
 
-    // const handleRegionUpdate = useCallback((region, smth) => {
-    //     console.log("region-update-end --> region:", region);
-    //     console.log(smth);
-    // }, []);
+
 
     const handleFileChange = (event) => {
-        const file =event.target.files[0];
+        const file = event.target.files[0];
         const reader = new FileReader();
 
         reader.onloadend = () => {
@@ -289,47 +198,96 @@ function AudioPlayer2() {
         reader.readAsArrayBuffer(file);
     };
 
+    const valuetext = (value) => {
+        return value;
+    };
+
+    const playbackSpeedHandler = (event, value) => {
+        console.log("Playback Speed", value);
+        console.log(wavesurferRef.current.getCurrentTime());
+        wavesurferRef.current.setPlaybackRate(value);
+        setPlaybackSpeed(value);
+    };
+
+    const handleKeyPress = (event) => {
+        if (event.key === 's') {
+            console.log("SS:", ss);
+            setSS(prevValue => prevValue+1);
+        }
+        if (event.key === 'n') {
+            setNSS(prevValue => prevValue+1);
+        }
+    };
+
+
+    useEffect(() => {
+
+        window.addEventListener('keypress', handleKeyPress);
+
+        return () => {
+            window.removeEventListener('keypress', handleKeyPress);
+        }
+    },[]);
+
+
     return (
-        <div className="App">
-            <WaveSurfer plugins={plugins} onMount={handleWSMount}>
-                <WaveForm id="waveform" cursorColor="transparent">
-                    {regions.map((regionProps) => (
-                        <Region
-                            // onUpdateEnd={handleRegionUpdate}
-                            key={regionProps.id}
-                            {...regionProps}
+        <MainCard>
+            <Stack>
+                <WaveSurfer plugins={plugins} onMount={handleWSMount}>
+                    <WaveForm {...waveformProps}>
+                        {regions.map((regionProps) => (
+                            <Region
+                                // onUpdateEnd={handleRegionUpdate}
+                                key={regionProps.id}
+                                {...regionProps}
+                            />
+                        ))}
+                        {markers.map((marker) => (
+                            <Marker
+                                key={marker.label}
+                                {...marker}
+                            />
+                        ))}
+                    </WaveForm>
+                    <div id="timeline"/>
+                </WaveSurfer>
+                <Box sx={{height: 10}}/>
+                <Stack spacing={1} direction={"row"}>
+                    <Box sx={{width: 120, mr: 2}}>
+                        <Slider
+                            aria-label="playbackspeed"
+                            defaultValue={1}
+                            getAriaValueText={valuetext}
+                            valueLabelDisplay="auto"
+                            step={.1}
+                            marks
+                            min={.3}
+                            max={1}
+                            value={playbackSpeed}
+                            onChange={playbackSpeedHandler}
                         />
-                    ))}
-                    {markers.map((marker) => (
-                        <Marker
-                            key={marker.label}
-                            {...marker}
+                    </Box>
+                    <Button variant={"contained"} onClick={generateMarker}>Generate Marker</Button>
+                    <Button variant={"contained"} onClick={play}>Play / Pause</Button>
+                    <Button variant={"contained"} onClick={removeLastRegion}>Remove last region</Button>
+                    <Button variant={"contained"} onClick={removeLastMarker}>Remove last marker</Button>
+                    <Button variant={"contained"} onClick={toggleTimeline}>Toggle timeline</Button>
+                    <Button
+                        variant={"contained"}
+                        component={"label"}
+                    >
+                        Choose File
+                        <input
+                            type={"file"}
+                            hidden
+                            onChange={handleFileChange}
                         />
-                    ))}
-                </WaveForm>
-                <div id="timeline" />
-            </WaveSurfer>
-            <Stack spacing={1} direction={"row"}>
-                <Button variant={"contained"} onClick={generateRegion}>Generate region</Button>
-                <Button variant={"contained"} onClick={generateMarker}>Generte Marker</Button>
-                <Button variant={"contained"} onClick={play}>Play / Pause</Button>
-                <Button variant={"contained"} onClick={removeLastRegion}>Remove last region</Button>
-                <Button variant={"contained"} onClick={removeLastMarker}>Remove last marker</Button>
-                <Button variant={"contained"} onClick={shuffleLastMarker}>Shuffle last marker</Button>
-                <Button variant={"contained"} onClick={toggleTimeline}>Toggle timeline</Button>
-                <Button
-                    variant={"contained"}
-                    component={"label"}
-                >
-                    Choose File
-                    <input
-                        type={"file"}
-                        hidden
-                        onChange={handleFileChange}
-                    />
-                </Button>
+                    </Button>
+                    <Button variant={"contained"} onClick={() => setSS(ss+1)}>SS</Button>
+                    <Button variant={"contained"} onClick={() => setNSS(nss+1)}>NSS</Button>
+                </Stack>
             </Stack>
-        </div>
+        </MainCard>
     );
 }
 

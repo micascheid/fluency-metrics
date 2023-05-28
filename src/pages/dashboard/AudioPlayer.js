@@ -7,7 +7,7 @@ import RegionsPlugin from "wavesurfer.js/dist/plugin/wavesurfer.regions.min";
 import TimelinePlugin from "wavesurfer.js/dist/plugin/wavesurfer.timeline.min";
 import MarkersPlugin from "wavesurfer.js/src/plugin/markers";
 import MainCard from "../../components/MainCard";
-import {Box, Button, Input, Stack} from "@mui/material";
+import {Box, Button, Input, Slider, Stack} from "@mui/material";
 // import { useKeyPress } from "./useKeyPress.ts";
 // const Buttons = styled.div`
 //   display: inline-block;
@@ -212,7 +212,7 @@ const AudioPlayer = () => {
     }, [regions, wavesurferRef]);
     const generateMarker = useCallback(() => {
         if (!wavesurferRef.current) return;
-        console.log("GENERATE MARKER CALLDED");
+        console.log("GENERATE MARKER CALLED");
         const minTimestampInSeconds = 0;
         const maxTimestampInSeconds = wavesurferRef.current.getDuration();
         const distance = generateNum(0, 10);
@@ -253,29 +253,6 @@ const AudioPlayer = () => {
 
         setMarkers(nextMarkers);
     }, [markers]);
-
-    const shuffleLastMarker = useCallback(() => {
-        setMarkers((prev) => {
-            const next = [...prev];
-            let lastIndex = next.length - 1;
-
-            const minTimestampInSeconds = 0;
-            const maxTimestampInSeconds = wavesurferRef.current.getDuration();
-            const distance = generateNum(0, 10);
-            const [min] = generateTwoNumsWithDistance(
-                distance,
-                minTimestampInSeconds,
-                maxTimestampInSeconds
-            );
-
-            next[lastIndex] = {
-                ...next[lastIndex],
-                time: min
-            };
-
-            return next;
-        });
-    }, []);
 
     const play = useCallback(() => {
         wavesurferRef.current.playPause();
