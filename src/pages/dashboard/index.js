@@ -1,9 +1,6 @@
 import {React, useState} from 'react';
 import {Grid} from "@mui/material";
-import Waveform from "./Waveform";
-import AudioPlayer from "./AudioPlayer";
 import AudioPlayer2 from "./AudioPlayer2";
-import MainCard from "../../components/MainCard";
 import FluencyCounts from "./FluencyCounts";
 
 const DefaultDashboard = () => {
