@@ -13,7 +13,7 @@ import "./styles.css";
 import RegionsPlugin from "wavesurfer.js/dist/plugin/wavesurfer.regions.min";
 import TimelinePlugin from "wavesurfer.js/dist/plugin/wavesurfer.timeline.min";
 import MarkersPlugin from "wavesurfer.js/src/plugin/markers";
-import {Box, Button, Slider, Stack} from "@mui/material";
+import {Box, Button, Slider, Stack, Typography} from "@mui/material";
 import MainCard from "../../components/MainCard";
 
 // const Buttons = styled.div`
@@ -47,11 +47,14 @@ function generateTwoNumsWithDistance(distance, min, max) {
     return generateTwoNumsWithDistance(distance, min, max);
 }
 
-const AudioPlayer2 = ({ss, nss, setSS, setNSS}) => {
+const AudioPlayer2 = ({transcript, ss, nss, setSS, setNSS}) => {
     const [timelineVis, setTimelineVis] = useState(true);
     const [playbackSpeed, setPlaybackSpeed] = useState(1);
-
-
+    const [currentWordIndex, setCurrentWordIndex] = useState(1);
+    // const wordMap = JSON.stringify(transcript);
+    const wordMap = {"10": {"text": "My", "start": 0.3, "end": 0.54, "confidence": 0.784}, "11": {"text": "name", "start": 0.54, "end": 0.82, "confidence": 0.996}, "12": {"text": "is", "start": 0.82, "end": 2.38, "confidence": 0.993}, "13": {"text": "Ray", "start": 2.38, "end": 3.84, "confidence": 0.59}, "14": {"text": "Remnitz.", "start": 3.84, "end": 4.7, "confidence": 0.293}, "20": {"text": "I'm", "start": 4.78, "end": 8.64, "confidence": 0.248}, "21": {"text": "20", "start": 8.64, "end": 10.14, "confidence": 0.78}};
+    const wordKeys = Object.keys(wordMap).sort((a, b) => wordMap[a].start - wordMap[b].start);
+    console.log("wordkeys", wordKeys);
     const plugins = useMemo(() => {
         return [
             {
@@ -96,7 +99,7 @@ const AudioPlayer2 = ({ss, nss, setSS, setNSS}) => {
             wavesurferRef.current = waveSurfer;
 
             if (wavesurferRef.current) {
-                wavesurferRef.current.load("/test_audio.mp3");
+                wavesurferRef.current.load("/stutter_testing.mp3");
 
                 // wavesurferRef.current.on("region-created", regionCreatedHandler);
 
@@ -185,7 +188,6 @@ const AudioPlayer2 = ({ss, nss, setSS, setNSS}) => {
     }, [playbackSpeed]);
 
 
-
     const handleFileChange = (event) => {
         const file = event.target.files[0];
         const reader = new FileReader();
@@ -209,25 +211,70 @@ const AudioPlayer2 = ({ss, nss, setSS, setNSS}) => {
         setPlaybackSpeed(value);
     };
 
-    const handleKeyPress = (event) => {
-        if (event.key === 's') {
-            console.log("SS:", ss);
-            setSS(prevValue => prevValue+1);
-        }
-        if (event.key === 'n') {
-            setNSS(prevValue => prevValue+1);
-        }
-    };
 
+
+
+    // useEffect(() => {
+    //     console.log(wordKeys);
+    //     if (wavesurferRef.current) {
+    //         wavesurferRef.current.on('audioprocess', () => {
+    //             const currentTime = wavesurferRef.current.getCurrentTime();
+    //             // Check if the current time of the audio is within the start and end time of the current word.
+    //             const key = currentWordIndex.toString();
+    //             if (key in wordMap &&
+    //                 currentTime >= wordMap[key].start &&
+    //                 currentTime <= wordMap[key].end
+    //             ) {
+    //                 setCurrentWordIndex((prevIndex) => prevIndex + 1);
+    //             }
+    //         });
+    //     }
+    //     // console.log("Word Map:" + wordMap[key].start);
+    //     const handleKeyPress = (event) => {
+    //         if (event.key === 's') {
+    //             console.log("SS:", ss);
+    //             setSS(prevValue => prevValue + 1);
+    //         }
+    //         if (event.key === 'n') {
+    //             setNSS(prevValue => prevValue + 1);
+    //         }
+    //     };
+    //     window.addEventListener('keypress', handleKeyPress);
+    //     return () => {
+    //         window.removeEventListener('keypress', handleKeyPress);
+    //     }
+    // }, [wavesurferRef, wordKeys, currentWordIndex, transcript]);
 
     useEffect(() => {
 
-        window.addEventListener('keypress', handleKeyPress);
+        wavesurferRef.current.on('audioprocess', function(time) {
+            let newWordIndex = null;
+            Object.keys(transcript).forEach((key) => {
+                if (time >= transcript[key].start && time <= transcript[key].end) {
+                    newWordIndex = key;
+                }
+            });
+
+            if (newWordIndex !== currentWordIndex) {
+                setCurrentWordIndex(newWordIndex);
+            }
+        });
+
+        const handleKeyPress = (event) => {
+                    if (event.key === 's') {
+                        console.log("SS:", ss);
+                        setSS(prevValue => prevValue + 1);
+                    }
+                    if (event.key === 'n') {
+                        setNSS(prevValue => prevValue + 1);
+                    }
+                };
 
         return () => {
+            // wavesurferRef.current.destroy();
             window.removeEventListener('keypress', handleKeyPress);
         }
-    },[]);
+    }, [wavesurferRef, currentWordIndex]);
 
 
     return (
@@ -283,9 +330,18 @@ const AudioPlayer2 = ({ss, nss, setSS, setNSS}) => {
                             onChange={handleFileChange}
                         />
                     </Button>
-                    <Button variant={"contained"} onClick={() => setSS(ss+1)}>SS</Button>
-                    <Button variant={"contained"} onClick={() => setNSS(nss+1)}>NSS</Button>
+                    <Button variant={"contained"} onClick={() => setSS(ss + 1)}>SS</Button>
+                    <Button variant={"contained"} onClick={() => setNSS(nss + 1)}>NSS</Button>
                 </Stack>
+                <Box>
+                    <Typography variant={"h4"}>
+                        {Object.keys(transcript).map((key) => (
+                            <span key={key} style={{backgroundColor: currentWordIndex === key ? 'yellow' : 'transparent'}}>
+                                {transcript[key].text + ' '}
+                            </span>
+                        ))}
+                    </Typography>
+                </Box>
             </Stack>
         </MainCard>
     );
