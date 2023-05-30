@@ -18,6 +18,8 @@ import MainCard from "../../components/MainCard";
 import ZoomIn from '@mui/icons-material/ZoomIn';
 import ZoomOut from '@mui/icons-material/ZoomOut';
 import Speed from '@mui/icons-material/Speed';
+import {Key, Keyboard} from "@mui/icons-material";
+import KeyboardLegend from "./KeyboardLegend";
 
 // const Buttons = styled.div`
 //   display: inline-block;
@@ -56,7 +58,15 @@ const AudioPlayer2 = ({transcript, ss, nss, setSS, setNSS}) => {
     const [currentWordIndex, setCurrentWordIndex] = useState(1);
     const [zoomLevel, setZoomLevel] = useState(1);
     // const wordMap = JSON.stringify(transcript);
-    const wordMap = {"10": {"text": "My", "start": 0.3, "end": 0.54, "confidence": 0.784}, "11": {"text": "name", "start": 0.54, "end": 0.82, "confidence": 0.996}, "12": {"text": "is", "start": 0.82, "end": 2.38, "confidence": 0.993}, "13": {"text": "Ray", "start": 2.38, "end": 3.84, "confidence": 0.59}, "14": {"text": "Remnitz.", "start": 3.84, "end": 4.7, "confidence": 0.293}, "20": {"text": "I'm", "start": 4.78, "end": 8.64, "confidence": 0.248}, "21": {"text": "20", "start": 8.64, "end": 10.14, "confidence": 0.78}};
+    const wordMap = {
+        "10": {"text": "My", "start": 0.3, "end": 0.54, "confidence": 0.784},
+        "11": {"text": "name", "start": 0.54, "end": 0.82, "confidence": 0.996},
+        "12": {"text": "is", "start": 0.82, "end": 2.38, "confidence": 0.993},
+        "13": {"text": "Ray", "start": 2.38, "end": 3.84, "confidence": 0.59},
+        "14": {"text": "Remnitz.", "start": 3.84, "end": 4.7, "confidence": 0.293},
+        "20": {"text": "I'm", "start": 4.78, "end": 8.64, "confidence": 0.248},
+        "21": {"text": "20", "start": 8.64, "end": 10.14, "confidence": 0.78}
+    };
     const wordKeys = Object.keys(wordMap).sort((a, b) => wordMap[a].start - wordMap[b].start);
     const plugins = useMemo(() => {
         return [
@@ -132,16 +142,16 @@ const AudioPlayer2 = ({transcript, ss, nss, setSS, setNSS}) => {
                 });
 
                 wavesurferRef.current.on("seek", () => {
-                   const time = wavesurferRef.current.getCurrentTime();
-                   let newWordIndex = null;
-                   Object.keys(transcript).forEach((key) => {
-                       if (time >= transcript[key].start && time <= transcript[key].end) {
-                           newWordIndex = key;
-                       }
-                   });
-                   if (newWordIndex !== currentWordIndex) {
-                       setCurrentWordIndex(newWordIndex);
-                   }
+                    const time = wavesurferRef.current.getCurrentTime();
+                    let newWordIndex = null;
+                    Object.keys(transcript).forEach((key) => {
+                        if (time >= transcript[key].start && time <= transcript[key].end) {
+                            newWordIndex = key;
+                        }
+                    });
+                    if (newWordIndex !== currentWordIndex) {
+                        setCurrentWordIndex(newWordIndex);
+                    }
                 });
 
                 if (window) {
@@ -242,7 +252,7 @@ const AudioPlayer2 = ({transcript, ss, nss, setSS, setNSS}) => {
 
     useEffect(() => {
 
-        wavesurferRef.current.on('audioprocess', function(time) {
+        wavesurferRef.current.on('audioprocess', function (time) {
             let newWordIndex = null;
             Object.keys(transcript).forEach((key) => {
                 if (time >= transcript[key].start && time <= transcript[key].end) {
@@ -256,17 +266,17 @@ const AudioPlayer2 = ({transcript, ss, nss, setSS, setNSS}) => {
         });
 
         const handleKeyPress = (event) => {
-                    if (event.key === 's') {
-                        console.log("SS:", ss);
-                        setSS(prevValue => prevValue + 1);
-                    }
-                    if (event.key === 'n') {
-                        setNSS(prevValue => prevValue + 1);
-                    }
-                    if (event.key === ' ') {
-                        wavesurferRef.current.playPause();
-                    }
-                };
+            if (event.key === 's') {
+                console.log("SS:", ss);
+                setSS(prevValue => prevValue + 1);
+            }
+            if (event.key === 'n') {
+                setNSS(prevValue => prevValue + 1);
+            }
+            if (event.key === ' ') {
+                wavesurferRef.current.playPause();
+            }
+        };
         window.addEventListener('keypress', handleKeyPress);
         return () => {
             window.removeEventListener('keypress', handleKeyPress);
@@ -310,7 +320,7 @@ const AudioPlayer2 = ({transcript, ss, nss, setSS, setNSS}) => {
                             max={1}
                             value={playbackSpeed}
                             onChange={playbackSpeedHandler}
-                            sx={{width: 90, mr:10}}
+                            sx={{width: 90, mr: 10}}
                         />
                     </Box>
                     {/*<Button variant={"contained"} onClick={generateMarker}>Generate Marker</Button>*/}
@@ -319,7 +329,7 @@ const AudioPlayer2 = ({transcript, ss, nss, setSS, setNSS}) => {
                     <Button variant={"contained"} onClick={removeLastMarker}>Remove last marker</Button>
                     <Button variant={"contained"} onClick={toggleTimeline}>Toggle timeline</Button>
                     {/*<Button variant={"contained"} onClick={zoomIn}>Zoom In</Button>*/}
-                    <Button variant={"contained"} onClick={zoomReset}>Zoom Out</Button>
+                    {/*<Button variant={"contained"} onClick={zoomReset}>Zoom Out</Button>*/}
                     <Button
                         variant={"contained"}
                         component={"label"}
@@ -339,7 +349,7 @@ const AudioPlayer2 = ({transcript, ss, nss, setSS, setNSS}) => {
                             aria-label="Zoom"
                             defaultValue={1}
                             // getAriaValueText={valuetext}
-                            valueLabelDisplay="auto"
+                            // valueLabelDisplay="auto"
                             // step={10} // Adjust the step according to your needs
                             min={0} // Adjust the minimum zoom level according to your needs
                             max={100} // Adjust the maximum zoom level according to your needs
@@ -353,7 +363,8 @@ const AudioPlayer2 = ({transcript, ss, nss, setSS, setNSS}) => {
                     <Typography variant={"h4"}>
                         {Object.keys(transcript).map((key) => (
                             <React.Fragment>
-                                <span key={key} style={{backgroundColor: currentWordIndex === key ? '#ADD8E6' : 'transparent'}}>
+                                <span key={key}
+                                      style={{backgroundColor: currentWordIndex === key ? '#ADD8E6' : 'transparent'}}>
                                     {transcript[key].text}
                                 </span>{" "}
                             </React.Fragment>
