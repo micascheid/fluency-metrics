@@ -213,7 +213,7 @@ const AudioPlayer = ({transcript, ss, nss, setSS, setNSS}) => {
             if (event.key === 'n') {
                 setNSS(prevValue => prevValue + 1);
             }
-            if (event.key === ' ') {
+            if (event.key === ' ' && wavesurferRef.current) {
                 wavesurferRef.current.playPause();
             }
         };
