@@ -1,6 +1,6 @@
 import {React, useState} from 'react';
 import {Grid} from "@mui/material";
-import AudioPlayer2 from "./AudioPlayer2";
+import AudioPlayer from "./AudioPlayer";
 import FluencyCounts from "./FluencyCounts";
 import KeyboardLegend from "./KeyboardLegend";
 import ResultCard from "./ResultCard";
@@ -16,7 +16,7 @@ const DefaultDashboard = () => {
     return (
         <Grid container spacing={2}>
             <Grid item xs={12} sm={12} md={12} lg={12}>
-                <AudioPlayer2 transcript={test_json} ss={ss} nss={nss} setSS={setSS} setNSS={setNSS}/>
+                <AudioPlayer transcript={test_json} ss={ss} nss={nss} setSS={setSS} setNSS={setNSS}/>
             </Grid>
             <Grid item xs={12} sm={12} md={6} lg={6}>
                 <KeyboardLegend />
