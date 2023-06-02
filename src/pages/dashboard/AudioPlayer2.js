@@ -15,12 +15,7 @@ import MainCard from "../../components/MainCard";
 import ZoomIn from '@mui/icons-material/ZoomIn';
 import ZoomOut from '@mui/icons-material/ZoomOut';
 import Speed from '@mui/icons-material/Speed';
-
-// const Buttons = styled.div`
-//   display: inline-block;
-// `;
-
-// const Button = styled.button``;
+import axios from 'axios';
 
 /**
  * @param min
@@ -36,23 +31,27 @@ import Speed from '@mui/icons-material/Speed';
  */
 
 const AudioPlayer2 = ({transcript, ss, nss, setSS, setNSS}) => {
+    // VARIABLES
     const [timelineVis, setTimelineVis] = useState(true);
     const [playbackSpeed, setPlaybackSpeed] = useState(1);
     const [currentWordIndex, setCurrentWordIndex] = useState(1);
     const [zoomLevel, setZoomLevel] = useState(1);
     const [markers, setMarkers] = useState([]);
     const wavesurferRef = useRef();
-
+    const [audioFile, setAudioFile] = useState(null);
+    const [transcription, setTranscription] = useState(null);
     const waveformProps = {
         id: "waveform",
         cursorColor: "#000000",
         cursorWidth: 2,
     }
+
+    //FUNCTIONS
     const plugins = useMemo(() => {
         return [
             {
                 plugin: RegionsPlugin,
-                options: {dragSelection: true}
+                options: {dragSelection: false}
             },
             timelineVis && {
                 plugin: TimelinePlugin,
@@ -78,22 +77,15 @@ const AudioPlayer2 = ({transcript, ss, nss, setSS, setNSS}) => {
         }
     };
 
-
-    // use regions ref to pass it inside useCallback
-    // so it will use always the most fresh version of regions list
-    // const regionsRef = useRef(regions);
-
     const handleWSMount = useCallback(
         (waveSurfer) => {
             if (waveSurfer.markers) {
                 waveSurfer.clearMarkers();
             }
-
+            console.log("WS MOUNT");
             wavesurferRef.current = waveSurfer;
 
             if (wavesurferRef.current) {
-                wavesurferRef.current.load("/stutter_testing.mp3");
-
                 // wavesurferRef.current.on("region-created", regionCreatedHandler);
 
                 wavesurferRef.current.on("ready", () => {
@@ -107,26 +99,31 @@ const AudioPlayer2 = ({transcript, ss, nss, setSS, setNSS}) => {
                 wavesurferRef.current.on("loading", (data) => {
                     console.log("loading --> ", data);
                 });
+                // wavesurferRef.current.on("seek", () => {
+                //     if (transcription !== null) {
+                //         console.log("NOT NULL!");
+                //     }
+                //     const time = wavesurferRef.current.getCurrentTime();
+                //     let newWordIndex = null;
+                //     if (transcription) {
+                //         Object.keys(transcription).map((key) => {
+                //             if (time >= transcription[key].start && time <= transcription[key].end) {
+                //                 newWordIndex = key;
+                //             }
+                //         });
+                //         if (newWordIndex !== currentWordIndex) {
+                //             setCurrentWordIndex(newWordIndex);
+                //         }
+                //     }
+                // });
 
-                wavesurferRef.current.on("seek", () => {
-                    const time = wavesurferRef.current.getCurrentTime();
-                    let newWordIndex = null;
-                    Object.keys(transcript).forEach((key) => {
-                        if (time >= transcript[key].start && time <= transcript[key].end) {
-                            newWordIndex = key;
-                        }
-                    });
-                    if (newWordIndex !== currentWordIndex) {
-                        setCurrentWordIndex(newWordIndex);
-                    }
-                });
 
                 if (window) {
                     window.surferidze = wavesurferRef.current;
                 }
             }
         },
-        []
+        [wavesurferRef]
     );
 
     const removeLastMarker = useCallback(() => {
@@ -145,11 +142,10 @@ const AudioPlayer2 = ({transcript, ss, nss, setSS, setNSS}) => {
         }
     }, [playbackSpeed]);
 
-
     const handleFileChange = (event) => {
         const file = event.target.files[0];
+        setAudioFile(file);
         const reader = new FileReader();
-
         reader.onloadend = () => {
             if (wavesurferRef.current) {
                 wavesurferRef.current.loadBlob(new Blob([reader.result]));
@@ -169,21 +165,44 @@ const AudioPlayer2 = ({transcript, ss, nss, setSS, setNSS}) => {
         setPlaybackSpeed(value);
     };
 
-    useEffect(() => {
+    // BACKEND CALLS
+    const get_transcription = () => {
 
-        wavesurferRef.current.on('audioprocess', function (time) {
-            let newWordIndex = null;
-            Object.keys(transcript).forEach((key) => {
-                if (time >= transcript[key].start && time <= transcript[key].end) {
-                    newWordIndex = key;
+        const formData = new FormData();
+        console.log(audioFile.name);
+        formData.append('file', audioFile);
+        axios.post('http://127.0.0.1:5000/get_transcription', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        }).then(response => {
+            // handle the response;
+            console.log(response.data.transcription_obj);
+            const transcriptionObj = response.data.transcription_obj;
+            setTranscription(transcriptionObj);
+        }).catch(error => {
+            // handle the error
+
+        });
+    };
+
+
+    // USE EFFECT
+    useEffect(() => {
+        if (transcription !== null) {
+            wavesurferRef.current.on('audioprocess', function (time) {
+                let newWordIndex = null;
+                Object.keys(transcription).forEach((key) => {
+                    if (time >= transcription[key].start && time <= transcription[key].end) {
+                        newWordIndex = key;
+                    }
+                });
+
+                if (newWordIndex !== currentWordIndex) {
+                    setCurrentWordIndex(newWordIndex);
                 }
             });
-
-            if (newWordIndex !== currentWordIndex) {
-                setCurrentWordIndex(newWordIndex);
-            }
-        });
-
+        }
         const handleKeyPress = (event) => {
             if (event.key === 's') {
                 console.log("SS:", ss);
@@ -196,27 +215,51 @@ const AudioPlayer2 = ({transcript, ss, nss, setSS, setNSS}) => {
                 wavesurferRef.current.playPause();
             }
         };
+
+        if (transcription && wavesurferRef.current) {
+            wavesurferRef.current.on("seek", () => {
+                const time = wavesurferRef.current.getCurrentTime();
+                let newWordIndex = null;
+                if (transcription) {
+                    Object.keys(transcription).map((key) => {
+                        if (time >= transcription[key].start && time <= transcription[key].end) {
+                            newWordIndex = key;
+                        }
+                    });
+                    if (newWordIndex !== currentWordIndex) {
+                        setCurrentWordIndex(newWordIndex);
+                    }
+                }
+            });
+        }
         window.addEventListener('keypress', handleKeyPress);
         return () => {
             window.removeEventListener('keypress', handleKeyPress);
         }
-    }, [wavesurferRef, currentWordIndex]);
+    }, [transcription, wavesurferRef, currentWordIndex]);
 
 
     return (
         <MainCard>
             <Stack>
-                <WaveSurfer plugins={plugins} onMount={handleWSMount}>
-                    <WaveForm {...waveformProps}>
-                        {markers.map((marker) => (
-                            <Marker
-                                key={marker.label}
-                                {...marker}
-                            />
-                        ))}
-                    </WaveForm>
-                    <div id="timeline"/>
-                </WaveSurfer>
+                {audioFile ? (
+                    <WaveSurfer plugins={plugins} onMount={handleWSMount}>
+                        <WaveForm {...waveformProps}>
+                            {markers.map((marker) => (
+                                <Marker
+                                    key={marker.label}
+                                    {...marker}
+                                />
+                            ))}
+                        </WaveForm>
+                        <div id="timeline"/>
+                    </WaveSurfer>
+                ) : (
+                    <Box sx={{height: 128, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                        <Typography variant={"h2"}>Upload an audio file to get started!</Typography>
+                    </Box>
+                )}
+
                 <Box sx={{height: 10}}/>
                 <Stack spacing={1} direction={"row"}>
                     <Speed/>
@@ -237,15 +280,9 @@ const AudioPlayer2 = ({transcript, ss, nss, setSS, setNSS}) => {
                     </Box>
                     {/*<Button variant={"contained"} onClick={generateMarker}>Generate Marker</Button>*/}
                     <Button variant={"contained"} onClick={play}>Play / Pause</Button>
-                    {/*<Button variant={"contained"} onClick={removeLastRegion}>Remove last region</Button>*/}
                     <Button variant={"contained"} onClick={removeLastMarker}>Remove last marker</Button>
                     <Button variant={"contained"} onClick={toggleTimeline}>Toggle timeline</Button>
-                    {/*<Button variant={"contained"} onClick={zoomIn}>Zoom In</Button>*/}
-                    {/*<Button variant={"contained"} onClick={zoomReset}>Zoom Out</Button>*/}
-                    <Button
-                        variant={"contained"}
-                        component={"label"}
-                    >
+                    <Button variant={"contained"} component={"label"}>
                         Choose File
                         <input
                             type={"file"}
@@ -253,8 +290,11 @@ const AudioPlayer2 = ({transcript, ss, nss, setSS, setNSS}) => {
                             onChange={handleFileChange}
                         />
                     </Button>
-                    {/*<Button variant={"contained"} onClick={() => setSS(ss + 1)}>SS</Button>*/}
-                    {/*<Button variant={"contained"} onClick={() => setNSS(nss + 1)}>NSS</Button>*/}
+                    <Button variant={"contained"}
+                            onClick={get_transcription}
+                            disabled={audioFile === null}>
+                        Get Transcription
+                    </Button>
                     <ZoomOut/>
                     <Box sx={{width: 100}}>
                         <Slider
@@ -272,16 +312,18 @@ const AudioPlayer2 = ({transcript, ss, nss, setSS, setNSS}) => {
                     <ZoomIn/>
                 </Stack>
                 <Box>
-                    <Typography variant={"h4"}>
-                        {Object.keys(transcript).map((key) => (
-                            <React.Fragment>
-                                <span key={key}
+                    {transcription !== null &&
+                        <Typography variant={"h4"}>
+                            {Object.keys(transcription).map((key) => (
+                                <React.Fragment key={key}>
+                                <span
                                       style={{backgroundColor: currentWordIndex === key ? '#ADD8E6' : 'transparent'}}>
-                                    {transcript[key].text}
+                                    {transcription[key].text}
                                 </span>{" "}
-                            </React.Fragment>
-                        ))}
-                    </Typography>
+                                </React.Fragment>
+                            ))}
+                        </Typography>
+                    }
                 </Box>
             </Stack>
         </MainCard>
