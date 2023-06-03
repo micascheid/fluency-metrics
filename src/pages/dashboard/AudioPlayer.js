@@ -17,6 +17,7 @@ import ZoomOut from '@mui/icons-material/ZoomOut';
 import Speed from '@mui/icons-material/Speed';
 import axios from 'axios';
 import {CircularProgress} from "@mui/material";
+import WordComponent from "./WordComponent";
 /**
  * @param min
  * @param max
@@ -41,6 +42,7 @@ const AudioPlayer = ({transcript, ss, nss, setSS, setNSS}) => {
     const [audioFile, setAudioFile] = useState(null);
     const [transcription, setTranscription] = useState(null);
     const [loadingTranscription, setLoadingTranscription] = useState(false);
+    const [isPlaying, setIsPlaying] = useState(false);
     const waveformProps = {
         id: "waveform",
         cursorColor: "#000000",
@@ -78,6 +80,14 @@ const AudioPlayer = ({transcript, ss, nss, setSS, setNSS}) => {
         }
     };
 
+    const handleUpdateWord = (index, newWord) => {
+        setTranscription(prevTranscription => {
+            const updatedTranscription = {...prevTranscription};
+            updatedTranscription[index].text = newWord;
+            return updatedTranscription;
+        });
+    };
+
     const handleWSMount = useCallback(
         (waveSurfer) => {
             if (waveSurfer.markers) {
@@ -100,25 +110,6 @@ const AudioPlayer = ({transcript, ss, nss, setSS, setNSS}) => {
                 wavesurferRef.current.on("loading", (data) => {
                     console.log("loading --> ", data);
                 });
-                // wavesurferRef.current.on("seek", () => {
-                //     if (transcription !== null) {
-                //         console.log("NOT NULL!");
-                //     }
-                //     const time = wavesurferRef.current.getCurrentTime();
-                //     let newWordIndex = null;
-                //     if (transcription) {
-                //         Object.keys(transcription).map((key) => {
-                //             if (time >= transcription[key].start && time <= transcription[key].end) {
-                //                 newWordIndex = key;
-                //             }
-                //         });
-                //         if (newWordIndex !== currentWordIndex) {
-                //             setCurrentWordIndex(newWordIndex);
-                //         }
-                //     }
-                // });
-
-
                 if (window) {
                     window.surferidze = wavesurferRef.current;
                 }
@@ -136,9 +127,8 @@ const AudioPlayer = ({transcript, ss, nss, setSS, setNSS}) => {
     }, []);
 
     const play = useCallback(() => {
-        wavesurferRef.current.playPause();
-        wavesurferRef.current.setPlaybackRate(playbackSpeed);
         if (wavesurferRef.current) {
+            wavesurferRef.current.playPause();
             wavesurferRef.current.setPlaybackRate(playbackSpeed);
         }
     }, [playbackSpeed]);
@@ -188,9 +178,26 @@ const AudioPlayer = ({transcript, ss, nss, setSS, setNSS}) => {
         });
     };
 
+    const handleKeyPress = (event)=>  {
+        if (wavesurferRef.current) {
+            if (event.key === 's') {
+                console.log("SS:", ss);
+                setSS(prevValue => prevValue + 1);
+            }
+            if (event.key === 'n') {
+                setNSS(prevValue => prevValue + 1);
+            }
+            if (event.key === " ") {
+                event.preventDefault();
+                console.log("SPACE-BAR");
+                wavesurferRef.current.playPause();
+            }
+        }
+    };
 
     // USE EFFECT
     useEffect(() => {
+        console.log("USE EFFECT");
         if (transcription !== null) {
             wavesurferRef.current.on('audioprocess', function (time) {
                 let newWordIndex = null;
@@ -205,18 +212,6 @@ const AudioPlayer = ({transcript, ss, nss, setSS, setNSS}) => {
                 }
             });
         }
-        const handleKeyPress = (event) => {
-            if (event.key === 's') {
-                console.log("SS:", ss);
-                setSS(prevValue => prevValue + 1);
-            }
-            if (event.key === 'n') {
-                setNSS(prevValue => prevValue + 1);
-            }
-            if (event.key === ' ' && wavesurferRef.current) {
-                wavesurferRef.current.playPause();
-            }
-        };
 
         if (transcription && wavesurferRef.current) {
             wavesurferRef.current.on("seek", () => {
@@ -237,9 +232,14 @@ const AudioPlayer = ({transcript, ss, nss, setSS, setNSS}) => {
         window.addEventListener('keypress', handleKeyPress);
         return () => {
             window.removeEventListener('keypress', handleKeyPress);
+            if(wavesurferRef.current) {
+                wavesurferRef.current.un('audioprocess');
+                if (transcription && wavesurferRef.current) {
+                    wavesurferRef.current.un("seek");
+                }
+            }
         }
-    }, [transcription, wavesurferRef, currentWordIndex]);
-
+    }, [wavesurferRef, transcription]);
 
     return (
         <MainCard>
@@ -282,7 +282,11 @@ const AudioPlayer = ({transcript, ss, nss, setSS, setNSS}) => {
                         />
                     </Box>
                     {/*<Button variant={"contained"} onClick={generateMarker}>Generate Marker</Button>*/}
-                    <Button variant={"contained"} onClick={play} disabled={!audioFile}>Play / Pause</Button>
+                    <Button variant={"contained"} onClick={(event) => {
+                            play();
+                            event.currentTarget.blur();
+                        }}
+                            disabled={!audioFile}>Play / Pause</Button>
                     <Button variant={"contained"} onClick={removeLastMarker} disabled={!audioFile}>Remove last
                         marker</Button>
                     <Button variant={"contained"} onClick={toggleTimeline} disabled={!audioFile}>Toggle
@@ -327,10 +331,12 @@ const AudioPlayer = ({transcript, ss, nss, setSS, setNSS}) => {
                             <Typography variant={"h4"}>
                                 {Object.keys(transcription).map((key) => (
                                     <React.Fragment key={key}>
-                                    <span
-                                        style={{backgroundColor: currentWordIndex === key ? '#ADD8E6' : 'transparent'}}>
-                                        {transcription[key].text}
-                                    </span>{" "}
+                                        <WordComponent
+                                            word={transcription[key].text}
+                                            onUpdateWord={handleUpdateWord}
+                                            index={key}
+                                            style={{backgroundColor: currentWordIndex === key ? '#ADD8E6' : 'transparent'}}>
+                                        </WordComponent>{" "}
                                     </React.Fragment>
                                 ))}
                             </Typography>
