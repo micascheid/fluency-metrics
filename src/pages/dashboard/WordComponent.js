@@ -1,11 +1,25 @@
-import React, { useState } from 'react';
+import React, {useState, useRef} from 'react';
+import {Popover, TextField, styled, useTheme, Box} from '@mui/material';
+import {KeyboardArrowUp} from "@mui/icons-material";
 
-const WordComponent = ({word, onUpdateWord, index, currentWordIndex, style}) => {
+
+const CustomInput = styled(TextField)(({theme}) => ({
+    ...theme.typography.h5,
+    '& input': {
+        textAlign: 'center'
+    },
+}));
+
+const WordComponent = ({word, onUpdateWord, index, style}) => {
     const [isEditing, setIsEditing] = useState(false);
+    const [anchorEl, setAnchorEl] = useState(null);
     const [newWord, setNewWord] = useState(word);
 
-    const handleDoubleClick = () => {
-      setIsEditing(true);
+    const wordRef = useRef();
+
+    const handleDoubleClick = (event) => {
+        setIsEditing(true);
+        setAnchorEl(wordRef.current);
     };
 
     const handleChange = (event) => {
@@ -17,21 +31,55 @@ const WordComponent = ({word, onUpdateWord, index, currentWordIndex, style}) => 
         onUpdateWord(index, newWord);
     };
 
+    const handleClose = () => {
+        setIsEditing(false);
+    };
+
+    const handleKeyDown = (event) => {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            handleBlur();
+        }
+    }
+
+    const handleKeyPress = (event) => {
+        event.stopPropagation();
+    }
+
+    const open = Boolean(anchorEl);
 
     return (
-        isEditing ? (
-            <input
-                type="text"
-                value={newWord}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                size={newWord.length > 0 ? newWord.length : 1}
-            />
-        ) : (
-            <span onDoubleClick={handleDoubleClick} style={style}>
-                {word}
+        <>
+            <span
+                ref={wordRef}
+                onDoubleClick={handleDoubleClick}
+                style={style}
+            >
+              {word}
             </span>
-        )
+            <Popover
+                open={isEditing}
+                anchorEl={anchorEl}
+                onClose={handleClose}
+                anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'center',
+                }}
+                transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'center',
+                }}
+            >
+                <CustomInput
+                    autoFocus
+                    value={newWord}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    onKeyDown={handleKeyDown}
+                    onKeyPress={handleKeyPress}
+                />
+            </Popover>
+        </>
     );
 };
 
