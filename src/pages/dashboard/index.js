@@ -24,9 +24,6 @@ const DefaultDashboard = () => {
             <Grid item xs={12} sm={12} md={6} lg={6}>
                 <FluencyCounts ss={ss} nss={nss}/>
             </Grid>
-            <Grid item xs={12} sm={12} md={12} lg={12}>
-                <ResultCard transcript={test_json} ss={ss} nss={nss} setSS={setSS} setNSS={setNSS}/>
-            </Grid>
         </Grid>
     );
 };

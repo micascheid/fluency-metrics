@@ -197,7 +197,6 @@ const AudioPlayer = ({transcript, ss, nss, setSS, setNSS}) => {
 
     // USE EFFECT
     useEffect(() => {
-        console.log("USE EFFECT");
         if (transcription !== null) {
             wavesurferRef.current.on('audioprocess', function (time) {
                 let newWordIndex = null;
