@@ -3,7 +3,7 @@ import {Grid} from "@mui/material";
 import AudioPlayer from "./AudioPlayer";
 import FluencyCounts from "./FluencyCounts";
 import KeyboardLegend from "./KeyboardLegend";
-import ResultCard from "./ResultCard";
+
 
 const DefaultDashboard = () => {
     const [ss, setSS] = useState(0);
