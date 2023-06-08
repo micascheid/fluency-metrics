@@ -1,4 +1,4 @@
-import React, {useState, createContext, useCallback} from "react";
+import React, {useState, createContext, useCallback, useEffect} from "react";
 
 
 export const StutteredContext = createContext();
@@ -7,13 +7,13 @@ export const StutteredProvider = ({children}) => {
     // VARIABLES
     const [stutteredEventCount, setStutteredEventCount] = useState(0);
     const [stutteredEventsList, setStutteredEventsList] = useState([]);
-    const [totalSyllables, setTotalSyllables] = useState(0);
+    const [totalSyllableCount, setTotalSyllableCount] = useState(0);
     const [transcriptionObj, setTranscriptionObj] = useState(null);
+    const [ss, setSS] = useState(0);
     // const [stutteredEvent, setStutteredEvent] = useState(0);
 
     //FUNCTIONS
     const handleStutteredChange = (change) => {
-        console.log("CHANGE:", change);
         setStutteredEventCount(prevCount =>  prevCount+change);
     };
 
@@ -31,7 +31,7 @@ export const StutteredProvider = ({children}) => {
         setStutteredEventCount(prevCount => prevCount-1);
     };
 
-    const setAdjustedSyllables = (index, syllableCount) => {
+    const setAdjustedSyllableCount = (index, syllableCount) => {
         setTranscriptionObj(prevTranscription => {
            const updatedTranscription = {...prevTranscription};
            updatedTranscription[index].syllable_count = syllableCount;
@@ -39,23 +39,31 @@ export const StutteredProvider = ({children}) => {
         });
     };
     const countTotalSyllables = () => {
-        console.log("COUNTING THEM SYLLABLES YALL");
         let sum = 0;
         for (let key in transcriptionObj) {
             sum += transcriptionObj[key].syllable_count;
         }
-        setTotalSyllables(sum);
+        setTotalSyllableCount(sum);
     };
+
+    useEffect(() => {
+        if (stutteredEventCount > 0){
+            const ssPercentage = Math.round((stutteredEventCount/totalSyllableCount)*1000)/10;
+            setSS(ssPercentage);
+        }
+    }, [totalSyllableCount, stutteredEventCount]);
 
 
     const contextValues = {
         transcriptionObj,
-        totalSyllables,
+        totalSyllableCount,
         stutteredEventCount,
         stutteredEventsList,
         setTranscriptionObj,
         setStutteredEventCount,
-        setAdjustedSyllables,
+        setTotalSyllableCount,
+        ss,
+        setAdjustedSyllableCount,
         countTotalSyllables,
         handleStutteredChange,
         addStutteredEvent,

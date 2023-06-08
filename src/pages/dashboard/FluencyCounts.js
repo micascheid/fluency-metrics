@@ -4,7 +4,7 @@ import {Stack, Typography} from "@mui/material";
 import {StutteredContext} from "../../context/StutteredContext";
 
 const FluencyCounts = () => {
-    const { totalSyllables, stutteredEventCount } = useContext(StutteredContext);
+    const { totalSyllableCount, stutteredEventCount, ss } = useContext(StutteredContext);
 
 
 
@@ -12,8 +12,9 @@ const FluencyCounts = () => {
         <MainCard>
             <Typography variant={"h4"} sx={{pb: 3}}>Fluency Counts</Typography>
             <Stack direction={"column"}>
-                <Typography>Total Syllables: {totalSyllables}</Typography>
+                <Typography>Total Syllables: {totalSyllableCount}</Typography>
                 <Typography>Stuttered Events: {stutteredEventCount}</Typography>
+                <Typography>%SS: {ss}</Typography>
             </Stack>
         </MainCard>
 

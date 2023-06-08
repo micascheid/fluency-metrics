@@ -10,11 +10,6 @@ import StutteredEvents from "./StutteredEvents";
 const DefaultDashboard = () => {
     const [se, setSS] = useState(0);
     const [nss, setNSS] = useState(0);
-    const { stutteredCount } = useContext(StutteredContext);
-
-    useEffect(() => {
-        console.log("stuttered count:", stutteredCount);
-    }, [stutteredCount]);
 
 
     return (

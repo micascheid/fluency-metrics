@@ -41,7 +41,6 @@ const AudioPlayer = ({ss, nss, setSS, setNSS}) => {
     const [markers, setMarkers] = useState([]);
     const wavesurferRef = useRef();
     const [audioFile, setAudioFile] = useState(null);
-    // const [transcription, setTranscription] = useState(null);
     const [loadingTranscription, setLoadingTranscription] = useState(false);
     const { countTotalSyllables, setTranscriptionObj, transcriptionObj } = useContext(StutteredContext);
     const waveformProps = {
@@ -168,8 +167,6 @@ const AudioPlayer = ({ss, nss, setSS, setNSS}) => {
                 'Content-Type': 'multipart/form-data',
             },
         }).then(response => {
-            // handle the response;
-            // console.log(response.data.transcription_obj);
             const transcriptionObj = response.data.transcription_obj;
             setTranscriptionObj(transcriptionObj);
             countTotalSyllables();
@@ -185,7 +182,6 @@ const AudioPlayer = ({ss, nss, setSS, setNSS}) => {
     const handleKeyPress = (event)=>  {
         if (wavesurferRef.current) {
             if (event.key === 's') {
-                console.log("SS:", ss);
                 setSS(prevValue => prevValue + 1);
             }
             if (event.key === 'n') {
@@ -193,7 +189,6 @@ const AudioPlayer = ({ss, nss, setSS, setNSS}) => {
             }
             if (event.key === " ") {
                 event.preventDefault();
-                console.log("SPACE-BAR");
                 wavesurferRef.current.playPause();
             }
         }
@@ -351,7 +346,6 @@ const AudioPlayer = ({ss, nss, setSS, setNSS}) => {
                         }
                     </Box>
                 )}
-
             </Stack>
         </MainCard>
     );

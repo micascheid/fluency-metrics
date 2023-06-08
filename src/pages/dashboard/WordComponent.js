@@ -12,7 +12,7 @@ const CustomWordInput = styled(TextField)(({ theme }) => ({
 
 const CustomSyllableInput = styled(TextField)(({ theme }) => ({
     ...theme.typography.body1,
-    width: '40px',
+    width: '55px',
     '& input': {
         textAlign: 'center',
     },
@@ -22,14 +22,17 @@ const WordComponent = ({ word, word_obj, onUpdateWord, index, style }) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const [newWord, setNewWord] = useState(word);
     const [isStuttered, setIsStuttered] = useState(false);
-    const { addStutteredEvent, removeStutteredEvent, countTotalSyllables, setAdjustedSyllables } = useContext(StutteredContext);
-    const [syllableCount, setSyllableCount] = useState(word_obj.syllable_count);
+    const { addStutteredEvent, removeStutteredEvent, setAdjustedSyllableCount } = useContext(StutteredContext);
+    const [syllableCount, setSyllableCount] = useState(parseInt(word_obj.syllable_count));
     const handlePopoverOpen = (event) => {
         setAnchorEl(event.currentTarget);
     };
 
     const handlePopoverClose = () => {
-            setAnchorEl(null);
+        if (syllableCount === 0) {
+            setSyllableCount(word_obj.syllable_count);
+        }
+        setAnchorEl(null);
     };
 
     const handleChange = (event) => {
@@ -37,11 +40,13 @@ const WordComponent = ({ word, word_obj, onUpdateWord, index, style }) => {
     };
 
     const handleSyllableChange = (event) => {
-        const value = event.target.value;
+        const value = parseInt(event.target.value);
         const isValid = Number.isInteger(Number(value));
         if (isValid) {
             setSyllableCount(value);
-            // setAdjustedSyllables(index, value);
+            setAdjustedSyllableCount(index, value);
+        } else {
+            setSyllableCount(0);
         }
     };
 
@@ -100,6 +105,7 @@ const WordComponent = ({ word, word_obj, onUpdateWord, index, style }) => {
                             onKeyDown={handleKeyDown}
                         />
                         <CustomSyllableInput
+                            type={"number"}
                             value={syllableCount}
                             onChange={handleSyllableChange}
                         />
