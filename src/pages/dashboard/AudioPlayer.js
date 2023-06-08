@@ -3,7 +3,7 @@ import React, {
     useEffect,
     useRef,
     useState,
-    useMemo,
+    useMemo, useContext,
 } from "react";
 import {WaveSurfer, WaveForm, Region, Marker} from "wavesurfer-react";
 import "./styles.css";
@@ -18,6 +18,7 @@ import Speed from '@mui/icons-material/Speed';
 import axios from 'axios';
 import {CircularProgress} from "@mui/material";
 import WordComponent from "./WordComponent";
+import {StutteredContext} from "../../context/StutteredContext";
 /**
  * @param min
  * @param max
@@ -31,7 +32,7 @@ import WordComponent from "./WordComponent";
  * @returns {([*, *]|[*, *])|*[]}
  */
 
-const AudioPlayer = ({transcript, ss, nss, setSS, setNSS}) => {
+const AudioPlayer = ({ss, nss, setSS, setNSS}) => {
     // VARIABLES
     const [timelineVis, setTimelineVis] = useState(true);
     const [playbackSpeed, setPlaybackSpeed] = useState(1);
@@ -40,9 +41,9 @@ const AudioPlayer = ({transcript, ss, nss, setSS, setNSS}) => {
     const [markers, setMarkers] = useState([]);
     const wavesurferRef = useRef();
     const [audioFile, setAudioFile] = useState(null);
-    const [transcription, setTranscription] = useState(null);
+    // const [transcription, setTranscription] = useState(null);
     const [loadingTranscription, setLoadingTranscription] = useState(false);
-    const [isPlaying, setIsPlaying] = useState(false);
+    const { countTotalSyllables, setTranscriptionObj, transcriptionObj } = useContext(StutteredContext);
     const waveformProps = {
         id: "waveform",
         cursorColor: "#000000",
@@ -81,7 +82,7 @@ const AudioPlayer = ({transcript, ss, nss, setSS, setNSS}) => {
     };
 
     const handleUpdateWord = (index, newWord) => {
-        setTranscription(prevTranscription => {
+        setTranscriptionObj(prevTranscription => {
             const updatedTranscription = {...prevTranscription};
             updatedTranscription[index].text = newWord;
             return updatedTranscription;
@@ -168,12 +169,15 @@ const AudioPlayer = ({transcript, ss, nss, setSS, setNSS}) => {
             },
         }).then(response => {
             // handle the response;
-            console.log(response.data.transcription_obj);
+            // console.log(response.data.transcription_obj);
             const transcriptionObj = response.data.transcription_obj;
-            setTranscription(transcriptionObj);
+            setTranscriptionObj(transcriptionObj);
+            countTotalSyllables();
             setLoadingTranscription(false);
+
         }).catch(error => {
             // handle the error
+            console.log("ERROR handling get_transcription:", error);
             setLoadingTranscription(false);
         });
     };
@@ -197,11 +201,11 @@ const AudioPlayer = ({transcript, ss, nss, setSS, setNSS}) => {
 
     // USE EFFECT
     useEffect(() => {
-        if (transcription !== null) {
+        if (transcriptionObj) {
             wavesurferRef.current.on('audioprocess', function (time) {
                 let newWordIndex = null;
-                Object.keys(transcription).forEach((key) => {
-                    if (time >= transcription[key].start && time <= transcription[key].end) {
+                Object.keys(transcriptionObj).forEach((key) => {
+                    if (time >= transcriptionObj[key].start && time <= transcriptionObj[key].end) {
                         newWordIndex = key;
                     }
                 });
@@ -212,13 +216,13 @@ const AudioPlayer = ({transcript, ss, nss, setSS, setNSS}) => {
             });
         }
 
-        if (transcription && wavesurferRef.current) {
+        if (transcriptionObj && wavesurferRef.current) {
             wavesurferRef.current.on("seek", () => {
                 const time = wavesurferRef.current.getCurrentTime();
                 let newWordIndex = null;
-                if (transcription) {
-                    Object.keys(transcription).map((key) => {
-                        if (time >= transcription[key].start && time <= transcription[key].end) {
+                if (transcriptionObj) {
+                    Object.keys(transcriptionObj).map((key) => {
+                        if (time >= transcriptionObj[key].start && time <= transcriptionObj[key].end) {
                             newWordIndex = key;
                         }
                     });
@@ -228,17 +232,21 @@ const AudioPlayer = ({transcript, ss, nss, setSS, setNSS}) => {
                 }
             });
         }
+
+        if (transcriptionObj !== null){
+            countTotalSyllables();
+        }
         window.addEventListener('keypress', handleKeyPress);
         return () => {
             window.removeEventListener('keypress', handleKeyPress);
             if(wavesurferRef.current) {
                 wavesurferRef.current.un('audioprocess');
-                if (transcription && wavesurferRef.current) {
+                if (transcriptionObj && wavesurferRef.current) {
                     wavesurferRef.current.un("seek");
                 }
             }
         }
-    }, [wavesurferRef, transcription]);
+    }, [wavesurferRef, transcriptionObj]);
 
     return (
         <MainCard>
@@ -326,12 +334,13 @@ const AudioPlayer = ({transcript, ss, nss, setSS, setNSS}) => {
                     </Box>
                 ) : (
                     <Box sx={{pt: 2}}>
-                        {transcription !== null &&
+                        {transcriptionObj &&
                             <Typography variant={"h4"}>
-                                {Object.keys(transcription).map((key) => (
+                                {Object.keys(transcriptionObj).map((key) => (
                                     <React.Fragment key={key}>
                                         <WordComponent
-                                            word={transcription[key].text}
+                                            word={transcriptionObj[key].text}
+                                            word_obj={transcriptionObj[key]}
                                             onUpdateWord={handleUpdateWord}
                                             index={key}
                                             style={{backgroundColor: currentWordIndex === key ? '#ADD8E6' : 'transparent'}}>

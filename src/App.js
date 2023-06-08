@@ -8,7 +8,6 @@ import UserContext from "./context/UserContext";
 import {useNavigate} from "react-router-dom";
 import {signOut, onAuthStateChanged,} from "firebase/auth";
 import {auth} from './FirebaseConfig';
-import AudioPlayer from "./pages/dashboard/AudioPlayer";
 
 const App = () => {
     const [user, setUser] = useState(null);

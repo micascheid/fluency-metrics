@@ -1,38 +1,52 @@
-import React, {useState, useRef} from 'react';
-import {Popover, TextField, styled, useTheme, Box} from '@mui/material';
-import {KeyboardArrowUp} from "@mui/icons-material";
+import React, { useState, useRef, useContext } from 'react';
+import { Popover, TextField, styled, Stack } from '@mui/material';
+import { Checkbox, FormControlLabel } from '@mui/material';
+import { StutteredContext } from "../../context/StutteredContext";
 
-
-const CustomInput = styled(TextField)(({theme}) => ({
+const CustomWordInput = styled(TextField)(({ theme }) => ({
     ...theme.typography.h5,
     '& input': {
-        textAlign: 'center'
+        textAlign: 'center',
     },
 }));
 
-const WordComponent = ({word, onUpdateWord, index, style}) => {
-    const [isEditing, setIsEditing] = useState(false);
+const CustomSyllableInput = styled(TextField)(({ theme }) => ({
+    ...theme.typography.body1,
+    width: '40px',
+    '& input': {
+        textAlign: 'center',
+    },
+}));
+
+const WordComponent = ({ word, word_obj, onUpdateWord, index, style }) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const [newWord, setNewWord] = useState(word);
+    const [isStuttered, setIsStuttered] = useState(false);
+    const { addStutteredEvent, removeStutteredEvent, countTotalSyllables, setAdjustedSyllables } = useContext(StutteredContext);
+    const [syllableCount, setSyllableCount] = useState(word_obj.syllable_count);
+    const handlePopoverOpen = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
 
-    const wordRef = useRef();
-
-    const handleDoubleClick = (event) => {
-        setIsEditing(true);
-        setAnchorEl(wordRef.current);
+    const handlePopoverClose = () => {
+            setAnchorEl(null);
     };
 
     const handleChange = (event) => {
         setNewWord(event.target.value);
     };
 
-    const handleBlur = () => {
-        setIsEditing(false);
-        onUpdateWord(index, newWord);
+    const handleSyllableChange = (event) => {
+        const value = event.target.value;
+        const isValid = Number.isInteger(Number(value));
+        if (isValid) {
+            setSyllableCount(value);
+            // setAdjustedSyllables(index, value);
+        }
     };
 
-    const handleClose = () => {
-        setIsEditing(false);
+    const handleBlur = () => {
+        onUpdateWord(index, newWord);
     };
 
     const handleKeyDown = (event) => {
@@ -42,25 +56,30 @@ const WordComponent = ({word, onUpdateWord, index, style}) => {
         }
     }
 
-    const handleKeyPress = (event) => {
-        event.stopPropagation();
-    }
+    const handleStutteredChangeLocal = (event) => {
+        const checked = event.target.checked;
 
-    const open = Boolean(anchorEl);
+        if (checked) {
+            addStutteredEvent(word_obj, null, null, newWord, index);
+        } else {
+            removeStutteredEvent(index);
+        }
+        setIsStuttered(checked);
+    };
 
     return (
         <>
             <span
-                ref={wordRef}
-                onDoubleClick={handleDoubleClick}
+                onClick={handlePopoverOpen}
                 style={style}
             >
-              {word}
+                {word}
             </span>
             <Popover
-                open={isEditing}
+                // style={{pointerEvents: 'none'}}
+                open={Boolean(anchorEl)}
                 anchorEl={anchorEl}
-                onClose={handleClose}
+                // style={{pointerEvents: 'none'}}
                 anchorOrigin={{
                     vertical: 'bottom',
                     horizontal: 'center',
@@ -69,15 +88,33 @@ const WordComponent = ({word, onUpdateWord, index, style}) => {
                     vertical: 'top',
                     horizontal: 'center',
                 }}
+                onClose={handlePopoverClose}
+
             >
-                <CustomInput
-                    autoFocus
-                    value={newWord}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    onKeyDown={handleKeyDown}
-                    onKeyPress={handleKeyPress}
-                />
+                <div onMouseLeave={handlePopoverClose}>
+                    <Stack direction={"column"} sx={{ padding: 1 }}>
+                        <CustomWordInput
+                            autoFocus
+                            value={newWord}
+                            onChange={handleChange}
+                            onKeyDown={handleKeyDown}
+                        />
+                        <CustomSyllableInput
+                            value={syllableCount}
+                            onChange={handleSyllableChange}
+                        />
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    checked={isStuttered}
+                                    onChange={handleStutteredChangeLocal}
+                                    onClick={(e) => e.stopPropagation()}
+                                />
+                            }
+                            label={"Stuttered"}
+                        />
+                    </Stack>
+                </div>
             </Popover>
         </>
     );

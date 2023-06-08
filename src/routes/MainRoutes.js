@@ -9,6 +9,7 @@ import userContext from "../context/UserContext";
 import UserContext from "../context/UserContext";
 import {useNavigate} from "react-router-dom";
 import AuthGuard from "../pages/authentication/AuthGuard";
+import {StutteredContext, StutteredProvider} from "../context/StutteredContext";
 
 // render - dashboard
 const DashboardDefault = Loadable(lazy(() => import('pages/dashboard')));
@@ -29,14 +30,20 @@ const MainRoutes = {
     children: [
         {
             path: '/',
-            element: <DashboardDefault/>
+            element:
+                <StutteredProvider>
+                    <DashboardDefault/>
+                </StutteredProvider>
         },
         {
             path: 'dashboard',
             children: [
                 {
                     path: 'default',
-                    element: <DashboardDefault/>
+                    element:
+                        <StutteredProvider>
+                            <DashboardDefault/>
+                        </StutteredProvider>
                 }
             ]
         },
