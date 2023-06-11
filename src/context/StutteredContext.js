@@ -10,8 +10,15 @@ export const StutteredProvider = ({children}) => {
     const [totalSyllableCount, setTotalSyllableCount] = useState(0);
     const [transcriptionObj, setTranscriptionObj] = useState(null);
     const [ss, setSS] = useState(0);
-    // const [stutteredEvent, setStutteredEvent] = useState(0);
+    const [averageDuration, setAverageDuration] = useState(0);
+    const [psList, setPsList] = useState([]);
 
+/*
+    Repetition: 0
+    Prolongation: 1
+    Block: 2
+    Interjection: 3
+ */
     //FUNCTIONS
     const handleStutteredChange = (change) => {
         setStutteredEventCount(prevCount =>  prevCount+change);
@@ -46,15 +53,39 @@ export const StutteredProvider = ({children}) => {
         setTotalSyllableCount(sum);
     };
 
+    const calcAverageDuration = () => {
+        console.log(stutteredEventsList);
+        const values = Object.values(stutteredEventsList);
+        values.sort((a,b) => b.duration - a.duration);
+
+        const topThreeDurations = values.slice(0, 3).map(item=> item.duration);
+        const total = topThreeDurations.reduce((a, b) => a + b, 0);
+
+        return parseFloat((total / topThreeDurations.length).toFixed(2));
+
+    };
+
     useEffect(() => {
+        console.log("Event List:",stutteredEventsList)
+        //Set Frequency and Physical concomitants
         if (stutteredEventCount > 0){
             const ssPercentage = Math.round((stutteredEventCount/totalSyllableCount)*1000)/10;
             setSS(ssPercentage);
+
+            const new_list = Object.values(stutteredEventsList).map(obj => obj.ps);
+            setPsList(new_list);
         }
+
+        //Set Duration
+        if (stutteredEventCount >= 3) {
+            setAverageDuration(calcAverageDuration());
+        }
+
     }, [totalSyllableCount, stutteredEventCount]);
 
 
     const contextValues = {
+        averageDuration,
         transcriptionObj,
         totalSyllableCount,
         stutteredEventCount,
@@ -63,6 +94,7 @@ export const StutteredProvider = ({children}) => {
         setStutteredEventCount,
         setTotalSyllableCount,
         ss,
+        psList,
         setAdjustedSyllableCount,
         countTotalSyllables,
         handleStutteredChange,

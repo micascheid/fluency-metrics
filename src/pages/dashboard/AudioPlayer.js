@@ -45,8 +45,9 @@ const AudioPlayer = ({ss, nss, setSS, setNSS}) => {
     const { countTotalSyllables, setTranscriptionObj, transcriptionObj } = useContext(StutteredContext);
     const waveformProps = {
         id: "waveform",
-        cursorColor: "#000000",
+        cursorColor: "#000",
         cursorWidth: 2,
+
     }
 
     //FUNCTIONS
@@ -59,7 +60,8 @@ const AudioPlayer = ({ss, nss, setSS, setNSS}) => {
             timelineVis && {
                 plugin: TimelinePlugin,
                 options: {
-                    container: "#timeline"
+                    container: "#timeline",
+                    timeInterval: .1
                 }
             },
             {
@@ -173,7 +175,6 @@ const AudioPlayer = ({ss, nss, setSS, setNSS}) => {
             setLoadingTranscription(false);
 
         }).catch(error => {
-            // handle the error
             console.log("ERROR handling get_transcription:", error);
             setLoadingTranscription(false);
         });

@@ -1,16 +1,16 @@
-import React, { useState, useRef, useContext } from 'react';
-import { Popover, TextField, styled, Stack } from '@mui/material';
-import { Checkbox, FormControlLabel } from '@mui/material';
-import { StutteredContext } from "../../context/StutteredContext";
+import React, {useState, useRef, useContext} from 'react';
+import {Popover, TextField, styled, Stack, Divider, Typography, Button, Box} from '@mui/material';
+import {Checkbox, FormControlLabel} from '@mui/material';
+import {StutteredContext} from "../../context/StutteredContext";
 
-const CustomWordInput = styled(TextField)(({ theme }) => ({
+const CustomWordInput = styled(TextField)(({theme}) => ({
     ...theme.typography.h5,
     '& input': {
         textAlign: 'center',
     },
 }));
 
-const CustomSyllableInput = styled(TextField)(({ theme }) => ({
+const CustomSyllableInput = styled(TextField)(({theme}) => ({
     ...theme.typography.body1,
     width: '55px',
     '& input': {
@@ -18,20 +18,40 @@ const CustomSyllableInput = styled(TextField)(({ theme }) => ({
     },
 }));
 
-const WordComponent = ({ word, word_obj, onUpdateWord, index, style }) => {
+const dividerStyles = {
+    "&::before, &::after": {
+        borderColor: "lightgray",
+    },
+    pt: 2,
+}
+
+const WordComponent = ({word, word_obj, onUpdateWord, index, style}) => {
+    // VARIABLES
     const [anchorEl, setAnchorEl] = useState(null);
     const [newWord, setNewWord] = useState(word);
     const [isStuttered, setIsStuttered] = useState(false);
-    const { addStutteredEvent, removeStutteredEvent, setAdjustedSyllableCount } = useContext(StutteredContext);
+    const [type, setType] = useState(null);
+    const [ps, setps] = useState(null);
     const [syllableCount, setSyllableCount] = useState(parseInt(word_obj.syllable_count));
+    const typeMap = {0: "Repetition", 1: "Prolongation", 2: "Block", 3: "Interjection"};
+    const psList = [0, 1, 2, 3, 4, 5];
+    const {addStutteredEvent, removeStutteredEvent, setAdjustedSyllableCount} = useContext(StutteredContext);
+
+
+    /* NOTES
+        type: Please see stuttered context for map
+     */
+
+    // FUNCTIONS
     const handlePopoverOpen = (event) => {
         setAnchorEl(event.currentTarget);
     };
 
-    const handlePopoverClose = () => {
+    const handlePopoverClose = (event) => {
         if (syllableCount === 0) {
             setSyllableCount(word_obj.syllable_count);
         }
+        handleBlur();
         setAnchorEl(null);
     };
 
@@ -59,13 +79,17 @@ const WordComponent = ({ word, word_obj, onUpdateWord, index, style }) => {
             event.preventDefault();
             handleBlur();
         }
-    }
+    };
+
+    const handleKeyPress = (event) => {
+        event.stopPropagation();
+    };
 
     const handleStutteredChangeLocal = (event) => {
         const checked = event.target.checked;
 
         if (checked) {
-            addStutteredEvent(word_obj, null, null, newWord, index);
+            addStutteredEvent(word_obj, typeMap[type], ps, newWord, index);
         } else {
             removeStutteredEvent(index);
         }
@@ -81,10 +105,8 @@ const WordComponent = ({ word, word_obj, onUpdateWord, index, style }) => {
                 {word}
             </span>
             <Popover
-                // style={{pointerEvents: 'none'}}
                 open={Boolean(anchorEl)}
                 anchorEl={anchorEl}
-                // style={{pointerEvents: 'none'}}
                 anchorOrigin={{
                     vertical: 'bottom',
                     horizontal: 'center',
@@ -94,31 +116,63 @@ const WordComponent = ({ word, word_obj, onUpdateWord, index, style }) => {
                     horizontal: 'center',
                 }}
                 onClose={handlePopoverClose}
-
+                transitionDuration={0}
             >
                 <div onMouseLeave={handlePopoverClose}>
-                    <Stack direction={"column"} sx={{ padding: 1 }}>
+                    <Stack direction={"column"} sx={{padding: 1}}>
+                        <Divider textAlign={"left"} sx={dividerStyles}>Stuttered Event</Divider>
+                        <Box sx={{ display: 'flex', alignItems: "center", justifyContent: "left"}}>
+                            <Checkbox
+                                checked={isStuttered}
+                                onChange={handleStutteredChangeLocal}
+                                onClick={(e) => e.stopPropagation()}
+                            />
+                        </Box>
+                        <Divider textAlign={"left"} sx={dividerStyles}>Text</Divider>
                         <CustomWordInput
-                            autoFocus
                             value={newWord}
                             onChange={handleChange}
                             onKeyDown={handleKeyDown}
+                            onKeyPress={handleKeyPress}
+                            sx={{mb: 1}}
                         />
+                        <Divider textAlign={"left"} sx={dividerStyles}>Syllables</Divider>
                         <CustomSyllableInput
                             type={"number"}
                             value={syllableCount}
                             onChange={handleSyllableChange}
                         />
-                        <FormControlLabel
-                            control={
-                                <Checkbox
-                                    checked={isStuttered}
-                                    onChange={handleStutteredChangeLocal}
-                                    onClick={(e) => e.stopPropagation()}
+
+                        <Divider textAlign={"left"} sx={dividerStyles}>Type</Divider>
+                        <Stack direction={"row"}>
+                            {Object.keys(typeMap).map((key, ind) => (
+                                <FormControlLabel
+                                    key={ind}
+                                    control={
+                                        <Checkbox
+                                            checked={key === type}
+                                            onChange={() => setType(key)}
+                                        />}
+                                    label={typeMap[key]}
                                 />
-                            }
-                            label={"Stuttered"}
-                        />
+                            ))}
+                        </Stack>
+                        <Divider textAlign={"left"} sx={dividerStyles}>Physical Concomitants</Divider>
+                        <Stack direction={"row"}>
+                            {Object.keys(psList).map((ind) => (
+                                <FormControlLabel
+                                    key={ind}
+                                    control={
+                                        <Checkbox
+                                            checked={ind === ps}
+                                            onChange={() => setps(ind)}
+                                        />}
+                                    label={ind}
+                                />
+                            ))}
+                        </Stack>
+                        <Button variant={"contained"} sx={{width: '40px', mb: 1}}
+                                onClick={handlePopoverClose}>Done</Button>
                     </Stack>
                 </div>
             </Popover>

@@ -17,13 +17,10 @@ const DefaultDashboard = () => {
             <Grid item xs={12} sm={12} md={12} lg={12}>
                 <AudioPlayer ss={se} nss={nss} setSS={setSS} setNSS={setNSS}/>
             </Grid>
-            <Grid item xs={12} sm={12} md={12} lg={12}>
+            <Grid item xs={12} sm={12} md={8} lg={8}>
                 <StutteredEvents />
             </Grid>
-            {/*<Grid item xs={12} sm={12} md={6} lg={6}>*/}
-            {/*    <KeyboardLegend />*/}
-            {/*</Grid>*/}
-            <Grid item xs={12} sm={12} md={6} lg={6}>
+            <Grid item xs={12} sm={12} md={4} lg={4}>
                 <FluencyCounts />
             </Grid>
         </Grid>

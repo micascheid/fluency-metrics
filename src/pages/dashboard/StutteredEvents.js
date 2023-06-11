@@ -22,7 +22,8 @@ const StutteredEvents = () => {
 
 
     return (
-      <MainCard>
+      <MainCard sx={{minHeight: '400px'}}>
+          <Typography variant={"h4"} sx={{pb: 3}}>Disfluency Events</Typography>
           {stutteredEventsList.length > 0 ? (
               <DataGrid
                   rows={stutteredEventsList}
@@ -32,12 +33,13 @@ const StutteredEvents = () => {
                           paginationModel: {page: 0, pageSize: 2}
                       },
                   }}
+                  sx={{borderColor: '#000'}}
                   pageSizeOptions={[2,10]}
                   checkboxSelection
               />
           ) : (
            <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-               <Typography variant={"h4"}>Upload your audio file to get started!</Typography>
+               <Typography variant={"h4"}>Get or provide transcription and mark disfluency events to get started</Typography>
            </Box>
           )
           }
