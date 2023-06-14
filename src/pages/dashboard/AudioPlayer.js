@@ -10,7 +10,7 @@ import "./styles.css";
 import RegionsPlugin from "wavesurfer.js/dist/plugin/wavesurfer.regions.min";
 import TimelinePlugin from "wavesurfer.js/dist/plugin/wavesurfer.timeline.min";
 import MarkersPlugin from "wavesurfer.js/src/plugin/markers";
-import {Box, Button, Slider, Stack, Typography} from "@mui/material";
+import {Box, Button, FormControl, InputLabel, MenuItem, Select, Slider, Stack, Switch, Typography} from "@mui/material";
 import MainCard from "../../components/MainCard";
 import ZoomIn from '@mui/icons-material/ZoomIn';
 import ZoomOut from '@mui/icons-material/ZoomOut';
@@ -19,6 +19,7 @@ import axios from 'axios';
 import {CircularProgress} from "@mui/material";
 import WordComponent from "./WordComponent";
 import {StutteredContext} from "../../context/StutteredContext";
+import ModeSwitch from "../../components/ModeSwitch";
 /**
  * @param min
  * @param max
@@ -32,7 +33,7 @@ import {StutteredContext} from "../../context/StutteredContext";
  * @returns {([*, *]|[*, *])|*[]}
  */
 
-const AudioPlayer = ({ss, nss, setSS, setNSS}) => {
+const AudioPlayer = ({setSS, setNSS}) => {
     // VARIABLES
     const [timelineVis, setTimelineVis] = useState(true);
     const [playbackSpeed, setPlaybackSpeed] = useState(1);
@@ -47,7 +48,6 @@ const AudioPlayer = ({ss, nss, setSS, setNSS}) => {
         id: "waveform",
         cursorColor: "#000",
         cursorWidth: 2,
-
     }
 
     //FUNCTIONS

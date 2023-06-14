@@ -5,6 +5,8 @@ import FluencyCounts from "./FluencyCounts";
 import KeyboardLegend from "./KeyboardLegend";
 import {StutteredProvider, StutteredContext} from "../../context/StutteredContext";
 import StutteredEvents from "./StutteredEvents";
+import Mode from "./Mode";
+import Transcription from "./Transcription";
 
 
 const DefaultDashboard = () => {
@@ -15,7 +17,13 @@ const DefaultDashboard = () => {
     return (
         <Grid container spacing={2}>
             <Grid item xs={12} sm={12} md={12} lg={12}>
+                <Mode />
+            </Grid>
+            <Grid item xs={12} sm={12} md={12} lg={12}>
                 <AudioPlayer ss={se} nss={nss} setSS={setSS} setNSS={setNSS}/>
+            </Grid>
+            <Grid item xs={12} sm={12} md={12} lg={12}>
+                <Transcription/>
             </Grid>
             <Grid item xs={12} sm={12} md={8} lg={8}>
                 <StutteredEvents />
