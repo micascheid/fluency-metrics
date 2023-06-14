@@ -37,13 +37,21 @@ const AudioPlayer = ({setSS, setNSS}) => {
     // VARIABLES
     const [timelineVis, setTimelineVis] = useState(true);
     const [playbackSpeed, setPlaybackSpeed] = useState(1);
-    const [currentWordIndex, setCurrentWordIndex] = useState(1);
+    // const [currentWordIndex, setCurrentWordIndex] = useState(1);
     const [zoomLevel, setZoomLevel] = useState(1);
     const [markers, setMarkers] = useState([]);
     const wavesurferRef = useRef();
     const [audioFile, setAudioFile] = useState(null);
-    const [loadingTranscription, setLoadingTranscription] = useState(false);
-    const { countTotalSyllables, setTranscriptionObj, transcriptionObj } = useContext(StutteredContext);
+    // const [loadingTranscription, setLoadingTranscription] = useState(false);
+    const {
+        countTotalSyllables,
+        setTranscriptionObj,
+        transcriptionObj,
+        setLoadingTranscription,
+        setCurrentWordIndex,
+        currentWordIndex,
+    } = useContext(StutteredContext);
+
     const waveformProps = {
         id: "waveform",
         cursorColor: "#000",
@@ -80,14 +88,6 @@ const AudioPlayer = ({setSS, setNSS}) => {
         if (wavesurferRef.current) {
             wavesurferRef.current.zoom(value);
         }
-    };
-
-    const handleUpdateWord = (index, newWord) => {
-        setTranscriptionObj(prevTranscription => {
-            const updatedTranscription = {...prevTranscription};
-            updatedTranscription[index].text = newWord;
-            return updatedTranscription;
-        });
     };
 
     const handleWSMount = useCallback(
@@ -229,9 +229,6 @@ const AudioPlayer = ({setSS, setNSS}) => {
             });
         }
 
-        if (transcriptionObj !== null){
-            countTotalSyllables();
-        }
         window.addEventListener('keypress', handleKeyPress);
         return () => {
             window.removeEventListener('keypress', handleKeyPress);
@@ -312,9 +309,6 @@ const AudioPlayer = ({setSS, setNSS}) => {
                         <Slider
                             aria-label="Zoom"
                             defaultValue={1}
-                            // getAriaValueText={valuetext}
-                            // valueLabelDisplay="auto"
-                            // step={10} // Adjust the step according to your needs
                             min={0} // Adjust the minimum zoom level according to your needs
                             max={100} // Adjust the maximum zoom level according to your needs
                             value={zoomLevel}
@@ -324,29 +318,6 @@ const AudioPlayer = ({setSS, setNSS}) => {
                     </Box>
                     <ZoomIn/>
                 </Stack>
-                {loadingTranscription ? (
-                    <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', pt: 2}}>
-                        <CircularProgress/>
-                    </Box>
-                ) : (
-                    <Box sx={{pt: 2}}>
-                        {transcriptionObj &&
-                            <Typography variant={"h4"}>
-                                {Object.keys(transcriptionObj).map((key) => (
-                                    <React.Fragment key={key}>
-                                        <WordComponent
-                                            word={transcriptionObj[key].text}
-                                            word_obj={transcriptionObj[key]}
-                                            onUpdateWord={handleUpdateWord}
-                                            index={key}
-                                            style={{backgroundColor: currentWordIndex === key ? '#ADD8E6' : 'transparent'}}>
-                                        </WordComponent>{" "}
-                                    </React.Fragment>
-                                ))}
-                            </Typography>
-                        }
-                    </Box>
-                )}
             </Stack>
         </MainCard>
     );

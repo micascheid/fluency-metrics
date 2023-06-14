@@ -9,9 +9,11 @@ export const StutteredProvider = ({children}) => {
     const [stutteredEventsList, setStutteredEventsList] = useState([]);
     const [totalSyllableCount, setTotalSyllableCount] = useState(0);
     const [transcriptionObj, setTranscriptionObj] = useState(null);
+    const [currentWordIndex, setCurrentWordIndex] = useState(1);
     const [ss, setSS] = useState(0);
     const [averageDuration, setAverageDuration] = useState(0);
     const [psList, setPsList] = useState([]);
+    const [loadingTranscription, setLoadingTranscription] = useState(false);
 
 /*
     Repetition: 0
@@ -95,6 +97,10 @@ export const StutteredProvider = ({children}) => {
         setTotalSyllableCount,
         ss,
         psList,
+        loadingTranscription,
+        setLoadingTranscription,
+        setCurrentWordIndex,
+        currentWordIndex,
         setAdjustedSyllableCount,
         countTotalSyllables,
         handleStutteredChange,
