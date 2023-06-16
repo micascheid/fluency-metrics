@@ -1,10 +1,11 @@
 import {FormControl, Grid, InputLabel, MenuItem, Select, Typography} from "@mui/material";
-import React, {useState} from "react";
+import React, {useContext, useState} from "react";
 import MainCard from "../../components/MainCard";
+import {StutteredContext} from "../../context/StutteredContext";
 
 
 const Mode = () => {
-    const [mode, setMode] = useState('');
+    const {mode, setMode} = useContext(StutteredContext);
     const handleMode = (event) => {
         setMode(event.target.value);
     };
@@ -20,8 +21,8 @@ const Mode = () => {
                             value={mode}
                             onChange={handleMode}
                         >
-                            <MenuItem value={"Auto"}>Auto</MenuItem>
-                            <MenuItem value={"Manual"}>Manual</MenuItem>
+                            <MenuItem value={"auto"}>Auto</MenuItem>
+                            <MenuItem value={"manual"}>Manual</MenuItem>
                         </Select>
                     </FormControl>
                 </Grid>

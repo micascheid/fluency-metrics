@@ -14,6 +14,7 @@ export const StutteredProvider = ({children}) => {
     const [averageDuration, setAverageDuration] = useState(0);
     const [psList, setPsList] = useState([]);
     const [loadingTranscription, setLoadingTranscription] = useState(false);
+    const [mode, setMode] = useState('');
 
 /*
     Repetition: 0
@@ -67,6 +68,14 @@ export const StutteredProvider = ({children}) => {
 
     };
 
+    const handleWordUpdate = (index, newWord) => {
+        setTranscriptionObj(prevTranscription => {
+            const updatedTranscription = {...prevTranscription};
+            updatedTranscription[index].text = newWord;
+            return updatedTranscription;
+        });
+    };
+
     useEffect(() => {
         console.log("Event List:",stutteredEventsList)
         //Set Frequency and Physical concomitants
@@ -101,6 +110,9 @@ export const StutteredProvider = ({children}) => {
         setLoadingTranscription,
         setCurrentWordIndex,
         currentWordIndex,
+        mode,
+        setMode,
+        handleWordUpdate,
         setAdjustedSyllableCount,
         countTotalSyllables,
         handleStutteredChange,

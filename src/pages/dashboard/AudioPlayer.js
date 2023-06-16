@@ -16,22 +16,8 @@ import ZoomIn from '@mui/icons-material/ZoomIn';
 import ZoomOut from '@mui/icons-material/ZoomOut';
 import Speed from '@mui/icons-material/Speed';
 import axios from 'axios';
-import {CircularProgress} from "@mui/material";
-import WordComponent from "./WordComponent";
 import {StutteredContext} from "../../context/StutteredContext";
-import ModeSwitch from "../../components/ModeSwitch";
-/**
- * @param min
- * @param max
- * @returns {*}
- */
-
-/**
- * @param distance
- * @param min
- * @param max
- * @returns {([*, *]|[*, *])|*[]}
- */
+import {MANUAL} from "../../constants";
 
 const AudioPlayer = ({setSS, setNSS}) => {
     // VARIABLES
@@ -50,6 +36,7 @@ const AudioPlayer = ({setSS, setNSS}) => {
         setLoadingTranscription,
         setCurrentWordIndex,
         currentWordIndex,
+        mode,
     } = useContext(StutteredContext);
 
     const waveformProps = {
@@ -69,7 +56,7 @@ const AudioPlayer = ({setSS, setNSS}) => {
                 plugin: TimelinePlugin,
                 options: {
                     container: "#timeline",
-                    timeInterval: .1
+                    timeInterval: 1
                 }
             },
             {
@@ -170,6 +157,7 @@ const AudioPlayer = ({setSS, setNSS}) => {
             },
         }).then(response => {
             const transcriptionObj = response.data.transcription_obj;
+            console.log("TRANSCRIPTION OBJ: ", transcriptionObj);
             setTranscriptionObj(transcriptionObj);
             countTotalSyllables();
             setLoadingTranscription(false);
@@ -301,7 +289,7 @@ const AudioPlayer = ({setSS, setNSS}) => {
                     </Button>
                     <Button variant={"contained"}
                             onClick={get_transcription}
-                            disabled={audioFile === null}>
+                            disabled={audioFile === null || mode === MANUAL}>
                         Get Transcription
                     </Button>
                     <ZoomOut/>

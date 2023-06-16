@@ -2,6 +2,8 @@ import React, {useState, useRef, useContext} from 'react';
 import {Popover, TextField, styled, Stack, Divider, Typography, Button, Box} from '@mui/material';
 import {Checkbox, FormControlLabel} from '@mui/material';
 import {StutteredContext} from "../../context/StutteredContext";
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
 
 const CustomWordInput = styled(TextField)(({theme}) => ({
     ...theme.typography.h5,
@@ -35,6 +37,7 @@ const WordComponent = ({word, word_obj, onUpdateWord, index, style}) => {
     const [syllableCount, setSyllableCount] = useState(parseInt(word_obj.syllable_count));
     const typeMap = {0: "Repetition", 1: "Prolongation", 2: "Block", 3: "Interjection"};
     const psList = [0, 1, 2, 3, 4, 5];
+    const [isClicked, setIsClicked] = useState(false);
     const {addStutteredEvent, removeStutteredEvent, setAdjustedSyllableCount} = useContext(StutteredContext);
 
 
@@ -45,6 +48,7 @@ const WordComponent = ({word, word_obj, onUpdateWord, index, style}) => {
     // FUNCTIONS
     const handlePopoverOpen = (event) => {
         setAnchorEl(event.currentTarget);
+        setIsClicked(true);
     };
 
     const handlePopoverClose = (event) => {
@@ -53,6 +57,7 @@ const WordComponent = ({word, word_obj, onUpdateWord, index, style}) => {
         }
         handleBlur();
         setAnchorEl(null);
+        setIsClicked(false);
     };
 
     const handleChange = (event) => {
@@ -100,7 +105,9 @@ const WordComponent = ({word, word_obj, onUpdateWord, index, style}) => {
         <>
             <span
                 onClick={handlePopoverOpen}
-                style={style}
+                style={{
+                    ...style,
+                backgroundColor: isClicked ? 'yellow' : 'transparent'}}
             >
                 {word}
             </span>
@@ -120,6 +127,11 @@ const WordComponent = ({word, word_obj, onUpdateWord, index, style}) => {
             >
                 <div onMouseLeave={handlePopoverClose}>
                     <Stack direction={"column"} sx={{padding: 1}}>
+                        <Box display={"flex"} justifyContent={"right"}>
+                            <IconButton onClick={handlePopoverClose}>
+                                <CloseIcon/>
+                            </IconButton>
+                        </Box>
                         <Divider textAlign={"left"} sx={dividerStyles}>Stuttered Event</Divider>
                         <Box sx={{ display: 'flex', alignItems: "center", justifyContent: "left"}}>
                             <Checkbox

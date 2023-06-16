@@ -3,27 +3,24 @@ import MainCard from "../../components/MainCard";
 import {Box, CircularProgress, Typography} from "@mui/material";
 import {StutteredContext} from "../../context/StutteredContext";
 import WordComponent from "./WordComponent";
+import TranscriptionAuto from "./TranscriptionAuto";
+import TranscriptionManual from "./TranscriptionManual";
+import {AUTO, MANUAL} from "../../constants";
 
 
 const Transcription = () => {
     // variables
     const {
+        mode,
         countTotalSyllable,
         setTranscriptionObj,
         transcriptionObj,
         loadingTranscription,
         currentWordIndex,
+        countTotalSyllables,
     } = useContext(StutteredContext);
 
     // FUNCTIONS
-    const handleWordUpdate = (index, newWord) => {
-        setTranscriptionObj(prevTranscription => {
-            const updatedTranscription = {...prevTranscription};
-            updatedTranscription[index].text = newWord;
-            return updatedTranscription;
-        });
-    };
-
     useEffect(() => {
         if (transcriptionObj !== null){
             countTotalSyllables();
@@ -38,20 +35,11 @@ const Transcription = () => {
                 </Box>
             ) : (
                 <Box sx={{pt: 2}}>
-                    {transcriptionObj &&
-                        <Typography variant={"h4"}>
-                            {Object.keys(transcriptionObj).map((key) => (
-                                <Fragment key={key}>
-                                    <WordComponent
-                                        word={transcriptionObj[key].text}
-                                        word_obj={transcriptionObj[key]}
-                                        onUpdateWord={handleWordUpdate}
-                                        index={key}
-                                        style={{backgroundColor: currentWordIndex === key ? '#ADD8E6' : 'transparent'}}>
-                                    </WordComponent>{" "}
-                                </Fragment>
-                            ))}
-                        </Typography>
+                    {transcriptionObj && mode === AUTO &&
+                        <TranscriptionAuto />
+                    }
+                    {mode === MANUAL &&
+                        <TranscriptionManual />
                     }
                 </Box>
             )}
