@@ -12,11 +12,8 @@ const Transcription = () => {
     // variables
     const {
         mode,
-        countTotalSyllable,
-        setTranscriptionObj,
         transcriptionObj,
         loadingTranscription,
-        currentWordIndex,
         countTotalSyllables,
     } = useContext(StutteredContext);
 
@@ -34,7 +31,7 @@ const Transcription = () => {
                     <CircularProgress/>
                 </Box>
             ) : (
-                <Box sx={{pt: 2}}>
+                <Box>
                     {transcriptionObj && mode === AUTO &&
                         <TranscriptionAuto />
                     }

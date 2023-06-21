@@ -15,6 +15,7 @@ export const StutteredProvider = ({children}) => {
     const [psList, setPsList] = useState([]);
     const [loadingTranscription, setLoadingTranscription] = useState(false);
     const [mode, setMode] = useState('');
+    const [audioFileName, setAudioFileName]= useState('');
 
 /*
     Repetition: 0
@@ -112,6 +113,8 @@ export const StutteredProvider = ({children}) => {
         currentWordIndex,
         mode,
         setMode,
+        audioFileName,
+        setAudioFileName,
         handleWordUpdate,
         setAdjustedSyllableCount,
         countTotalSyllables,

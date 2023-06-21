@@ -1,4 +1,4 @@
-import {Fragment, React, useContext, useRef, useState} from "react";
+import {Fragment, React, useContext, useEffect, useRef, useState} from "react";
 import {Box, Button, Stack, TextField, Typography} from "@mui/material";
 import axios from 'axios';
 import {BASE_URL} from "../../constants";
@@ -9,6 +9,7 @@ import {StutteredContext} from "../../context/StutteredContext";
 const TranscriptionManual = () => {
     // VARIABLES
     const [editing, setEditing] = useState(true);
+    const [textFieldValue, setTextFieldValue] = useState('');
     const textFieldRef = useRef();
     const {
         transcriptionObj,
@@ -35,6 +36,24 @@ const TranscriptionManual = () => {
         }
     };
 
+    const handleTextFieldInitValue = () => {
+        let build_string = "";
+        Object.keys(transcriptionObj).forEach((key, index) => {
+            if (index === 0) {
+                build_string = transcriptionObj[key].text;
+            } else {
+                build_string = build_string + " " + transcriptionObj[key].text;
+            }
+        });
+        setTextFieldValue(build_string);
+    };
+
+    useEffect(() => {
+        if (transcriptionObj) {
+            handleTextFieldInitValue();
+        }
+    }, [editing, transcriptionObj]);
+
     return (
         <Stack spacing={1}>
             {editing ? (
@@ -46,7 +65,9 @@ const TranscriptionManual = () => {
                         variant={"outlined"}
                         multiline
                         fullWidth
-                        rows={5}
+                        minRows={3}
+                        maxRows={15}
+                        defaultValue={textFieldValue}
                         sx={{
                             '& .MuiInputBase-input.Mui-disabled': { WebkitTextFillColor: '#000000' },
                             '& .MuiInputBase-root': {fontSize: '18px'},

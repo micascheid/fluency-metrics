@@ -5,12 +5,12 @@ import React, {
     useState,
     useMemo, useContext,
 } from "react";
-import {WaveSurfer, WaveForm, Region, Marker} from "wavesurfer-react";
+import {WaveSurfer, WaveForm, Marker} from "wavesurfer-react";
 import "./styles.css";
 import RegionsPlugin from "wavesurfer.js/dist/plugin/wavesurfer.regions.min";
 import TimelinePlugin from "wavesurfer.js/dist/plugin/wavesurfer.timeline.min";
 import MarkersPlugin from "wavesurfer.js/src/plugin/markers";
-import {Box, Button, FormControl, InputLabel, MenuItem, Select, Slider, Stack, Switch, Typography} from "@mui/material";
+import {Box, Button, Slider, Stack, Typography} from "@mui/material";
 import MainCard from "../../components/MainCard";
 import ZoomIn from '@mui/icons-material/ZoomIn';
 import ZoomOut from '@mui/icons-material/ZoomOut';
@@ -23,12 +23,11 @@ const AudioPlayer = ({setSS, setNSS}) => {
     // VARIABLES
     const [timelineVis, setTimelineVis] = useState(true);
     const [playbackSpeed, setPlaybackSpeed] = useState(1);
-    // const [currentWordIndex, setCurrentWordIndex] = useState(1);
     const [zoomLevel, setZoomLevel] = useState(1);
     const [markers, setMarkers] = useState([]);
     const wavesurferRef = useRef();
     const [audioFile, setAudioFile] = useState(null);
-    // const [loadingTranscription, setLoadingTranscription] = useState(false);
+
     const {
         countTotalSyllables,
         setTranscriptionObj,
@@ -37,6 +36,7 @@ const AudioPlayer = ({setSS, setNSS}) => {
         setCurrentWordIndex,
         currentWordIndex,
         mode,
+        setAudioFileName,
     } = useContext(StutteredContext);
 
     const waveformProps = {
@@ -124,7 +124,11 @@ const AudioPlayer = ({setSS, setNSS}) => {
 
     const handleFileChange = (event) => {
         const file = event.target.files[0];
+        if (!file) {
+            return;
+        }
         setAudioFile(file);
+        setAudioFileName(file.name);
         const reader = new FileReader();
         reader.onloadend = () => {
             if (wavesurferRef.current) {
@@ -168,7 +172,7 @@ const AudioPlayer = ({setSS, setNSS}) => {
         });
     };
 
-    const handleKeyPress = (event)=>  {
+    const handleKeyPress = (event) => {
         if (wavesurferRef.current) {
             if (event.key === 's') {
                 setSS(prevValue => prevValue + 1);
@@ -190,7 +194,7 @@ const AudioPlayer = ({setSS, setNSS}) => {
                 let newWordIndex = null;
                 Object.keys(transcriptionObj).forEach((key) => {
                     if (time >= transcriptionObj[key].start && time <= transcriptionObj[key].end) {
-                        newWordIndex = key;
+                        newWordIndex = parseInt(key);
                     }
                 });
 
@@ -205,9 +209,11 @@ const AudioPlayer = ({setSS, setNSS}) => {
                 const time = wavesurferRef.current.getCurrentTime();
                 let newWordIndex = null;
                 if (transcriptionObj) {
-                    Object.keys(transcriptionObj).map((key) => {
+                    Object.keys(transcriptionObj).forEach((key) => {
+                        // const parsedKey = parseInt(key);
                         if (time >= transcriptionObj[key].start && time <= transcriptionObj[key].end) {
                             newWordIndex = key;
+
                         }
                     });
                     if (newWordIndex !== currentWordIndex) {
@@ -220,7 +226,7 @@ const AudioPlayer = ({setSS, setNSS}) => {
         window.addEventListener('keypress', handleKeyPress);
         return () => {
             window.removeEventListener('keypress', handleKeyPress);
-            if(wavesurferRef.current) {
+            if (wavesurferRef.current) {
                 wavesurferRef.current.un('audioprocess');
                 if (transcriptionObj && wavesurferRef.current) {
                     wavesurferRef.current.un("seek");
@@ -269,17 +275,25 @@ const AudioPlayer = ({setSS, setNSS}) => {
                             sx={{width: 90, mr: 10}}
                         />
                     </Box>
-                    {/*<Button variant={"contained"} onClick={generateMarker}>Generate Marker</Button>*/}
                     <Button variant={"contained"} onClick={(event) => {
-                            play();
-                            event.currentTarget.blur();
-                        }}
+                        play();
+                        event.currentTarget.blur();
+                    }}
                             disabled={!audioFile}>Play / Pause</Button>
-                    <Button variant={"contained"} onClick={removeLastMarker} disabled={!audioFile}>Remove last
+                    <Button variant={"contained"} onClick={(event)=>{
+                        removeLastMarker();
+                        event.currentTarget.blur();
+                    }} disabled={!audioFile}>Remove last
                         marker</Button>
-                    <Button variant={"contained"} onClick={toggleTimeline} disabled={!audioFile}>Toggle
+                    <Button variant={"contained"} onClick={(event)=>{
+                        toggleTimeline();
+                        event.currentTarget.blur();
+                    }} disabled={!audioFile}>
+                        Toggle
                         timeline</Button>
-                    <Button variant={"contained"} component={"label"}>
+                    <Button disabled={mode===''} variant={"contained"} component={"label"} onClick={(event) => {
+                    event.currentTarget.blur();
+                    }}>
                         Choose File
                         <input
                             type={"file"}
@@ -288,7 +302,10 @@ const AudioPlayer = ({setSS, setNSS}) => {
                         />
                     </Button>
                     <Button variant={"contained"}
-                            onClick={get_transcription}
+                            onClick={(event)=> {
+                                get_transcription();
+                                event.currentTarget.blur();
+                            }}
                             disabled={audioFile === null || mode === MANUAL}>
                         Get Transcription
                     </Button>

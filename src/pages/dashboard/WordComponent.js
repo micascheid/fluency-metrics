@@ -24,7 +24,7 @@ const dividerStyles = {
     "&::before, &::after": {
         borderColor: "lightgray",
     },
-    pt: 2,
+    pt: 1
 }
 
 const WordComponent = ({word, word_obj, onUpdateWord, index, style}) => {
@@ -38,7 +38,7 @@ const WordComponent = ({word, word_obj, onUpdateWord, index, style}) => {
     const typeMap = {0: "Repetition", 1: "Prolongation", 2: "Block", 3: "Interjection"};
     const psList = [0, 1, 2, 3, 4, 5];
     const [isClicked, setIsClicked] = useState(false);
-    const {addStutteredEvent, removeStutteredEvent, setAdjustedSyllableCount} = useContext(StutteredContext);
+    const {addStutteredEvent, currentWordIndex, removeStutteredEvent, setAdjustedSyllableCount} = useContext(StutteredContext);
 
 
     /* NOTES
@@ -51,13 +51,20 @@ const WordComponent = ({word, word_obj, onUpdateWord, index, style}) => {
         setIsClicked(true);
     };
 
-    const handlePopoverClose = (event) => {
+    const handlePopoverClose = () => {
         if (syllableCount === 0) {
             setSyllableCount(word_obj.syllable_count);
         }
+        handleStutteredEvent();
         handleBlur();
         setAnchorEl(null);
         setIsClicked(false);
+    };
+
+    const closePopover = () => {
+        handleBlur();
+        setAnchorEl(null);
+        setIsClicked(false)
     };
 
     const handleChange = (event) => {
@@ -66,11 +73,15 @@ const WordComponent = ({word, word_obj, onUpdateWord, index, style}) => {
 
     const handleSyllableChange = (event) => {
         const value = parseInt(event.target.value);
-        const isValid = Number.isInteger(Number(value));
-        if (isValid) {
+        console.log("Input value: ", event.target.value);
+        console.log("Parsed value: ", value);
+        // const isValid = Number.isNaN(value);
+        if (!Number.isNaN(value)) {
+            console.log("Setting syllableCount to ", value);
             setSyllableCount(value);
             setAdjustedSyllableCount(index, value);
         } else {
+            console.log("Setting syllableCount to 0");
             setSyllableCount(0);
         }
     };
@@ -90,15 +101,12 @@ const WordComponent = ({word, word_obj, onUpdateWord, index, style}) => {
         event.stopPropagation();
     };
 
-    const handleStutteredChangeLocal = (event) => {
-        const checked = event.target.checked;
-
-        if (checked) {
+    const handleStutteredEvent = () => {
+        if (isStuttered) {
             addStutteredEvent(word_obj, typeMap[type], ps, newWord, index);
         } else {
             removeStutteredEvent(index);
         }
-        setIsStuttered(checked);
     };
 
     return (
@@ -107,7 +115,7 @@ const WordComponent = ({word, word_obj, onUpdateWord, index, style}) => {
                 onClick={handlePopoverOpen}
                 style={{
                     ...style,
-                backgroundColor: isClicked ? 'yellow' : 'transparent'}}
+                    backgroundColor: isClicked ? 'yellow' : style.backgroundColor}}
             >
                 {word}
             </span>
@@ -122,21 +130,20 @@ const WordComponent = ({word, word_obj, onUpdateWord, index, style}) => {
                     vertical: 'top',
                     horizontal: 'center',
                 }}
-                onClose={handlePopoverClose}
+                onClose={closePopover}
                 transitionDuration={0}
             >
-                <div onMouseLeave={handlePopoverClose}>
-                    <Stack direction={"column"} sx={{padding: 1}}>
-                        <Box display={"flex"} justifyContent={"right"}>
-                            <IconButton onClick={handlePopoverClose}>
-                                <CloseIcon/>
-                            </IconButton>
-                        </Box>
+
+                <div onMouseLeave={closePopover}>
+                    <Stack direction={"column"} sx={{pl: 1, pb: 1}}>
+                        <IconButton sx={{mb: '-1'}} onClick={closePopover}>
+                            <CloseIcon/>
+                        </IconButton>
                         <Divider textAlign={"left"} sx={dividerStyles}>Stuttered Event</Divider>
                         <Box sx={{ display: 'flex', alignItems: "center", justifyContent: "left"}}>
                             <Checkbox
                                 checked={isStuttered}
-                                onChange={handleStutteredChangeLocal}
+                                onChange={()=>setIsStuttered(prevState => !prevState)}
                                 onClick={(e) => e.stopPropagation()}
                             />
                         </Box>
@@ -153,8 +160,9 @@ const WordComponent = ({word, word_obj, onUpdateWord, index, style}) => {
                             type={"number"}
                             value={syllableCount}
                             onChange={handleSyllableChange}
+                            disabled={!isStuttered}
+                            inputProps={{min: 0}}
                         />
-
                         <Divider textAlign={"left"} sx={dividerStyles}>Type</Divider>
                         <Stack direction={"row"}>
                             {Object.keys(typeMap).map((key, ind) => (
@@ -164,6 +172,7 @@ const WordComponent = ({word, word_obj, onUpdateWord, index, style}) => {
                                         <Checkbox
                                             checked={key === type}
                                             onChange={() => setType(key)}
+                                            disabled={!isStuttered}
                                         />}
                                     label={typeMap[key]}
                                 />
@@ -178,6 +187,7 @@ const WordComponent = ({word, word_obj, onUpdateWord, index, style}) => {
                                         <Checkbox
                                             checked={ind === ps}
                                             onChange={() => setps(ind)}
+                                            disabled={!isStuttered}
                                         />}
                                     label={ind}
                                 />
