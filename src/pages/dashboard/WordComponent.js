@@ -160,7 +160,7 @@ const WordComponent = ({word, word_obj, onUpdateWord, index, style}) => {
                             type={"number"}
                             value={syllableCount}
                             onChange={handleSyllableChange}
-                            disabled={!isStuttered}
+                            // disabled={!isStuttered}
                             inputProps={{min: 0}}
                         />
                         <Divider textAlign={"left"} sx={dividerStyles}>Type</Divider>

@@ -4,6 +4,7 @@ import axios from 'axios';
 import {BASE_URL} from "../../constants";
 import WordComponent from "./WordComponent";
 import {StutteredContext} from "../../context/StutteredContext";
+import ErrorBox from "./ErrorBox";
 
 
 const TranscriptionManual = () => {
@@ -15,14 +16,15 @@ const TranscriptionManual = () => {
         transcriptionObj,
         setTranscriptionObj,
         handleWordUpdate,
-        currentWordIndex} = useContext(StutteredContext);
+        currentWordIndex,
+        fileChosen} = useContext(StutteredContext);
 
     //FUNCTIONS
     const handleKeyPress = (event) => {
         event.stopPropagation();
     };
 
-    const manualTranscriptionHandler = () => {
+    const manualTranscriptionHandler = ({fileSelected}) => {
         setEditing(prevState => !prevState);
 
         if (editing) {
@@ -56,7 +58,14 @@ const TranscriptionManual = () => {
 
     return (
         <Stack spacing={1}>
-            {editing ? (
+            {!fileChosen &&
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                    <Typography variant={"h4"}>
+                        Choose an audio file to get started
+                    </Typography>
+                </Box>
+            }
+            {editing && fileChosen? (
                     <TextField
                         inputRef={textFieldRef}
                         onKeyPress={handleKeyPress}
@@ -89,18 +98,20 @@ const TranscriptionManual = () => {
                     ))}
                 </Typography>
             )}
-            <Button
-                onClick={manualTranscriptionHandler}
-                variant={"contained"}
-                sx={{width: 100}}
-            >
-                {editing ? (
-                    "Done"
-                ) : (
-                    "Edit"
-                )
-                }
-            </Button>
+            {fileChosen &&
+                <Button
+                    onClick={manualTranscriptionHandler}
+                    variant={"contained"}
+                    sx={{width: 100}}
+                >
+                    {editing ? (
+                        "Done"
+                    ) : (
+                        "Edit"
+                    )
+                    }
+                </Button>
+            }
         </Stack>
     );
 };

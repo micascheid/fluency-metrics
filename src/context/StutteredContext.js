@@ -16,13 +16,19 @@ export const StutteredProvider = ({children}) => {
     const [loadingTranscription, setLoadingTranscription] = useState(false);
     const [mode, setMode] = useState('');
     const [audioFileName, setAudioFileName]= useState('');
+    const [kiStutteredEventTimes, setkiStutteredEventTimes] = useState([]);
+    const [kiStutteredRegions, setkiStutteredRegions] = useState({});
+    const [fileChosen, setFileChosen] = useState(false);
+    const [longest3Durations, setLongest3Durations] = useState([1.1,2.2,3.3]);
 
-/*
-    Repetition: 0
-    Prolongation: 1
-    Block: 2
-    Interjection: 3
- */
+    /*
+        Repetition: 0
+        Prolongation: 1
+        Block: 2
+        Interjection: 3
+
+        stutteredEventList={1:{start: <>,end: <>}, {2:{start: <>,end: <>}}
+     */
     //FUNCTIONS
     const handleStutteredChange = (change) => {
         setStutteredEventCount(prevCount =>  prevCount+change);
@@ -69,6 +75,30 @@ export const StutteredProvider = ({children}) => {
 
     };
 
+    const longestDurations = (newRegions) => {
+        setLongest3Durations(() => {
+            let durations = [0,0,0];
+            if (newRegions !== undefined) {
+                durations = Object.values(newRegions).map(item => item.duration);
+                while (durations.length < 3) {
+                    durations.push(0);
+                }
+            }
+            durations.sort((a,b) => b - a);
+            durations = durations.slice(0,3).map(num => +num.toFixed(2));
+            console.log("DURATIONS: " + durations);
+            setAverageDuration(() => {
+               let avg = 0
+                Object.values(durations).map(duration => {
+                   avg += duration;
+               })
+                return parseFloat((avg/3).toFixed(2));
+            });
+            return durations.slice(0,3).map(num => +num.toFixed(2));
+        })
+
+        // return values.slice(0,3).map(item => item.duration);
+    };
     const handleWordUpdate = (index, newWord) => {
         setTranscriptionObj(prevTranscription => {
             const updatedTranscription = {...prevTranscription};
@@ -77,8 +107,36 @@ export const StutteredProvider = ({children}) => {
         });
     };
 
+    const kiStutteredEventsToStutteredRegions = () => {
+        let newRegions = [];
+        console.log("CREATING REGIONS: " + kiStutteredEventTimes);
+        for (let i = 0; i < kiStutteredEventTimes.length; i+=2){
+            if (!((i+1) === kiStutteredEventTimes.length)) {
+                const start = kiStutteredEventTimes[i];
+                const end = kiStutteredEventTimes[i+1];
+                const duration = end - start;
+                newRegions.push({id: (i/2), start: start, end: end, duration: duration});
+            }
+        }
+        setkiStutteredRegions(newRegions);
+        longestDurations(newRegions);
+
+    };
+
+    const durationAverageRegions = useCallback(() => {
+        let durations = [];
+        if (kiStutteredRegions % 2 === 0) {
+            for (let obj in kiStutteredRegions) {
+                console.log("START:", obj.start, " END:", obj.end);
+                durations.push(obj.end - obj.start);
+            }
+            console.log("DURATIONS:", durations);
+        }
+    }, [kiStutteredRegions]);
+
+
     useEffect(() => {
-        console.log("Event List:",stutteredEventsList)
+        console.log("Getting set in here");
         //Set Frequency and Physical concomitants
         if (stutteredEventCount > 0){
             const ssPercentage = Math.round((stutteredEventCount/totalSyllableCount)*1000)/10;
@@ -87,13 +145,14 @@ export const StutteredProvider = ({children}) => {
             const new_list = Object.values(stutteredEventsList).map(obj => obj.ps);
             setPsList(new_list);
         }
+        kiStutteredEventsToStutteredRegions();
 
         //Set Duration
         if (stutteredEventCount >= 3) {
             setAverageDuration(calcAverageDuration());
         }
 
-    }, [totalSyllableCount, stutteredEventCount]);
+    }, [totalSyllableCount, stutteredEventCount, kiStutteredEventTimes]);
 
 
     const contextValues = {
@@ -111,16 +170,22 @@ export const StutteredProvider = ({children}) => {
         setLoadingTranscription,
         setCurrentWordIndex,
         currentWordIndex,
+        kiStutteredEventTimes,
+        kiStutteredRegions,
+        setFileChosen,
+        fileChosen,
         mode,
         setMode,
         audioFileName,
         setAudioFileName,
         handleWordUpdate,
         setAdjustedSyllableCount,
+        setkiStutteredEventTimes,
         countTotalSyllables,
         handleStutteredChange,
         addStutteredEvent,
         removeStutteredEvent,
+        longest3Durations,
     }
 
     return (

@@ -6,6 +6,8 @@ import {StutteredContext} from "../../context/StutteredContext";
 
 const Mode = () => {
     const {mode, setMode} = useContext(StutteredContext);
+    const autoModeText = "Some text about auto mode";
+    const manualModeText = "Some text about manual mode";
     const handleMode = (event) => {
         setMode(event.target.value);
     };
@@ -27,10 +29,10 @@ const Mode = () => {
                     </FormControl>
                 </Grid>
                 <Grid item xs={5} sm={5} md={5} lg={5}>
-                    <Typography>-Some text about auto mode here</Typography>
+                    <Typography>{autoModeText}</Typography>
                 </Grid>
                 <Grid item xs={5} sm={5} md={5} lg={5}>
-                    <Typography>-Some text about manual mode here</Typography>
+                    <Typography>{manualModeText}</Typography>
                 </Grid>
             </Grid>
         </MainCard>

@@ -5,7 +5,7 @@ import React, {
     useState,
     useMemo, useContext,
 } from "react";
-import {WaveSurfer, WaveForm, Marker} from "wavesurfer-react";
+import {WaveSurfer, WaveForm, Marker, Region} from "wavesurfer-react";
 import "./styles.css";
 import RegionsPlugin from "wavesurfer.js/dist/plugin/wavesurfer.regions.min";
 import TimelinePlugin from "wavesurfer.js/dist/plugin/wavesurfer.timeline.min";
@@ -37,6 +37,9 @@ const AudioPlayer = ({setSS, setNSS}) => {
         currentWordIndex,
         mode,
         setAudioFileName,
+        kiStutteredRegions,
+        setkiStutteredEventTimes,
+        setFileChosen,
     } = useContext(StutteredContext);
 
     const waveformProps = {
@@ -61,7 +64,7 @@ const AudioPlayer = ({setSS, setNSS}) => {
             },
             {
                 plugin: MarkersPlugin,
-                options: {draggable: true}
+                options: {draggable: false}
             },
         ].filter(Boolean);
     }, [timelineVis]);
@@ -125,10 +128,12 @@ const AudioPlayer = ({setSS, setNSS}) => {
     const handleFileChange = (event) => {
         const file = event.target.files[0];
         if (!file) {
+            setFileChosen(false);
             return;
         }
         setAudioFile(file);
         setAudioFileName(file.name);
+        setFileChosen(true);
         const reader = new FileReader();
         reader.onloadend = () => {
             if (wavesurferRef.current) {
@@ -175,7 +180,9 @@ const AudioPlayer = ({setSS, setNSS}) => {
     const handleKeyPress = (event) => {
         if (wavesurferRef.current) {
             if (event.key === 's') {
+                const time  = wavesurferRef.current.getCurrentTime();
                 setSS(prevValue => prevValue + 1);
+                addStutteredTime(time);
             }
             if (event.key === 'n') {
                 setNSS(prevValue => prevValue + 1);
@@ -187,6 +194,18 @@ const AudioPlayer = ({setSS, setNSS}) => {
         }
     };
 
+    const addStutteredTime = (time) => {
+        setkiStutteredEventTimes(prevTimes => {
+            const newList = [...prevTimes, time];
+            newList.sort((a, b) => a - b);
+            return newList;
+        })
+    };
+
+    const handleRegionUpdate = useCallback((region, smth) => {
+      console.log("Dragging Region", region);
+        console.log(smth);
+    },[]);
     // USE EFFECT
     useEffect(() => {
         if (transcriptionObj) {
@@ -210,10 +229,8 @@ const AudioPlayer = ({setSS, setNSS}) => {
                 let newWordIndex = null;
                 if (transcriptionObj) {
                     Object.keys(transcriptionObj).forEach((key) => {
-                        // const parsedKey = parseInt(key);
                         if (time >= transcriptionObj[key].start && time <= transcriptionObj[key].end) {
                             newWordIndex = key;
-
                         }
                     });
                     if (newWordIndex !== currentWordIndex) {
@@ -245,6 +262,13 @@ const AudioPlayer = ({setSS, setNSS}) => {
                                 <Marker
                                     key={marker.label}
                                     {...marker}
+                                />
+                            ))}
+                            {kiStutteredRegions.map((regionProps) => (
+                                <Region
+                                    key={regionProps.id}
+                                    {...regionProps}
+                                    onUpdateEnd={handleRegionUpdate}
                                 />
                             ))}
                         </WaveForm>

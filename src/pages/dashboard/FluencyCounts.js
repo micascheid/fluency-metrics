@@ -1,6 +1,6 @@
 import React, {useContext} from 'react';
 import MainCard from "../../components/MainCard";
-import {Divider, Stack, Typography} from "@mui/material";
+import {Divider, List, Stack, Typography} from "@mui/material";
 import {StutteredContext} from "../../context/StutteredContext";
 import {styled} from "@mui/material/styles";
 
@@ -11,7 +11,7 @@ const dividerStyles = {
     pt: 3,
 }
 const FluencyCounts = () => {
-    const { totalSyllableCount, stutteredEventCount, ss, averageDuration, psList } = useContext(StutteredContext);
+    const { totalSyllableCount, stutteredEventCount, ss, averageDuration, psList, longest3Durations } = useContext(StutteredContext);
 
 
     return (
@@ -24,6 +24,14 @@ const FluencyCounts = () => {
                 <Typography>%SS: {ss}</Typography>
                 <Divider textAlign={"left"} sx={dividerStyles}><Typography variant={"h5"}>Duration</Typography></Divider>
                 <Typography>Average: {averageDuration}</Typography>
+                <Typography>Longest Three:</Typography>
+                {Object.values(longest3Durations).map((duration, index) => {
+                        if (duration !== 0) {
+                            return <Typography key={index}>{duration}</Typography>
+                        }
+                        return null;
+                    }
+                )}
                 <Divider textAlign={"left"} sx={dividerStyles}><Typography variant={"h5"}>Physical Concomitants</Typography></Divider>
                 <Typography>{psList}</Typography>
             </Stack>
