@@ -26,7 +26,7 @@ const AudioPlayer = ({setSS, setNSS}) => {
     const [zoomLevel, setZoomLevel] = useState(1);
     const [markers, setMarkers] = useState([]);
     const wavesurferRef = useRef();
-    const [audioFile, setAudioFile] = useState(null);
+    // const [audioFile, setAudioFile] = useState(null);
 
     const {
         countTotalSyllables,
@@ -36,6 +36,7 @@ const AudioPlayer = ({setSS, setNSS}) => {
         setCurrentWordIndex,
         currentWordIndex,
         mode,
+        audioFile,
         setAudioFileName,
         kiStutteredRegions,
         setkiStutteredEventTimes,
@@ -125,22 +126,15 @@ const AudioPlayer = ({setSS, setNSS}) => {
         }
     }, [playbackSpeed]);
 
-    const handleFileChange = (event) => {
-        const file = event.target.files[0];
-        if (!file) {
-            setFileChosen(false);
-            return;
-        }
-        setAudioFile(file);
-        setAudioFileName(file.name);
-        setFileChosen(true);
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            if (wavesurferRef.current) {
+    const loadAudioFile = (file) => {
+        console.log("Setting Audio File");
+        if (file && wavesurferRef.current) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
                 wavesurferRef.current.loadBlob(new Blob([reader.result]));
             }
-        };
-        reader.readAsArrayBuffer(file);
+            reader.readAsArrayBuffer(file)
+        }
     };
 
     const valuetext = (value) => {
@@ -208,6 +202,7 @@ const AudioPlayer = ({setSS, setNSS}) => {
     },[]);
     // USE EFFECT
     useEffect(() => {
+        loadAudioFile(audioFile);
         if (transcriptionObj) {
             wavesurferRef.current.on('audioprocess', function (time) {
                 let newWordIndex = null;
@@ -250,7 +245,7 @@ const AudioPlayer = ({setSS, setNSS}) => {
                 }
             }
         }
-    }, [wavesurferRef, transcriptionObj]);
+    }, [wavesurferRef, transcriptionObj, audioFile]);
 
     return (
         <MainCard>
@@ -315,16 +310,16 @@ const AudioPlayer = ({setSS, setNSS}) => {
                     }} disabled={!audioFile}>
                         Toggle
                         timeline</Button>
-                    <Button disabled={mode===''} variant={"contained"} component={"label"} onClick={(event) => {
-                    event.currentTarget.blur();
-                    }}>
-                        Choose File
-                        <input
-                            type={"file"}
-                            hidden
-                            onChange={handleFileChange}
-                        />
-                    </Button>
+                    {/*<Button disabled={mode===''} variant={"contained"} component={"label"} onClick={(event) => {*/}
+                    {/*event.currentTarget.blur();*/}
+                    {/*}}>*/}
+                    {/*    Choose File*/}
+                    {/*    <input*/}
+                    {/*        type={"file"}*/}
+                    {/*        hidden*/}
+                    {/*        onChange={handleFileChange}*/}
+                    {/*    />*/}
+                    {/*</Button>*/}
                     <Button variant={"contained"}
                             onClick={(event)=> {
                                 get_transcription();

@@ -16,6 +16,7 @@ export const StutteredProvider = ({children}) => {
     const [loadingTranscription, setLoadingTranscription] = useState(false);
     const [mode, setMode] = useState('');
     const [audioFileName, setAudioFileName]= useState('');
+    const [audioFile, setAudioFile] = useState(null);
     const [kiStutteredEventTimes, setkiStutteredEventTimes] = useState([]);
     const [kiStutteredRegions, setkiStutteredRegions] = useState({});
     const [fileChosen, setFileChosen] = useState(false);
@@ -177,6 +178,8 @@ export const StutteredProvider = ({children}) => {
         setMode,
         audioFileName,
         setAudioFileName,
+        setAudioFile,
+        audioFile,
         handleWordUpdate,
         setAdjustedSyllableCount,
         setkiStutteredEventTimes,
