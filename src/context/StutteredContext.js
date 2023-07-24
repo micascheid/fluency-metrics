@@ -86,7 +86,7 @@ export const StutteredProvider = ({children}) => {
             }
             durations.sort((a,b) => b - a);
             durations = durations.slice(0,3).map(num => +num.toFixed(2));
-            console.log("DURATIONS: " + durations);
+
             setAverageDuration(() => {
                let avg = 0
                 Object.values(durations).map(duration => {
@@ -109,7 +109,6 @@ export const StutteredProvider = ({children}) => {
 
     const kiStutteredEventsToStutteredRegions = () => {
         let newRegions = [];
-        console.log("CREATING REGIONS: " + kiStutteredEventTimes);
         for (let i = 0; i < kiStutteredEventTimes.length; i+=2){
             if (!((i+1) === kiStutteredEventTimes.length)) {
                 const start = kiStutteredEventTimes[i];

@@ -24,14 +24,16 @@ const FluencyCounts = () => {
                 <Typography>%SS: {ss}</Typography>
                 <Divider textAlign={"left"} sx={dividerStyles}><Typography variant={"h5"}>Duration</Typography></Divider>
                 <Typography>Average: {averageDuration}</Typography>
-                <Typography>Longest Three:</Typography>
-                {Object.values(longest3Durations).map((duration, index) => {
-                        if (duration !== 0) {
-                            return <Typography key={index}>{duration}</Typography>
+                <Stack direction={"row"}>
+                    <Typography>Longest Three: </Typography>
+                    {Object.values(longest3Durations).map((duration, index) => {
+                            if (duration !== 0) {
+                                return <Typography style={{paddingLeft: "8px", textDecoration: "underline"}} key={index}>{duration}</Typography>
+                            }
+                            return null;
                         }
-                        return null;
-                    }
-                )}
+                    )}
+                </Stack>
                 <Divider textAlign={"left"} sx={dividerStyles}><Typography variant={"h5"}>Physical Concomitants</Typography></Divider>
                 <Typography>{psList}</Typography>
             </Stack>
