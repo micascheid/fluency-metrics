@@ -200,9 +200,13 @@ const AudioPlayer = ({setSS, setNSS}) => {
       console.log("Dragging Region", region);
         console.log(smth);
     },[]);
-    // USE EFFECT
+
+    // USE EFFECTS
     useEffect(() => {
         loadAudioFile(audioFile);
+    },[audioFile]);
+
+    useEffect(() => {
         if (transcriptionObj) {
             wavesurferRef.current.on('audioprocess', function (time) {
                 let newWordIndex = null;
@@ -245,7 +249,7 @@ const AudioPlayer = ({setSS, setNSS}) => {
                 }
             }
         }
-    }, [wavesurferRef, transcriptionObj, audioFile]);
+    }, [wavesurferRef, transcriptionObj]);
 
     return (
         <MainCard>
@@ -299,11 +303,6 @@ const AudioPlayer = ({setSS, setNSS}) => {
                         event.currentTarget.blur();
                     }}
                             disabled={!audioFile}>Play / Pause</Button>
-                    <Button variant={"contained"} onClick={(event)=>{
-                        removeLastMarker();
-                        event.currentTarget.blur();
-                    }} disabled={!audioFile}>Remove last
-                        marker</Button>
                     <Button variant={"contained"} onClick={(event)=>{
                         toggleTimeline();
                         event.currentTarget.blur();

@@ -24,7 +24,7 @@ const TranscriptionManual = () => {
         event.stopPropagation();
     };
 
-    const manualTranscriptionHandler = ({fileSelected}) => {
+    const manualTranscriptionHandler = () => {
         setEditing(prevState => !prevState);
 
         if (editing) {
@@ -100,7 +100,11 @@ const TranscriptionManual = () => {
             )}
             {fileChosen &&
                 <Button
-                    onClick={manualTranscriptionHandler}
+                    onClick={(event) => {
+                        manualTranscriptionHandler();
+                        event.currentTarget.blur();
+                    }
+                    }
                     variant={"contained"}
                     sx={{width: 100}}
                 >

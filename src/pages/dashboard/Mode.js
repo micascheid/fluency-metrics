@@ -26,7 +26,7 @@ const Mode = () => {
         <MainCard>
             <Grid container spacing={2}>
                 <Grid item xs={2} sm={2} md={2} lg={2}>
-                    <Stack spacing={2}>
+                    <Stack style={{maxWidth: "120px"}} spacing={2}>
                         <FormControl>
                             <InputLabel>Mode</InputLabel>
                             <Select
