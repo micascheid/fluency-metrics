@@ -5,7 +5,7 @@ import {StutteredContext} from "../../context/StutteredContext";
 
 
 const Mode = () => {
-    const {mode, setMode, setFileChosen, audioFile, setAudioFile, setAudioFileName} = useContext(StutteredContext);
+    const {mode, setMode, setFileChosen, setAudioFile, setAudioFileName, audioFileName} = useContext(StutteredContext);
     const autoModeText = "Some text about auto mode";
     const manualModeText = "Some text about manual mode";
     const handleMode = (event) => {
@@ -26,7 +26,7 @@ const Mode = () => {
         <MainCard>
             <Grid container spacing={2}>
                 <Grid item xs={2} sm={2} md={2} lg={2}>
-                    <Stack style={{maxWidth: "120px"}} spacing={2}>
+                    <Stack style={{maxWidth: "120px"}} >
                         <FormControl>
                             <InputLabel>Mode</InputLabel>
                             <Select
@@ -35,11 +35,11 @@ const Mode = () => {
                                 value={mode}
                                 onChange={handleMode}
                             >
-                                <MenuItem value={"auto"}>Auto</MenuItem>
                                 <MenuItem value={"manual"}>Manual</MenuItem>
+                                <MenuItem value={"auto"}>Auto</MenuItem>
                             </Select>
                         </FormControl>
-                        <Button disabled={mode === ''} variant={"contained"} component={"label"} onClick={(event) => {
+                        <Button sx={{mt: 2}} disabled={mode === ''} variant={"contained"} component={"label"} onClick={(event) => {
                             event.currentTarget.blur();
                         }}>
                             Choose File
@@ -49,6 +49,7 @@ const Mode = () => {
                                 onChange={handleFileChange}
                             />
                         </Button>
+                        <Typography variant={"body1"}>{audioFileName}</Typography>
                     </Stack>
                 </Grid>
                 <Grid item xs={5} sm={5} md={5} lg={5}>
