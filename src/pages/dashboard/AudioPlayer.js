@@ -39,6 +39,7 @@ const AudioPlayer = ({setSS, setNSS}) => {
         audioFile,
         setAudioFileName,
         kiStutteredRegions,
+        kiStutteredEventTimes,
         setkiStutteredEventTimes,
         setFileChosen,
     } = useContext(StutteredContext);
@@ -197,7 +198,9 @@ const AudioPlayer = ({setSS, setNSS}) => {
     };
 
     const handleRegionUpdate = useCallback((region, smth) => {
-      console.log("Dragging Region", region);
+        console.log("Dragging Region", region);
+        console.log("EVENT TIMES: " + kiStutteredEventTimes);
+        console.log("ID",  kiStutteredEventTimes[0].id);
         console.log(smth);
     },[]);
 
