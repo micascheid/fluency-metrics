@@ -207,14 +207,26 @@ const AudioPlayer = ({setSS, setNSS}) => {
                 wavesurferRef.current.playPause();
             }
         }
-        console.log("KISTUTTEREDREGIONS", kiStutteredRegions);
     };
 
     const handleRegionUpdate = useCallback((region, smth) => {
         console.log("Dragging Region", region.id);
-
-        console.log(smth);
-    }, []);
+        // console.log(smth);
+        console.log("WAVESURFER REGION", region);
+        console.log("KISTUTTEREDREGION", kiStutteredRegions);
+        let changeRegion = kiStutteredRegions[region.id];
+        console.log("Change regions", changeRegion);
+        const duration = region.end - region.start;
+        changeRegion.start = region.start;
+        changeRegion.end = region.end;
+        changeRegion.duration = duration;
+        setkiStutteredRegions(prevRegions => {
+           return {
+               ...prevRegions,
+               [region.id]: changeRegion
+           }
+        });
+    }, [kiStutteredRegions]);
 
     // USE EFFECTS
     useEffect(() => {
@@ -279,10 +291,10 @@ const AudioPlayer = ({setSS, setNSS}) => {
                                 />
                             ))}
                             {Object.entries(kiStutteredRegions).map(([id,regionProps]) => {
-                                // console.log("LENGTH: ", kiStutteredRegions.length);
                                 return (
                                     <Region
                                         key={id}
+                                        id={id}
                                         {...regionProps}
                                         onUpdateEnd={handleRegionUpdate}
                                     />

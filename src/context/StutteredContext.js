@@ -108,21 +108,6 @@ export const StutteredProvider = ({children}) => {
         });
     };
 
-    // const kiStutteredEventsToStutteredRegions = () => {
-    //     let newRegions = [];
-    //     for (let i = 0; i < kiStutteredEventTimes.length; i+=2){
-    //         if (!((i+1) === kiStutteredEventTimes.length)) {
-    //             const start = kiStutteredEventTimes[i];
-    //             const end = kiStutteredEventTimes[i+1];
-    //             const duration = end - start;
-    //             newRegions.push({id: (i/2), start: start, end: end, duration: duration});
-    //         }
-    //     }
-    //     setkiStutteredRegions(newRegions);
-    //     longestDurations(newRegions);
-    //
-    // };
-
     const durationAverageRegions = useCallback(() => {
         let durations = [];
         if (kiStutteredRegions % 2 === 0) {
@@ -145,7 +130,6 @@ export const StutteredProvider = ({children}) => {
             const new_list = Object.values(stutteredEventsList).map(obj => obj.ps);
             setPsList(new_list);
         }
-        // kiStutteredEventsToStutteredRegions();
 
         //Set Duration
         if (stutteredEventCount >= 3) {
