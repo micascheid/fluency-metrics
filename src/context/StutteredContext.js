@@ -64,42 +64,42 @@ export const StutteredProvider = ({children}) => {
         setTotalSyllableCount(sum);
     };
 
-    const calcAverageDuration = () => {
-        console.log(stutteredEventsList);
-        const values = Object.values(stutteredEventsList);
-        values.sort((a,b) => b.duration - a.duration);
-
-        const topThreeDurations = values.slice(0, 3).map(item=> item.duration);
-        const total = topThreeDurations.reduce((a, b) => a + b, 0);
-
-        return parseFloat((total / topThreeDurations.length).toFixed(2));
-
-    };
-
-    const longestDurations = (newRegions) => {
-        setLongest3Durations(() => {
-            let durations = [0,0,0];
-            if (newRegions !== undefined) {
-                durations = Object.values(newRegions).map(item => item.duration);
-                while (durations.length < 3) {
-                    durations.push(0);
-                }
-            }
-            durations.sort((a,b) => b - a);
-            durations = durations.slice(0,3).map(num => +num.toFixed(2));
-
-            setAverageDuration(() => {
-               let avg = 0
-                Object.values(durations).map(duration => {
-                   avg += duration;
-               })
-                return parseFloat((avg/3).toFixed(2));
-            });
-            return durations.slice(0,3).map(num => +num.toFixed(2));
+    const configureDurations = () => {
+        const durations = Object.entries(kiStutteredRegions).map(([key, value]) => {
+            return Number((value.duration).toFixed(2));
         })
-
-        // return values.slice(0,3).map(item => item.duration);
+        durations.sort((a,b) => b - a);
+        let topThree = durations.slice(0,3);
+        const average = Number((topThree.reduce((a,b) => a + b, 0) / topThree.length).toFixed(2));
+        console.log("AVERAGE", average);
+        setLongest3Durations(topThree);
+        setAverageDuration(average)
     };
+
+    // const longestDurations = (newRegions) => {
+    //     setLongest3Durations(() => {
+    //         let durations = [0,0,0];
+    //         if (newRegions !== undefined) {
+    //             durations = Object.values(newRegions).map(item => item.duration);
+    //             while (durations.length < 3) {
+    //                 durations.push(0);
+    //             }
+    //         }
+    //         durations.sort((a,b) => b - a);
+    //         durations = durations.slice(0,3).map(num => +num.toFixed(2));
+    //
+    //         setAverageDuration(() => {
+    //            let avg = 0
+    //             Object.values(durations).map(duration => {
+    //                avg += duration;
+    //            })
+    //             return parseFloat((avg/3).toFixed(2));
+    //         });
+    //         return durations.slice(0,3).map(num => +num.toFixed(2));
+    //     })
+    //
+    //     // return values.slice(0,3).map(item => item.duration);
+    // };
     const handleWordUpdate = (index, newWord) => {
         setTranscriptionObj(prevTranscription => {
             const updatedTranscription = {...prevTranscription};
@@ -132,11 +132,11 @@ export const StutteredProvider = ({children}) => {
         }
 
         //Set Duration
-        if (stutteredEventCount >= 3) {
-            setAverageDuration(calcAverageDuration());
+        if (Object.keys(kiStutteredRegions).length >= 3) {
+            configureDurations();
         }
 
-    }, [totalSyllableCount, stutteredEventCount]);
+    }, [totalSyllableCount, stutteredEventCount, kiStutteredRegions]);
 
 
     const contextValues = {
