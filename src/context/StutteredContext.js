@@ -18,7 +18,7 @@ export const StutteredProvider = ({children}) => {
     const [audioFileName, setAudioFileName]= useState('');
     const [audioFile, setAudioFile] = useState(null);
     // const [kiStutteredEventTimes, setkiStutteredEventTimes] = useState([]);
-    const [kiStutteredRegions, setkiStutteredRegions] = useState([]);
+    const [kiStutteredRegions, setkiStutteredRegions] = useState({});
     const [fileChosen, setFileChosen] = useState(false);
     const [longest3Durations, setLongest3Durations] = useState([1.1,2.2,3.3]);
 

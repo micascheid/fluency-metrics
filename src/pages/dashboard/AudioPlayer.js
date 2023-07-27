@@ -28,13 +28,7 @@ const AudioPlayer = ({setSS, setNSS}) => {
     const [creatingRegion, setCreatingRegion] = useState(null);
     const [isCreatingRegion, setIsCreatingRegion] = useState(false);
     const wavesurferRef = useRef();
-    let newRegionTemp;
-    // let isCreatingRegionTemp = isCreatingRegion;
-    let regions = [];
-    const renderCount = useRef(0);
 
-
-    // const [audioFile, setAudioFile] = useState(null);
 
     const {
         countTotalSyllables,
@@ -184,30 +178,27 @@ const AudioPlayer = ({setSS, setNSS}) => {
                 const time = wavesurferRef.current.getCurrentTime();
                 if (!isCreatingRegion) {
                     const newRegionTemp = {start: time};
-                    // isCreatingRegionTemp = true;
                     setIsCreatingRegion(true);
                     setCreatingRegion(newRegionTemp);
                 } else {
-                    // console.log("DO YOU GET CALLED IN HERE?");
                     const duration = time - creatingRegion.start;
                     const region = {
                         start: creatingRegion.start,
                         end: time,
                         duration: duration,
-                        id: `${kiStutteredRegions.length}`
                     };
 
-                    setkiStutteredRegions(prevRegions => [
+                    const id = Object.keys(kiStutteredRegions).length;
+                    setkiStutteredRegions(prevRegions => ({
                         ...prevRegions,
-                        region
-                    ]);
-                    // isCreatingRegionTemp = false;
+                        [id]: region
+                    }));
+
                     setCreatingRegion(null);
                     setIsCreatingRegion(false);
                 }
             }
 
-            // console.log("Region AFTER", creatingRegion);
             if (event.key === 'n') {
                 setNSS(prevValue => prevValue + 1);
             }
@@ -216,10 +207,12 @@ const AudioPlayer = ({setSS, setNSS}) => {
                 wavesurferRef.current.playPause();
             }
         }
+        console.log("KISTUTTEREDREGIONS", kiStutteredRegions);
     };
 
     const handleRegionUpdate = useCallback((region, smth) => {
-        console.log("Dragging Region", region);
+        console.log("Dragging Region", region.id);
+
         console.log(smth);
     }, []);
 
@@ -229,7 +222,6 @@ const AudioPlayer = ({setSS, setNSS}) => {
     }, [audioFile]);
 
     useEffect(() => {
-        console.log("USE EFFECT");
         if (transcriptionObj) {
             wavesurferRef.current.on('audioprocess', function (time) {
                 let newWordIndex = null;
@@ -265,7 +257,6 @@ const AudioPlayer = ({setSS, setNSS}) => {
         window.addEventListener('keypress', handleKeyPress);
         return () => {
             window.removeEventListener('keypress', handleKeyPress);
-            console.log("REMOVED");
             if (wavesurferRef.current) {
                 wavesurferRef.current.un('audioprocess');
                 if (transcriptionObj && wavesurferRef.current) {
@@ -287,11 +278,11 @@ const AudioPlayer = ({setSS, setNSS}) => {
                                     {...marker}
                                 />
                             ))}
-                            {kiStutteredRegions.map((regionProps) => {
+                            {Object.entries(kiStutteredRegions).map(([id,regionProps]) => {
                                 // console.log("LENGTH: ", kiStutteredRegions.length);
                                 return (
                                     <Region
-                                        key={regionProps.id}
+                                        key={id}
                                         {...regionProps}
                                         onUpdateEnd={handleRegionUpdate}
                                     />
@@ -336,16 +327,6 @@ const AudioPlayer = ({setSS, setNSS}) => {
                     }} disabled={!audioFile}>
                         Toggle
                         timeline</Button>
-                    {/*<Button disabled={mode===''} variant={"contained"} component={"label"} onClick={(event) => {*/}
-                    {/*event.currentTarget.blur();*/}
-                    {/*}}>*/}
-                    {/*    Choose File*/}
-                    {/*    <input*/}
-                    {/*        type={"file"}*/}
-                    {/*        hidden*/}
-                    {/*        onChange={handleFileChange}*/}
-                    {/*    />*/}
-                    {/*</Button>*/}
                     <Button variant={"contained"}
                             onClick={(event) => {
                                 get_transcription();
