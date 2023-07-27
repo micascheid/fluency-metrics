@@ -25,7 +25,15 @@ const AudioPlayer = ({setSS, setNSS}) => {
     const [playbackSpeed, setPlaybackSpeed] = useState(1);
     const [zoomLevel, setZoomLevel] = useState(1);
     const [markers, setMarkers] = useState([]);
+    const [creatingRegion, setCreatingRegion] = useState(null);
+    const [isCreatingRegion, setIsCreatingRegion] = useState(false);
     const wavesurferRef = useRef();
+    let newRegionTemp;
+    // let isCreatingRegionTemp = isCreatingRegion;
+    let regions = [];
+    const renderCount = useRef(0);
+
+
     // const [audioFile, setAudioFile] = useState(null);
 
     const {
@@ -37,10 +45,8 @@ const AudioPlayer = ({setSS, setNSS}) => {
         currentWordIndex,
         mode,
         audioFile,
-        setAudioFileName,
         kiStutteredRegions,
-        kiStutteredEventTimes,
-        setkiStutteredEventTimes,
+        setkiStutteredRegions,
         setFileChosen,
     } = useContext(StutteredContext);
 
@@ -175,10 +181,33 @@ const AudioPlayer = ({setSS, setNSS}) => {
     const handleKeyPress = (event) => {
         if (wavesurferRef.current) {
             if (event.key === 's') {
-                const time  = wavesurferRef.current.getCurrentTime();
-                setSS(prevValue => prevValue + 1);
-                addStutteredTime(time);
+                const time = wavesurferRef.current.getCurrentTime();
+                if (!isCreatingRegion) {
+                    const newRegionTemp = {start: time};
+                    // isCreatingRegionTemp = true;
+                    setIsCreatingRegion(true);
+                    setCreatingRegion(newRegionTemp);
+                } else {
+                    // console.log("DO YOU GET CALLED IN HERE?");
+                    const duration = time - creatingRegion.start;
+                    const region = {
+                        start: creatingRegion.start,
+                        end: time,
+                        duration: duration,
+                        id: `${kiStutteredRegions.length}`
+                    };
+
+                    setkiStutteredRegions(prevRegions => [
+                        ...prevRegions,
+                        region
+                    ]);
+                    // isCreatingRegionTemp = false;
+                    setCreatingRegion(null);
+                    setIsCreatingRegion(false);
+                }
             }
+
+            // console.log("Region AFTER", creatingRegion);
             if (event.key === 'n') {
                 setNSS(prevValue => prevValue + 1);
             }
@@ -189,27 +218,18 @@ const AudioPlayer = ({setSS, setNSS}) => {
         }
     };
 
-    const addStutteredTime = (time) => {
-        setkiStutteredEventTimes(prevTimes => {
-            const newList = [...prevTimes, time];
-            newList.sort((a, b) => a - b);
-            return newList;
-        })
-    };
-
     const handleRegionUpdate = useCallback((region, smth) => {
         console.log("Dragging Region", region);
-        console.log("EVENT TIMES: " + kiStutteredEventTimes);
-        console.log("ID",  kiStutteredEventTimes[0].id);
         console.log(smth);
-    },[]);
+    }, []);
 
     // USE EFFECTS
     useEffect(() => {
         loadAudioFile(audioFile);
-    },[audioFile]);
+    }, [audioFile]);
 
     useEffect(() => {
+        console.log("USE EFFECT");
         if (transcriptionObj) {
             wavesurferRef.current.on('audioprocess', function (time) {
                 let newWordIndex = null;
@@ -245,6 +265,7 @@ const AudioPlayer = ({setSS, setNSS}) => {
         window.addEventListener('keypress', handleKeyPress);
         return () => {
             window.removeEventListener('keypress', handleKeyPress);
+            console.log("REMOVED");
             if (wavesurferRef.current) {
                 wavesurferRef.current.un('audioprocess');
                 if (transcriptionObj && wavesurferRef.current) {
@@ -252,7 +273,7 @@ const AudioPlayer = ({setSS, setNSS}) => {
                 }
             }
         }
-    }, [wavesurferRef, transcriptionObj]);
+    }, [wavesurferRef, transcriptionObj, handleKeyPress]);
 
     return (
         <MainCard>
@@ -266,13 +287,16 @@ const AudioPlayer = ({setSS, setNSS}) => {
                                     {...marker}
                                 />
                             ))}
-                            {kiStutteredRegions.map((regionProps) => (
-                                <Region
-                                    key={regionProps.id}
-                                    {...regionProps}
-                                    onUpdateEnd={handleRegionUpdate}
-                                />
-                            ))}
+                            {kiStutteredRegions.map((regionProps) => {
+                                // console.log("LENGTH: ", kiStutteredRegions.length);
+                                return (
+                                    <Region
+                                        key={regionProps.id}
+                                        {...regionProps}
+                                        onUpdateEnd={handleRegionUpdate}
+                                    />
+                                )
+                            })}
                         </WaveForm>
                         <div id="timeline"/>
                     </WaveSurfer>
@@ -306,7 +330,7 @@ const AudioPlayer = ({setSS, setNSS}) => {
                         event.currentTarget.blur();
                     }}
                             disabled={!audioFile}>Play / Pause</Button>
-                    <Button variant={"contained"} onClick={(event)=>{
+                    <Button variant={"contained"} onClick={(event) => {
                         toggleTimeline();
                         event.currentTarget.blur();
                     }} disabled={!audioFile}>
@@ -323,7 +347,7 @@ const AudioPlayer = ({setSS, setNSS}) => {
                     {/*    />*/}
                     {/*</Button>*/}
                     <Button variant={"contained"}
-                            onClick={(event)=> {
+                            onClick={(event) => {
                                 get_transcription();
                                 event.currentTarget.blur();
                             }}
