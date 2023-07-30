@@ -61,7 +61,7 @@ const AudioPlayer = ({setSS, setNSS}) => {
                 plugin: TimelinePlugin,
                 options: {
                     container: "#timeline",
-                    timeInterval: 1
+                    timeInterval: .1
                 }
             },
             {

@@ -20,7 +20,7 @@ export const StutteredProvider = ({children}) => {
     // const [kiStutteredEventTimes, setkiStutteredEventTimes] = useState([]);
     const [kiStutteredRegions, setkiStutteredRegions] = useState({});
     const [fileChosen, setFileChosen] = useState(false);
-    const [longest3Durations, setLongest3Durations] = useState([1.1,2.2,3.3]);
+    const [longest3Durations, setLongest3Durations] = useState([0,0,0]);
 
     /*
         Repetition: 0
@@ -123,13 +123,13 @@ export const StutteredProvider = ({children}) => {
     useEffect(() => {
         console.log("Getting set in here");
         //Set Frequency and Physical concomitants
-        if (stutteredEventCount > 0){
-            const ssPercentage = Math.round((stutteredEventCount/totalSyllableCount)*1000)/10;
-            setSS(ssPercentage);
-
-            const new_list = Object.values(stutteredEventsList).map(obj => obj.ps);
-            setPsList(new_list);
-        }
+        // if (stutteredEventCount > 0){
+        //     const ssPercentage = Math.round((stutteredEventCount/totalSyllableCount)*1000)/10;
+        //     setSS(ssPercentage);
+        //
+        //     const new_list = Object.values(stutteredEventsList).map(obj => obj.ps);
+        //     setPsList(new_list);
+        // }
 
         //Set Duration
         if (Object.keys(kiStutteredRegions).length >= 3) {

@@ -36,7 +36,7 @@ const Mode = () => {
                                 onChange={handleMode}
                             >
                                 <MenuItem value={"manual"}>Manual</MenuItem>
-                                <MenuItem value={"auto"}>Auto</MenuItem>
+                                <MenuItem value={"auto"}>Semi-Auto</MenuItem>
                             </Select>
                         </FormControl>
                         <Button sx={{mt: 2}} disabled={mode === ''} variant={"contained"} component={"label"} onClick={(event) => {
