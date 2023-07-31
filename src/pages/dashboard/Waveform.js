@@ -3,9 +3,6 @@ import MainCard from "../../components/MainCard";
 import {Box} from "@mui/material";
 import WaveSurfer from 'wavesurfer';
 import { Wavesurfer } from 'wavesurfer-react';
-// import Timeline from 'wavesurfer/dist/plugin/wavesurfer.timeline.min';
-// let WaveSurferTimeLinePlugin = require("wavesurfer/dist/plugin/wavesurfer.timeline.min.js");
-// import TimelinePlugin from 'wavesurfer/dist/plugin/wavesurfer.timeline.min';
 import RegionsPlugin from "wavesurfer.js/dist/plugin/wavesurfer.regions.min";
 
 const Waveform = () => {
@@ -14,14 +11,6 @@ const Waveform = () => {
     const wavesurferRef = useRef(null);
 
     useEffect(() => {
-        wavesurferRef.current = WaveSurfer.create({
-            container: '#waveform',
-            waveColor: 'violet',
-            progressColor: 'purple',
-            plugins: [
-                RegionsPlugin.create({})
-            ]
-        });
 
         wavesurferRef.current.on('ready', function () {
             // Assuming 30 seconds of audio fits within 1000 pixels
