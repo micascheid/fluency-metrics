@@ -1,4 +1,4 @@
-import React, {useState, createContext, useCallback, useEffect} from "react";
+import React, {useState, createContext, useEffect} from "react";
 
 
 export const StutteredContext = createContext();
@@ -10,17 +10,18 @@ export const StutteredProvider = ({children}) => {
     const [totalSyllableCount, setTotalSyllableCount] = useState(0);
     const [transcriptionObj, setTranscriptionObj] = useState(null);
     const [currentWordIndex, setCurrentWordIndex] = useState(1);
-    const [ss, setSS] = useState(0);
+    // const [ss, setSS] = useState(0);
     const [averageDuration, setAverageDuration] = useState(0);
-    const [psList, setPsList] = useState([]);
+    // const [psList, setPsList] = useState([]);
     const [loadingTranscription, setLoadingTranscription] = useState(false);
     const [mode, setMode] = useState('');
-    const [audioFileName, setAudioFileName]= useState('');
+    const [audioFileName, setAudioFileName] = useState('');
     const [audioFile, setAudioFile] = useState(null);
-    // const [kiStutteredEventTimes, setkiStutteredEventTimes] = useState([]);
     const [kiStutteredRegions, setkiStutteredRegions] = useState({});
     const [fileChosen, setFileChosen] = useState(false);
-    const [longest3Durations, setLongest3Durations] = useState([0,0,0]);
+    const [longest3Durations, setLongest3Durations] = useState([0, 0, 0]);
+    const [audioPlayerControl, setAudioPlayerControl] = useState(null);
+    const [playBackSpeed, setPlayBackSpeed] = useState(1);
 
     /*
         Repetition: 0
@@ -31,29 +32,30 @@ export const StutteredProvider = ({children}) => {
         stutteredEventList={1:{start: <>,end: <>}, {2:{start: <>,end: <>}}
      */
     //FUNCTIONS
+
     const handleStutteredChange = (change) => {
-        setStutteredEventCount(prevCount =>  prevCount+change);
+        setStutteredEventCount(prevCount => prevCount + change);
     };
 
     const addStutteredEvent = (word_obj, type, ps, newWord, wordIndex) => {
         const duration = word_obj.end - word_obj.start;
         const eventItem = {type: type, duration: duration, ps: ps, text: newWord, uid: wordIndex};
-        if (!stutteredEventsList.some((obj) => obj.uid === wordIndex)){
-            setStutteredEventsList(prevEvents => [...prevEvents, {...eventItem, id: prevEvents.length+1}])
-            setStutteredEventCount(prevCount => prevCount+1);
+        if (!stutteredEventsList.some((obj) => obj.uid === wordIndex)) {
+            setStutteredEventsList(prevEvents => [...prevEvents, {...eventItem, id: prevEvents.length + 1}])
+            setStutteredEventCount(prevCount => prevCount + 1);
         }
     };
 
     const removeStutteredEvent = (wordIndex) => {
         setStutteredEventsList(prevList => prevList.filter(word_obj => word_obj.uid !== wordIndex));
-        setStutteredEventCount(prevCount => prevCount-1);
+        setStutteredEventCount(prevCount => prevCount - 1);
     };
 
     const setAdjustedSyllableCount = (index, syllableCount) => {
         setTranscriptionObj(prevTranscription => {
-           const updatedTranscription = {...prevTranscription};
-           updatedTranscription[index].syllable_count = syllableCount;
-           return updatedTranscription;
+            const updatedTranscription = {...prevTranscription};
+            updatedTranscription[index].syllable_count = syllableCount;
+            return updatedTranscription;
         });
     };
     const countTotalSyllables = () => {
@@ -68,38 +70,14 @@ export const StutteredProvider = ({children}) => {
         const durations = Object.entries(kiStutteredRegions).map(([key, value]) => {
             return Number((value.duration).toFixed(2));
         })
-        durations.sort((a,b) => b - a);
-        let topThree = durations.slice(0,3);
-        const average = Number((topThree.reduce((a,b) => a + b, 0) / topThree.length).toFixed(2));
+        durations.sort((a, b) => b - a);
+        let topThree = durations.slice(0, 3);
+        const average = Number((topThree.reduce((a, b) => a + b, 0) / topThree.length).toFixed(2));
         console.log("AVERAGE", average);
         setLongest3Durations(topThree);
         setAverageDuration(average)
     };
 
-    // const longestDurations = (newRegions) => {
-    //     setLongest3Durations(() => {
-    //         let durations = [0,0,0];
-    //         if (newRegions !== undefined) {
-    //             durations = Object.values(newRegions).map(item => item.duration);
-    //             while (durations.length < 3) {
-    //                 durations.push(0);
-    //             }
-    //         }
-    //         durations.sort((a,b) => b - a);
-    //         durations = durations.slice(0,3).map(num => +num.toFixed(2));
-    //
-    //         setAverageDuration(() => {
-    //            let avg = 0
-    //             Object.values(durations).map(duration => {
-    //                avg += duration;
-    //            })
-    //             return parseFloat((avg/3).toFixed(2));
-    //         });
-    //         return durations.slice(0,3).map(num => +num.toFixed(2));
-    //     })
-    //
-    //     // return values.slice(0,3).map(item => item.duration);
-    // };
     const handleWordUpdate = (index, newWord) => {
         setTranscriptionObj(prevTranscription => {
             const updatedTranscription = {...prevTranscription};
@@ -108,35 +86,40 @@ export const StutteredProvider = ({children}) => {
         });
     };
 
-    const durationAverageRegions = useCallback(() => {
-        let durations = [];
-        if (kiStutteredRegions % 2 === 0) {
-            for (let obj in kiStutteredRegions) {
-                console.log("START:", obj.start, " END:", obj.end);
-                durations.push(obj.end - obj.start);
-            }
-            console.log("DURATIONS:", durations);
-        }
-    }, [kiStutteredRegions]);
-
-
     useEffect(() => {
         console.log("Getting set in here");
-        //Set Frequency and Physical concomitants
-        // if (stutteredEventCount > 0){
-        //     const ssPercentage = Math.round((stutteredEventCount/totalSyllableCount)*1000)/10;
-        //     setSS(ssPercentage);
-        //
-        //     const new_list = Object.values(stutteredEventsList).map(obj => obj.ps);
-        //     setPsList(new_list);
-        // }
 
         //Set Duration
         if (Object.keys(kiStutteredRegions).length >= 3) {
             configureDurations();
         }
 
+        if (Object.keys(kiStutteredRegions).length > 0 && transcriptionObj) {
+            transcriptError();
+        }
+
     }, [totalSyllableCount, stutteredEventCount, kiStutteredRegions]);
+
+    const transcriptError = () => {
+        let transcriptionNew = JSON.parse(JSON.stringify(transcriptionObj));
+        Object.keys(transcriptionNew).forEach((tKey) => {
+            const wordStart = transcriptionNew[tKey].start;
+            const wordEnd = transcriptionNew[tKey].end;
+            transcriptionNew[tKey].stuttered = false;
+            Object.keys(kiStutteredRegions).some((regionKey) => {
+                const regionStart = kiStutteredRegions[regionKey].start;
+                const regionEnd = kiStutteredRegions[regionKey].end;
+
+                if ((wordEnd >= regionStart && wordEnd <= regionEnd) ||
+                    (wordStart >= regionEnd && wordStart <= regionEnd)) {
+                    transcriptionNew[tKey].stuttered = true;
+                    return true;
+                }
+                return false;
+            });
+        });
+        setTranscriptionObj(transcriptionNew);
+    };
 
 
     const contextValues = {
@@ -148,8 +131,8 @@ export const StutteredProvider = ({children}) => {
         setTranscriptionObj,
         setStutteredEventCount,
         setTotalSyllableCount,
-        ss,
-        psList,
+        // ss,
+        // psList,
         loadingTranscription,
         setLoadingTranscription,
         setCurrentWordIndex,
@@ -171,6 +154,11 @@ export const StutteredProvider = ({children}) => {
         addStutteredEvent,
         removeStutteredEvent,
         longest3Durations,
+        setAudioPlayerControl,
+        audioPlayerControl,
+        setPlayBackSpeed,
+        playBackSpeed,
+        transcriptError,
     }
 
     return (

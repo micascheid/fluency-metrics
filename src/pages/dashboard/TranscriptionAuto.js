@@ -5,7 +5,11 @@ import {StutteredContext} from "../../context/StutteredContext";
 
 
 const TranscriptionAuto = () => {
-    const {transcriptionObj, handleWordUpdate, currentWordIndex} = useContext(StutteredContext);
+    const {
+        transcriptionObj,
+        handleWordUpdate,
+        currentWordIndex,
+    } = useContext(StutteredContext);
 
     // console.log("CURRENT WORD INDEX: " + typeof currentWordIndex);
 
@@ -18,7 +22,8 @@ const TranscriptionAuto = () => {
                         word_obj={transcriptionObj[key]}
                         onUpdateWord={handleWordUpdate}
                         index={key}
-                        style={{backgroundColor: currentWordIndex === parseInt(key) ? '#ADD8E6' : 'transparent'}}
+                        style={{textDecoration: currentWordIndex === parseInt(key) ? 'underline' : 'none',
+                                backgroundColor: transcriptionObj[key].stuttered ? "#ADD8E6" : 'transparent'}}
                     >
                     </WordComponent>{" "}
                 </Fragment>

@@ -19,17 +19,14 @@ import axios from 'axios';
 import {StutteredContext} from "../../context/StutteredContext";
 import {MANUAL} from "../../constants";
 
-const AudioPlayer = ({setSS, setNSS}) => {
+const AudioPlayer = () => {
     // VARIABLES
     const [timelineVis, setTimelineVis] = useState(true);
-    const [playbackSpeed, setPlaybackSpeed] = useState(1);
     const [zoomLevel, setZoomLevel] = useState(1);
     const [markers, setMarkers] = useState([]);
     const [creatingRegion, setCreatingRegion] = useState(null);
     const [isCreatingRegion, setIsCreatingRegion] = useState(false);
     const wavesurferRef = useRef();
-
-
     const {
         countTotalSyllables,
         setTranscriptionObj,
@@ -41,8 +38,12 @@ const AudioPlayer = ({setSS, setNSS}) => {
         audioFile,
         kiStutteredRegions,
         setkiStutteredRegions,
-        setFileChosen,
+        setAudioPlayerControl,
+        setPlayBackSpeed,
+        playBackSpeed,
+        transcriptError,
     } = useContext(StutteredContext);
+
 
     const waveformProps = {
         id: "waveform",
@@ -123,9 +124,9 @@ const AudioPlayer = ({setSS, setNSS}) => {
     const play = useCallback(() => {
         if (wavesurferRef.current) {
             wavesurferRef.current.playPause();
-            wavesurferRef.current.setPlaybackRate(playbackSpeed);
+            wavesurferRef.current.setPlaybackRate(playBackSpeed);
         }
-    }, [playbackSpeed]);
+    }, [playBackSpeed]);
 
     const loadAudioFile = (file) => {
         console.log("Setting Audio File");
@@ -142,12 +143,12 @@ const AudioPlayer = ({setSS, setNSS}) => {
         return value;
     };
 
-    const playbackSpeedHandler = (event, value) => {
+    const playbackSpeedHandler = useCallback((event, value) => {
         console.log("Playback Speed", value);
         console.log(wavesurferRef.current.getCurrentTime());
         wavesurferRef.current.setPlaybackRate(value);
-        setPlaybackSpeed(value);
-    };
+        setPlayBackSpeed(value);
+    },[playBackSpeed]);
 
     // BACKEND CALLS
     const get_transcription = () => {
@@ -171,6 +172,12 @@ const AudioPlayer = ({setSS, setNSS}) => {
             setLoadingTranscription(false);
         });
     };
+
+    const playPause = () => {
+        if (wavesurferRef.current !== null) {
+            wavesurferRef.current.playPause();
+        }
+    }
 
     const handleKeyPress = (event) => {
         if (wavesurferRef.current) {
@@ -199,12 +206,9 @@ const AudioPlayer = ({setSS, setNSS}) => {
                 }
             }
 
-            if (event.key === 'n') {
-                setNSS(prevValue => prevValue + 1);
-            }
             if (event.key === " ") {
                 event.preventDefault();
-                wavesurferRef.current.playPause();
+                playPause();
             }
         }
     };
@@ -231,9 +235,15 @@ const AudioPlayer = ({setSS, setNSS}) => {
     // USE EFFECTS
     useEffect(() => {
         loadAudioFile(audioFile);
+        if (wavesurferRef.current !== null) {
+            setAudioPlayerControl({
+               playPause: playPause
+            });
+        }
     }, [audioFile]);
 
     useEffect(() => {
+        console.log("USEEFFECT YALL");
         if (transcriptionObj) {
             wavesurferRef.current.on('audioprocess', function (time) {
                 let newWordIndex = null;
@@ -266,6 +276,10 @@ const AudioPlayer = ({setSS, setNSS}) => {
             });
         }
 
+        if (wavesurferRef.current) {
+            wavesurferRef.current.setPlaybackRate(playBackSpeed);
+        }
+
         window.addEventListener('keypress', handleKeyPress);
         return () => {
             window.removeEventListener('keypress', handleKeyPress);
@@ -276,7 +290,7 @@ const AudioPlayer = ({setSS, setNSS}) => {
                 }
             }
         }
-    }, [wavesurferRef, transcriptionObj, handleKeyPress]);
+    }, [wavesurferRef, transcriptionObj, handleKeyPress, playBackSpeed]);
 
     return (
         <MainCard>
@@ -320,10 +334,13 @@ const AudioPlayer = ({setSS, setNSS}) => {
                             valueLabelDisplay="auto"
                             step={.1}
                             marks
-                            min={.3}
+                            min={.4}
                             max={1}
-                            value={playbackSpeed}
-                            onChange={playbackSpeedHandler}
+                            value={playBackSpeed}
+                            onChange={(event, value) => {
+                                console.log("Getting hit here?");
+                                playbackSpeedHandler(event, value);
+                            }}
                             disabled={!audioFile}
                             sx={{width: 90, mr: 10}}
                         />

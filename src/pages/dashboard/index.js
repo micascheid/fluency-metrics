@@ -3,15 +3,12 @@ import {Grid} from "@mui/material";
 import AudioPlayer from "./AudioPlayer";
 import FluencyCounts from "./FluencyCounts";
 import KeyboardLegend from "./KeyboardLegend";
-import {StutteredProvider, StutteredContext} from "../../context/StutteredContext";
 import StutteredEvents from "./StutteredEvents";
 import Mode from "./Mode";
 import Transcription from "./Transcription";
 
 
 const DefaultDashboard = () => {
-    const [se, setSS] = useState(0);
-    const [nss, setNSS] = useState(0);
 
 
     return (
@@ -20,7 +17,7 @@ const DefaultDashboard = () => {
                 <Mode />
             </Grid>
             <Grid item xs={12} sm={12} md={12} lg={12}>
-                <AudioPlayer ss={se} nss={nss} setSS={setSS} setNSS={setNSS}/>
+                <AudioPlayer/>
             </Grid>
             <Grid item xs={12} sm={12} md={12} lg={12}>
                 <Transcription/>
