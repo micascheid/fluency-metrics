@@ -47,6 +47,7 @@ const WordComponent = ({word, word_obj, onUpdateWord, index, style}) => {
 
     // FUNCTIONS
     const handlePopoverOpen = (event) => {
+        console.log(event.currentTarget);
         setAnchorEl(event.currentTarget);
         setIsClicked(true);
     };
@@ -160,7 +161,6 @@ const WordComponent = ({word, word_obj, onUpdateWord, index, style}) => {
                             type={"number"}
                             value={syllableCount}
                             onChange={handleSyllableChange}
-                            // disabled={!isStuttered}
                             inputProps={{min: 0}}
                         />
                         <Divider textAlign={"left"} sx={dividerStyles}>Type</Divider>

@@ -10,7 +10,7 @@ import "./styles.css";
 import RegionsPlugin from "wavesurfer.js/dist/plugin/wavesurfer.regions.min";
 import TimelinePlugin from "wavesurfer.js/dist/plugin/wavesurfer.timeline.min";
 import MarkersPlugin from "wavesurfer.js/src/plugin/markers";
-import {Box, Button, Slider, Stack, Typography} from "@mui/material";
+import {Box, Button, Popover, Slider, Stack, Typography} from "@mui/material";
 import MainCard from "../../components/MainCard";
 import ZoomIn from '@mui/icons-material/ZoomIn';
 import ZoomOut from '@mui/icons-material/ZoomOut';
@@ -18,6 +18,7 @@ import Speed from '@mui/icons-material/Speed';
 import axios from 'axios';
 import {StutteredContext} from "../../context/StutteredContext";
 import {MANUAL} from "../../constants";
+import AudioPlayerPopover from "./popovers/AudioPlayerPopover";
 
 const AudioPlayer = () => {
     // VARIABLES
@@ -26,6 +27,9 @@ const AudioPlayer = () => {
     const [markers, setMarkers] = useState([]);
     const [creatingRegion, setCreatingRegion] = useState(null);
     const [isCreatingRegion, setIsCreatingRegion] = useState(false);
+    const [popoverOpen, setPopoverOpen] = useState(false);
+
+    const [anchorEl, setAnchorEl] = useState(null);
     const wavesurferRef = useRef();
     const {
         countTotalSyllables,
@@ -113,13 +117,18 @@ const AudioPlayer = () => {
         [wavesurferRef]
     );
 
-    const removeLastMarker = useCallback(() => {
-        setMarkers(prevMarkers => {
-            let nextMarkers = [...prevMarkers];
-            nextMarkers.pop();
-            return nextMarkers;
-        });
-    }, []);
+    const handlePopoverOpen = (region, smth) => {
+        // get wave element bounding rect
+        console.log(region.id);
+        console.log(smth.currentTarget);
+        const anchorElement = smth.currentTarget;
+        if (anchorElement) {
+            setPopoverOpen(true);
+            setAnchorEl(anchorElement);
+        }
+
+    }
+
 
     const play = useCallback(() => {
         if (wavesurferRef.current) {
@@ -148,7 +157,7 @@ const AudioPlayer = () => {
         console.log(wavesurferRef.current.getCurrentTime());
         wavesurferRef.current.setPlaybackRate(value);
         setPlayBackSpeed(value);
-    },[playBackSpeed]);
+    }, [playBackSpeed]);
 
     // BACKEND CALLS
     const get_transcription = () => {
@@ -225,10 +234,10 @@ const AudioPlayer = () => {
         changeRegion.end = region.end;
         changeRegion.duration = duration;
         setkiStutteredRegions(prevRegions => {
-           return {
-               ...prevRegions,
-               [region.id]: changeRegion
-           }
+            return {
+                ...prevRegions,
+                [region.id]: changeRegion
+            }
         });
     }, [kiStutteredRegions]);
 
@@ -237,7 +246,7 @@ const AudioPlayer = () => {
         loadAudioFile(audioFile);
         if (wavesurferRef.current !== null) {
             setAudioPlayerControl({
-               playPause: playPause
+                playPause: playPause
             });
         }
     }, [audioFile]);
@@ -304,16 +313,29 @@ const AudioPlayer = () => {
                                     {...marker}
                                 />
                             ))}
-                            {Object.entries(kiStutteredRegions).map(([id,regionProps]) => {
+                            {Object.entries(kiStutteredRegions).map(([id, regionProps]) => {
                                 return (
                                     <Region
                                         key={id}
                                         id={id}
                                         {...regionProps}
                                         onUpdateEnd={handleRegionUpdate}
+                                        onClick={handlePopoverOpen}
                                     />
                                 )
                             })}
+                            {anchorEl && (
+                                <AudioPlayerPopover anchorEl={anchorEl} setAnchorEl={setAnchorEl} popoverOpen={Boolean(anchorEl)} setPopoverOpen={setPopoverOpen}/>
+                                // <Popover
+                                //     open={popoverOpen}
+                                //     anchorEl={anchorEl}
+                                //     // onClose={handlePopoverClose}
+                                //     anchorOrigin={{vertical: 'center', horizontal: 'center'}}
+                                // >
+                                //     <Typography>POPOVER!</Typography>
+                                // </Popover>
+                            )}
+
                         </WaveForm>
                         <div id="timeline"/>
                     </WaveSurfer>
