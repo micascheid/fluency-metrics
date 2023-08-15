@@ -37,10 +37,9 @@ import UserContext from "../../../context/UserContext";
 
 const AuthLogin = () => {
     const navigate = useNavigate();
-    const [checked, setChecked] = React.useState(false);
     const [isLoggingIn, setIsLoggingIn] = useState(false);
 
-    const [showPassword, setShowPassword] = React.useState(false);
+    const [showPassword, setShowPassword] = useState(false);
     const {login} = useContext(UserContext);
 
     const handleClickShowPassword = () => {
@@ -55,8 +54,8 @@ const AuthLogin = () => {
         <>
             <Formik
                 initialValues={{
-                    // email: 'micascheid@gmail.com',
-                    // password: '123456',
+                    email: '',
+                    password: '',
                     submit: null
                 }}
                 validationSchema={Yup.object().shape({
@@ -82,7 +81,7 @@ const AuthLogin = () => {
                         })
                 }}
             >
-                {({errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values}) => (
+                {({errors, handleBlur, handleChange, handleSubmit, touched, values}) => (
                     <form noValidate onSubmit={handleSubmit}>
                         <Grid container spacing={3}>
                             <Grid item xs={12}>
@@ -142,19 +141,6 @@ const AuthLogin = () => {
                             </Grid>
 
                             <Grid item xs={12} sx={{mt: -1}}>
-                                {/*<Stack direction="row" justifyContent="space-between" alignItems="center" spacing={2}>*/}
-                                {/*    <FormControlLabel*/}
-                                {/*        control={*/}
-                                {/*            <Checkbox*/}
-                                {/*                checked={checked}*/}
-                                {/*                onChange={(event) => setChecked(event.target.checked)}*/}
-                                {/*                name="checked"*/}
-                                {/*                color="primary"*/}
-                                {/*                size="small"*/}
-                                {/*            />*/}
-                                {/*        }*/}
-                                {/*        label={<Typography variant="h6">Keep me signed in</Typography>}*/}
-                                {/*    />*/}
                                 <Link variant="h6" component={RouterLink} to="" color="text.primary">
                                     Forgot Password?
                                 </Link>
@@ -180,14 +166,6 @@ const AuthLogin = () => {
                                     </Button>
                                 </AnimateButton>
                             </Grid>
-                            {/*<Grid item xs={12}>*/}
-                            {/*    <Divider>*/}
-                            {/*        <Typography variant="caption"> Login with</Typography>*/}
-                            {/*    </Divider>*/}
-                            {/*</Grid>*/}
-                            {/*<Grid item xs={12}>*/}
-                            {/*    <FirebaseSocial />*/}
-                            {/*</Grid>*/}
                         </Grid>
                     </form>
                 )}

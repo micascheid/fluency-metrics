@@ -1,4 +1,4 @@
-import React, {useState, useRef, useContext} from 'react';
+import React, {useState, useRef, useContext, useEffect} from 'react';
 import {Popover, TextField, styled, Stack, Divider, Typography, Button, Box} from '@mui/material';
 import {Checkbox, FormControlLabel} from '@mui/material';
 import {StutteredContext} from "../../context/StutteredContext";
@@ -38,7 +38,12 @@ const WordComponent = ({word, word_obj, onUpdateWord, index, style}) => {
     const typeMap = {0: "Repetition", 1: "Prolongation", 2: "Block", 3: "Interjection"};
     const psList = [0, 1, 2, 3, 4, 5];
     const [isClicked, setIsClicked] = useState(false);
-    const {addStutteredEvent, currentWordIndex, removeStutteredEvent, setAdjustedSyllableCount} = useContext(StutteredContext);
+    const {
+        addStutteredEvent,
+        removeStutteredEvent,
+        setAdjustedSyllableCount,
+        mode,
+    } = useContext(StutteredContext);
 
 
     /* NOTES
@@ -47,6 +52,7 @@ const WordComponent = ({word, word_obj, onUpdateWord, index, style}) => {
 
     // FUNCTIONS
     const handlePopoverOpen = (event) => {
+        console.log("KEY: ", typeof index);
         console.log(event.currentTarget);
         setAnchorEl(event.currentTarget);
         setIsClicked(true);
@@ -76,7 +82,6 @@ const WordComponent = ({word, word_obj, onUpdateWord, index, style}) => {
         const value = parseInt(event.target.value);
         console.log("Input value: ", event.target.value);
         console.log("Parsed value: ", value);
-        // const isValid = Number.isNaN(value);
         if (!Number.isNaN(value)) {
             console.log("Setting syllableCount to ", value);
             setSyllableCount(value);
@@ -110,15 +115,25 @@ const WordComponent = ({word, word_obj, onUpdateWord, index, style}) => {
         }
     };
 
+    useEffect(() => {
+        setNewWord(word);
+    }, [word]);
+
+
     return (
         <>
             <span
-                onClick={handlePopoverOpen}
+                onClick={() => {
+                    if (mode !== "auto") {
+                        handlePopoverOpen();
+                    }
+                }
+                }
                 style={{
                     ...style,
                     backgroundColor: isClicked ? 'yellow' : style.backgroundColor}}
             >
-                {word}
+                {newWord}
             </span>
             <Popover
                 open={Boolean(anchorEl)}

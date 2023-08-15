@@ -21,7 +21,8 @@ const dividerStyles = {
     "&::before, &::after": {
         borderColor: "lightgray",
     },
-    pt: 1
+    pt: 2,
+    pb: 1,
 }
 
 export {dividerStyles, CustomWordInput, CustomSyllableInput};

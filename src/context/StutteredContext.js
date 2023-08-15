@@ -10,9 +10,7 @@ export const StutteredProvider = ({children}) => {
     const [totalSyllableCount, setTotalSyllableCount] = useState(0);
     const [transcriptionObj, setTranscriptionObj] = useState(null);
     const [currentWordIndex, setCurrentWordIndex] = useState(1);
-    // const [ss, setSS] = useState(0);
     const [averageDuration, setAverageDuration] = useState(0);
-    // const [psList, setPsList] = useState([]);
     const [loadingTranscription, setLoadingTranscription] = useState(false);
     const [mode, setMode] = useState('');
     const [audioFileName, setAudioFileName] = useState('');
@@ -28,7 +26,6 @@ export const StutteredProvider = ({children}) => {
         Prolongation: 1
         Block: 2
         Interjection: 3
-
         stutteredEventList={1:{start: <>,end: <>}, {2:{start: <>,end: <>}}
      */
     //FUNCTIONS
@@ -37,7 +34,7 @@ export const StutteredProvider = ({children}) => {
         setStutteredEventCount(prevCount => prevCount + change);
     };
 
-    const addStutteredEvent = (word_obj, type, ps, newWord, wordIndex) => {
+    const addStutteredEvent = (word_obj, type, syllable_count, ps, newWord, wordIndex) => {
         const duration = word_obj.end - word_obj.start;
         const eventItem = {type: type, duration: duration, ps: ps, text: newWord, uid: wordIndex};
         if (!stutteredEventsList.some((obj) => obj.uid === wordIndex)) {
@@ -46,9 +43,50 @@ export const StutteredProvider = ({children}) => {
         }
     };
 
+
+    const addStutteredEventWaveForm = (region, syllableCount, ps, text, type, wordIndex) => {
+        const duration = region.end - region.start;
+        const eventItem = {duration: duration, syllable_count: syllableCount, ps: ps, text: text, type: type, id: region.id};
+        if (!stutteredEventsList.some((obj) => obj.id === wordIndex)) {
+            setStutteredEventsList(prevEvents => [...prevEvents, {...eventItem, id: prevEvents.length}])
+            setStutteredEventCount(prevCount => prevCount + 1);
+        }
+    };
+
+    const updateStutteredEventWaveForm = (region, syllable_count, ps, text, type) => {
+        setStutteredEventsList(prevList => {
+            return prevList.map(event => {
+                if (stutteredEventsList[region.id]) {
+                    const duration = region.end - region.start;
+                    const eventItem = {
+                        duration: duration,
+                        syllable_count: syllable_count,
+                        ps: ps,
+                        text: text,
+                        type: type,
+                        id: region.id
+                    };
+                    console.log("EVENT", event.id, "REGION", region.id);
+                    if (Number(event.id) === Number(region.id)) {
+                        console.log("updating:", event);
+                        return {
+                            ...eventItem
+                        };
+                    }
+                    return event;
+                }});
+            });
+    };
+
+    const randomFunction = () => {
+      console.log("RANDOM FUNCTION");
+    };
+
     const removeStutteredEvent = (wordIndex) => {
-        setStutteredEventsList(prevList => prevList.filter(word_obj => word_obj.uid !== wordIndex));
-        setStutteredEventCount(prevCount => prevCount - 1);
+        setStutteredEventsList(prevList => prevList.filter(word_obj => word_obj.id !== wordIndex));
+        if (stutteredEventsList) {
+            setStutteredEventsList(prevCount => prevCount-1)
+        }
     };
 
     const setAdjustedSyllableCount = (index, syllableCount) => {
@@ -87,18 +125,20 @@ export const StutteredProvider = ({children}) => {
     };
 
     useEffect(() => {
-        console.log("Getting set in here");
-
         //Set Duration
         if (Object.keys(kiStutteredRegions).length >= 3) {
             configureDurations();
         }
 
-        if (Object.keys(kiStutteredRegions).length > 0 && transcriptionObj) {
+        if (Object.keys(kiStutteredRegions).length >= 0 && transcriptionObj) {
             transcriptError();
         }
 
     }, [totalSyllableCount, stutteredEventCount, kiStutteredRegions]);
+
+    useEffect(() => {
+       setStutteredEventCount(stutteredEventsList.length);
+    }, [stutteredEventsList]);
 
     const transcriptError = () => {
         let transcriptionNew = JSON.parse(JSON.stringify(transcriptionObj));
@@ -109,9 +149,8 @@ export const StutteredProvider = ({children}) => {
             Object.keys(kiStutteredRegions).some((regionKey) => {
                 const regionStart = kiStutteredRegions[regionKey].start;
                 const regionEnd = kiStutteredRegions[regionKey].end;
-
-                if ((wordEnd >= regionStart && wordEnd <= regionEnd) ||
-                    (wordStart >= regionEnd && wordStart <= regionEnd)) {
+                if ((wordStart >= regionStart && wordStart <= regionEnd) ||
+                    (wordEnd >= regionStart && wordEnd <= regionEnd)){
                     transcriptionNew[tKey].stuttered = true;
                     return true;
                 }
@@ -131,8 +170,6 @@ export const StutteredProvider = ({children}) => {
         setTranscriptionObj,
         setStutteredEventCount,
         setTotalSyllableCount,
-        // ss,
-        // psList,
         loadingTranscription,
         setLoadingTranscription,
         setCurrentWordIndex,
@@ -152,6 +189,7 @@ export const StutteredProvider = ({children}) => {
         countTotalSyllables,
         handleStutteredChange,
         addStutteredEvent,
+        updateStutteredEventWaveForm,
         removeStutteredEvent,
         longest3Durations,
         setAudioPlayerControl,
@@ -159,6 +197,8 @@ export const StutteredProvider = ({children}) => {
         setPlayBackSpeed,
         playBackSpeed,
         transcriptError,
+        randomFunction,
+        addStutteredEventWaveForm
     }
 
     return (

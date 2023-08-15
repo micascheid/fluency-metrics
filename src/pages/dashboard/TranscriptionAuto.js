@@ -9,8 +9,13 @@ const TranscriptionAuto = () => {
         transcriptionObj,
         handleWordUpdate,
         currentWordIndex,
+        kiStutteredRegions,
     } = useContext(StutteredContext);
 
+    useEffect(() => {
+
+    },[kiStutteredRegions]);
+    // console.log("HEY GETTING RE RENDERED HERE:", transcriptionObj);
     // console.log("CURRENT WORD INDEX: " + typeof currentWordIndex);
 
     return (

@@ -28,9 +28,11 @@ const AudioPlayer = () => {
     const [creatingRegion, setCreatingRegion] = useState(null);
     const [isCreatingRegion, setIsCreatingRegion] = useState(false);
     const [popoverOpen, setPopoverOpen] = useState(false);
-
     const [anchorEl, setAnchorEl] = useState(null);
     const wavesurferRef = useRef();
+    const [currentRegion, setCurrentRegion] = useState(null);
+    const [stutteredWords, setStutteredWords] = useState({});
+
     const {
         countTotalSyllables,
         setTranscriptionObj,
@@ -45,9 +47,7 @@ const AudioPlayer = () => {
         setAudioPlayerControl,
         setPlayBackSpeed,
         playBackSpeed,
-        transcriptError,
     } = useContext(StutteredContext);
-
 
     const waveformProps = {
         id: "waveform",
@@ -119,16 +119,16 @@ const AudioPlayer = () => {
 
     const handlePopoverOpen = (region, smth) => {
         // get wave element bounding rect
-        console.log(region.id);
-        console.log(smth.currentTarget);
+        console.log("Stuttered words:", )
         const anchorElement = smth.currentTarget;
         if (anchorElement) {
+            console.log("REGION", region);
             setPopoverOpen(true);
             setAnchorEl(anchorElement);
+            setCurrentRegion(region);
         }
-
+        setStutteredWords(getStutteredWordsFromRegion(region));
     }
-
 
     const play = useCallback(() => {
         if (wavesurferRef.current) {
@@ -171,7 +171,7 @@ const AudioPlayer = () => {
             },
         }).then(response => {
             const transcriptionObj = response.data.transcription_obj;
-            console.log("TRANSCRIPTION OBJ: ", transcriptionObj);
+            // console.log("TRANSCRIPTION OBJ: ", transcriptionObj);
             setTranscriptionObj(transcriptionObj);
             countTotalSyllables();
             setLoadingTranscription(false);
@@ -203,7 +203,6 @@ const AudioPlayer = () => {
                         end: time,
                         duration: duration,
                     };
-
                     const id = Object.keys(kiStutteredRegions).length;
                     setkiStutteredRegions(prevRegions => ({
                         ...prevRegions,
@@ -241,6 +240,22 @@ const AudioPlayer = () => {
         });
     }, [kiStutteredRegions]);
 
+
+    const getStutteredWordsFromRegion = (region) => {
+        const words =  Object.keys(transcriptionObj).filter(key => {
+            const regionStart = region.start;
+            const regionEnd = region.end;
+            const word = transcriptionObj[key];
+            return (word.start >= regionStart && word.start <= regionEnd) ||
+                (word.end >= regionStart && word.end <= regionEnd);
+        }).reduce((result, key) => {
+            result[key] = transcriptionObj[key];
+            return result;
+        }, {})
+        return words;
+    };
+
+
     // USE EFFECTS
     useEffect(() => {
         loadAudioFile(audioFile);
@@ -252,7 +267,6 @@ const AudioPlayer = () => {
     }, [audioFile]);
 
     useEffect(() => {
-        console.log("USEEFFECT YALL");
         if (transcriptionObj) {
             wavesurferRef.current.on('audioprocess', function (time) {
                 let newWordIndex = null;
@@ -299,7 +313,7 @@ const AudioPlayer = () => {
                 }
             }
         }
-    }, [wavesurferRef, transcriptionObj, handleKeyPress, playBackSpeed]);
+    }, [wavesurferRef, transcriptionObj, handleKeyPress, playBackSpeed, kiStutteredRegions]);
 
     return (
         <MainCard>
@@ -324,16 +338,15 @@ const AudioPlayer = () => {
                                     />
                                 )
                             })}
-                            {anchorEl && (
-                                <AudioPlayerPopover anchorEl={anchorEl} setAnchorEl={setAnchorEl} popoverOpen={Boolean(anchorEl)} setPopoverOpen={setPopoverOpen}/>
-                                // <Popover
-                                //     open={popoverOpen}
-                                //     anchorEl={anchorEl}
-                                //     // onClose={handlePopoverClose}
-                                //     anchorOrigin={{vertical: 'center', horizontal: 'center'}}
-                                // >
-                                //     <Typography>POPOVER!</Typography>
-                                // </Popover>
+                            {anchorEl && currentRegion && (
+                                <AudioPlayerPopover
+                                    anchorEl={anchorEl}
+                                    setAnchorEl={setAnchorEl}
+                                    popoverOpen={Boolean(anchorEl)}
+                                    setPopoverOpen={setPopoverOpen}
+                                    stutteredWords={stutteredWords}
+                                    region={currentRegion}
+                                />
                             )}
 
                         </WaveForm>

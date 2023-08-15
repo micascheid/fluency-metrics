@@ -1,19 +1,24 @@
-import React, {useContext} from 'react';
+import React, {useContext, useEffect} from 'react';
 import MainCard from "../../components/MainCard";
 import {Box, Typography} from "@mui/material";
 import {StutteredContext} from "../../context/StutteredContext";
 import { DataGrid } from '@mui/x-data-grid';
 
 const StutteredEvents = () => {
-    const { stutteredCount, stutteredEventsList } = useContext(StutteredContext);
+    const { stutteredEventsList } = useContext(StutteredContext);
     const columns = [
         {field: 'id', headerName: "Event #", flex: 1},
         {field: 'type', headerName: "Type", flex: 1},
+        {field: 'syllable_count', headerName: "Syllables", flex: 1},
         {field: 'duration', headerName: "Duration", flex: 1, type: 'number', align: 'left', headerAlign: 'left'},
         {field: 'ps', headerName: "Phys Conc", flex: 1, type: 'number', align: 'left', headerAlign: 'left'},
         {field: 'text', headerName: "Text", flex: 1},
     ]
 
+    useEffect(() => {
+        console.log("hello there");
+        console.log("STUTTEREDEVENTSLIST:", stutteredEventsList);
+    }, [stutteredEventsList]);
 
     return (
       <MainCard sx={{minHeight: '800px'}}>
@@ -24,11 +29,11 @@ const StutteredEvents = () => {
                   columns={columns}
                   initialState={{
                       pagination: {
-                          paginationModel: {page: 0, pageSize: 2}
+                          paginationModel: {page: 0, pageSize: 5}
                       },
                   }}
                   sx={{borderColor: '#000'}}
-                  pageSizeOptions={[2,10]}
+                  pageSizeOptions={[5,10]}
                   checkboxSelection
               />
           ) : (
