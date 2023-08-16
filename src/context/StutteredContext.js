@@ -5,8 +5,8 @@ export const StutteredContext = createContext();
 
 export const StutteredProvider = ({children}) => {
     // VARIABLES
-    const [stutteredEventCount, setStutteredEventCount] = useState(0);
-    const [stutteredEventsList, setStutteredEventsList] = useState([]);
+    const [stutteredEventsCount, setStutteredEventsCount] = useState(0);
+    const [stutteredEvents, setStutteredEvents] = useState({});
     const [totalSyllableCount, setTotalSyllableCount] = useState(0);
     const [transcriptionObj, setTranscriptionObj] = useState(null);
     const [currentWordIndex, setCurrentWordIndex] = useState(1);
@@ -31,15 +31,15 @@ export const StutteredProvider = ({children}) => {
     //FUNCTIONS
 
     const handleStutteredChange = (change) => {
-        setStutteredEventCount(prevCount => prevCount + change);
+        setStutteredEventsCount(prevCount => prevCount + change);
     };
 
     const addStutteredEvent = (word_obj, type, syllable_count, ps, newWord, wordIndex) => {
         const duration = word_obj.end - word_obj.start;
         const eventItem = {type: type, duration: duration, ps: ps, text: newWord, uid: wordIndex};
-        if (!stutteredEventsList.some((obj) => obj.uid === wordIndex)) {
-            setStutteredEventsList(prevEvents => [...prevEvents, {...eventItem, id: prevEvents.length + 1}])
-            setStutteredEventCount(prevCount => prevCount + 1);
+        if (!stutteredEvents.some((obj) => obj.uid === wordIndex)) {
+            setStutteredEvents(prevEvents => [...prevEvents, {...eventItem, id: prevEvents.length + 1}])
+            setStutteredEventsCount(prevCount => prevCount + 1);
         }
     };
 
@@ -47,16 +47,14 @@ export const StutteredProvider = ({children}) => {
     const addStutteredEventWaveForm = (region, syllableCount, ps, text, type, wordIndex) => {
         const duration = region.end - region.start;
         const eventItem = {duration: duration, syllable_count: syllableCount, ps: ps, text: text, type: type, id: region.id};
-        if (!stutteredEventsList.some((obj) => obj.id === wordIndex)) {
-            setStutteredEventsList(prevEvents => [...prevEvents, {...eventItem, id: prevEvents.length}])
-            setStutteredEventCount(prevCount => prevCount + 1);
+        if (!stutteredEvents[region.id]) {
+            setStutteredEvents(prevEvents => ({...prevEvents, [region.id]: eventItem}));
+            setStutteredEventsCount(prevCount => prevCount + 1);
         }
     };
 
     const updateStutteredEventWaveForm = (region, syllable_count, ps, text, type) => {
-        setStutteredEventsList(prevList => {
-            return prevList.map(event => {
-                if (stutteredEventsList[region.id]) {
+        setStutteredEvents(prevEvents => {
                     const duration = region.end - region.start;
                     const eventItem = {
                         duration: duration,
@@ -66,15 +64,10 @@ export const StutteredProvider = ({children}) => {
                         type: type,
                         id: region.id
                     };
-                    console.log("EVENT", event.id, "REGION", region.id);
-                    if (Number(event.id) === Number(region.id)) {
-                        console.log("updating:", event);
-                        return {
-                            ...eventItem
-                        };
-                    }
-                    return event;
-                }});
+                    return {
+                        ...prevEvents,
+                        [region.id]: eventItem
+                    };
             });
     };
 
@@ -83,11 +76,20 @@ export const StutteredProvider = ({children}) => {
     };
 
     const removeStutteredEvent = (wordIndex) => {
-        setStutteredEventsList(prevList => prevList.filter(word_obj => word_obj.id !== wordIndex));
-        if (stutteredEventsList) {
-            setStutteredEventsList(prevCount => prevCount-1)
+        setStutteredEvents(prevList => prevList.filter(word_obj => word_obj.id !== wordIndex));
+        if (stutteredEvents) {
+            setStutteredEventsCount(prevCount => prevCount-1)
         }
     };
+
+    const removeStutteredEventsWaveForm = (region) => {
+        setStutteredEvents(prevEvents => {
+            const newEvents = {...prevEvents};
+            delete newEvents[region.id];
+            return newEvents;
+        });
+        setStutteredEventsCount(preCount => preCount - 1);
+    }
 
     const setAdjustedSyllableCount = (index, syllableCount) => {
         setTranscriptionObj(prevTranscription => {
@@ -134,11 +136,11 @@ export const StutteredProvider = ({children}) => {
             transcriptError();
         }
 
-    }, [totalSyllableCount, stutteredEventCount, kiStutteredRegions]);
+    }, [totalSyllableCount, stutteredEventsCount, kiStutteredRegions]);
 
     useEffect(() => {
-       setStutteredEventCount(stutteredEventsList.length);
-    }, [stutteredEventsList]);
+       setStutteredEventsCount(stutteredEvents.length);
+    }, [stutteredEvents]);
 
     const transcriptError = () => {
         let transcriptionNew = JSON.parse(JSON.stringify(transcriptionObj));
@@ -165,10 +167,10 @@ export const StutteredProvider = ({children}) => {
         averageDuration,
         transcriptionObj,
         totalSyllableCount,
-        stutteredEventCount,
-        stutteredEventsList,
+        stutteredEventsCount,
+        stutteredEvents,
         setTranscriptionObj,
-        setStutteredEventCount,
+        setStutteredEventsCount,
         setTotalSyllableCount,
         loadingTranscription,
         setLoadingTranscription,
@@ -198,7 +200,8 @@ export const StutteredProvider = ({children}) => {
         playBackSpeed,
         transcriptError,
         randomFunction,
-        addStutteredEventWaveForm
+        addStutteredEventWaveForm,
+        removeStutteredEventsWaveForm
     }
 
     return (

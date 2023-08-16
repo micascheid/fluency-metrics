@@ -47,6 +47,7 @@ const AudioPlayer = () => {
         setAudioPlayerControl,
         setPlayBackSpeed,
         playBackSpeed,
+        stutteredEvents
     } = useContext(StutteredContext);
 
     const waveformProps = {
@@ -346,6 +347,7 @@ const AudioPlayer = () => {
                                     setPopoverOpen={setPopoverOpen}
                                     stutteredWords={stutteredWords}
                                     region={currentRegion}
+                                    exists={stutteredEvents[currentRegion.id]}
                                 />
                             )}
 

@@ -5,7 +5,7 @@ import {StutteredContext} from "../../context/StutteredContext";
 import { DataGrid } from '@mui/x-data-grid';
 
 const StutteredEvents = () => {
-    const { stutteredEventsList } = useContext(StutteredContext);
+    const { stutteredEvents } = useContext(StutteredContext);
     const columns = [
         {field: 'id', headerName: "Event #", flex: 1},
         {field: 'type', headerName: "Type", flex: 1},
@@ -16,16 +16,14 @@ const StutteredEvents = () => {
     ]
 
     useEffect(() => {
-        console.log("hello there");
-        console.log("STUTTEREDEVENTSLIST:", stutteredEventsList);
-    }, [stutteredEventsList]);
+    }, [stutteredEvents]);
 
     return (
       <MainCard sx={{minHeight: '800px'}}>
           <Typography variant={"h4"} sx={{pb: 3}}>Disfluency Events</Typography>
-          {stutteredEventsList.length > 0 ? (
+          {Object.keys(stutteredEvents).length > 0 ? (
               <DataGrid
-                  rows={stutteredEventsList}
+                  rows={Object.values(stutteredEvents)}
                   columns={columns}
                   initialState={{
                       pagination: {

@@ -14,22 +14,25 @@ import {StutteredContext} from "../../../context/StutteredContext";
 
 
 
-const AudioPlayerPopover = ({anchorEl, setAnchorEl, popoverOpen, setPopoverOpen, stutteredWords, region}) => {
-    const [stutterType, setStutterType] = useState('');
-    const [pcVal, setPcVal] = useState('');
-    const [syllableCount, setSyllableCount] = useState(0);
-    const typeList = ["Repetition", "Prolongation", "Block", "Interjection"];
-    const pcList = [0, 1, 2, 3, 4, 5];
-    const [localStutteredWords, setLocalStutteredWords] = useState('');
-
+const AudioPlayerPopover = ({anchorEl, setAnchorEl, popoverOpen, setPopoverOpen, stutteredWords, region, exists}) => {
     const {
         transcriptionObj,
         setTranscriptionObj,
         setkiStutteredRegions,
         addStutteredEventWaveForm,
         updateStutteredEventWaveForm,
-        stutteredEventsList,
+        stutteredEvents,
+        removeStutteredEventsWaveForm,
     } = useContext(StutteredContext);
+
+    const stutteredEvent = exists ? stutteredEvents[region.id] : null;
+    const [stutterType, setStutterType] = useState(exists ? stutteredEvent["type"] : '');
+    const [pcVal, setPcVal] = useState(exists ? stutteredEvent["ps"] : '');
+    const [syllableCount, setSyllableCount] = useState(exists ? stutteredEvent["syllable_count"] : 0);
+    const typeList = ["Repetition", "Prolongation", "Block", "Interjection"];
+    const pcList = [0, 1, 2, 3, 4, 5];
+    const [localStutteredWords, setLocalStutteredWords] = useState();
+
 
     const handlePopoverClose = () => {
         setPopoverOpen(false);
@@ -90,20 +93,8 @@ const AudioPlayerPopover = ({anchorEl, setAnchorEl, popoverOpen, setPopoverOpen,
         updateTranscriptionObj();
         const wordKeys = Object.keys(stutteredWords);
         const insertKey = wordKeys[0];
-        console.log("STUTTERED EVENT LIST:", stutteredEventsList);
-        console.log("REGION ID: ", region.id + stutteredEventsList.some(eventItem => {
-            console.log("eventID:",eventItem.id);
-        }));
-        let found = false;
 
-        stutteredEventsList.some(eventItem => {
-            const r = Number(region.id);
-            if (Number(eventItem.id) === Number(region.id)) {
-                found = true;
-            }
-        })
-        if (!(stutteredEventsList.length === 0) && found){
-            console.log("MAKING UPDATE");
+        if (!(stutteredEvents.length === 0) && stutteredEvents[region.id]){
             updateStutteredEventWaveForm(region, syllableCount, pcVal, localStutteredWords, stutterType);
         } else {
             addStutteredEventWaveForm(region, syllableCount, pcVal, localStutteredWords, stutterType, insertKey);
@@ -128,6 +119,7 @@ const AudioPlayerPopover = ({anchorEl, setAnchorEl, popoverOpen, setPopoverOpen,
             delete newRegion[region.id];
             return newRegion;
         })
+        removeStutteredEventsWaveForm(region);
     };
 
     const stutteredWordsDisplay = (words) => {
@@ -154,9 +146,10 @@ const AudioPlayerPopover = ({anchorEl, setAnchorEl, popoverOpen, setPopoverOpen,
                         <IconButton onClick={(event) => {
                             handleRegionDelete();
                             handlePopoverClose(event);
-                        }
-                        }>
-                            <DeleteForeverIcon sx={{color: 'red'}}/>
+                        }}
+                                    disabled={!exists}
+                        >
+                            <DeleteForeverIcon disabled={true} sx={{color: exists ? 'red' : 'grey'}}/>
                         </IconButton>
                     </Box>
                     <Divider textAlign={"left"} sx={dividerStyles}>Stuttered Text</Divider>
