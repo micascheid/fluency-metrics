@@ -32,6 +32,8 @@ const AudioPlayer = () => {
     const wavesurferRef = useRef();
     const [currentRegion, setCurrentRegion] = useState(null);
     const [stutteredWords, setStutteredWords] = useState({});
+    const [popoverKey, setPopoverKey] = useState(null);
+    const [popoverColor, setPopoverColor] = useState(false);
 
     const {
         countTotalSyllables,
@@ -119,7 +121,6 @@ const AudioPlayer = () => {
     );
 
     const handlePopoverOpen = (region, smth) => {
-        // get wave element bounding rect
         console.log("Stuttered words:", )
         const anchorElement = smth.currentTarget;
         if (anchorElement) {
@@ -127,6 +128,7 @@ const AudioPlayer = () => {
             setPopoverOpen(true);
             setAnchorEl(anchorElement);
             setCurrentRegion(region);
+            setPopoverKey(region.id);
         }
         setStutteredWords(getStutteredWordsFromRegion(region));
     }
@@ -203,6 +205,7 @@ const AudioPlayer = () => {
                         start: creatingRegion.start,
                         end: time,
                         duration: duration,
+                        color: "rgba(0, 0, 0, .2)"
                     };
                     const id = Object.keys(kiStutteredRegions).length;
                     setkiStutteredRegions(prevRegions => ({
@@ -224,9 +227,6 @@ const AudioPlayer = () => {
 
     const handleRegionUpdate = useCallback((region, smth) => {
         console.log("Dragging Region", region.id);
-        // console.log(smth);
-        console.log("WAVESURFER REGION", region);
-        console.log("KISTUTTEREDREGION", kiStutteredRegions);
         let changeRegion = kiStutteredRegions[region.id];
         console.log("Change regions", changeRegion);
         const duration = region.end - region.start;
@@ -336,11 +336,13 @@ const AudioPlayer = () => {
                                         {...regionProps}
                                         onUpdateEnd={handleRegionUpdate}
                                         onClick={handlePopoverOpen}
+
                                     />
                                 )
                             })}
                             {anchorEl && currentRegion && (
                                 <AudioPlayerPopover
+                                    key={popoverKey}
                                     anchorEl={anchorEl}
                                     setAnchorEl={setAnchorEl}
                                     popoverOpen={Boolean(anchorEl)}
@@ -348,6 +350,7 @@ const AudioPlayer = () => {
                                     stutteredWords={stutteredWords}
                                     region={currentRegion}
                                     exists={stutteredEvents[currentRegion.id]}
+                                    // setPopoverColor={setPopoverColor}
                                 />
                             )}
 

@@ -14,10 +14,11 @@ import {StutteredContext} from "../../../context/StutteredContext";
 
 
 
-const AudioPlayerPopover = ({anchorEl, setAnchorEl, popoverOpen, setPopoverOpen, stutteredWords, region, exists}) => {
+const AudioPlayerPopover = ({anchorEl, setAnchorEl, popoverOpen, setPopoverOpen, stutteredWords, region, exists, setPopoverColor}) => {
     const {
         transcriptionObj,
         setTranscriptionObj,
+        kiStutteredRegions,
         setkiStutteredRegions,
         addStutteredEventWaveForm,
         updateStutteredEventWaveForm,
@@ -31,7 +32,10 @@ const AudioPlayerPopover = ({anchorEl, setAnchorEl, popoverOpen, setPopoverOpen,
     const [syllableCount, setSyllableCount] = useState(exists ? stutteredEvent["syllable_count"] : 0);
     const typeList = ["Repetition", "Prolongation", "Block", "Interjection"];
     const pcList = [0, 1, 2, 3, 4, 5];
-    const [localStutteredWords, setLocalStutteredWords] = useState();
+    const stutteredWordsDisplay = (words) => {
+        return Object.values(words).map(word_obj => word_obj.text).join(' ');
+    };
+    const [localStutteredWords, setLocalStutteredWords] = useState('');
 
 
     const handlePopoverClose = () => {
@@ -98,14 +102,25 @@ const AudioPlayerPopover = ({anchorEl, setAnchorEl, popoverOpen, setPopoverOpen,
             updateStutteredEventWaveForm(region, syllableCount, pcVal, localStutteredWords, stutterType);
         } else {
             addStutteredEventWaveForm(region, syllableCount, pcVal, localStutteredWords, stutterType, insertKey);
+            let changeRegion = kiStutteredRegions[region.id];
+            changeRegion.color = "rgba(255, 153, 10, .5)";
+            setkiStutteredRegions(prevRegions => {
+                return {
+                    ...prevRegions,
+                    [region.id]: changeRegion
+                }
+            });
         }
+        console.log("COLOR", anchorEl);
         setPopoverOpen(false);
         setAnchorEl(null);
     };
 
     const handleChange = (event) => {
         const words = event.target.value;
-        setLocalStutteredWords(event.target.value);
+        if (words !== localStutteredWords) {
+            setLocalStutteredWords(words);
+        }
     };
 
     const handleKeyPress = (event) => {
@@ -122,12 +137,13 @@ const AudioPlayerPopover = ({anchorEl, setAnchorEl, popoverOpen, setPopoverOpen,
         removeStutteredEventsWaveForm(region);
     };
 
-    const stutteredWordsDisplay = (words) => {
-        return Object.values(words).map(word_obj => word_obj.text).join(' ');
-    };
+    // const stutteredWordsDisplay = (words) => {
+    //     return Object.values(words).map(word_obj => word_obj.text).join(' ');
+    // };
 
     useEffect(() => {
         setLocalStutteredWords(stutteredWordsDisplay(stutteredWords));
+
     }, [stutteredWords]);
 
     return (
@@ -136,6 +152,7 @@ const AudioPlayerPopover = ({anchorEl, setAnchorEl, popoverOpen, setPopoverOpen,
             anchorEl={anchorEl}
             onClose={handlePopoverClose}
             anchorOrigin={{vertical: 'center', horizontal: 'center'}}
+            transitionDuration={0}
         >
             <Box sx={{minWidth: 200}}>
                 <Stack direction={"column"} sx={{pl: 1}}>
@@ -147,9 +164,9 @@ const AudioPlayerPopover = ({anchorEl, setAnchorEl, popoverOpen, setPopoverOpen,
                             handleRegionDelete();
                             handlePopoverClose(event);
                         }}
-                                    disabled={!exists}
+                                    // disabled={!exists}
                         >
-                            <DeleteForeverIcon disabled={true} sx={{color: exists ? 'red' : 'grey'}}/>
+                            <DeleteForeverIcon sx={{color: 'red'}}/>
                         </IconButton>
                     </Box>
                     <Divider textAlign={"left"} sx={dividerStyles}>Stuttered Text</Divider>

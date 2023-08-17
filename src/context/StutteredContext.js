@@ -44,13 +44,22 @@ export const StutteredProvider = ({children}) => {
     };
 
 
-    const addStutteredEventWaveForm = (region, syllableCount, ps, text, type, wordIndex) => {
+    const addStutteredEventWaveForm = (region, syllableCount, ps, text, type) => {
         const duration = region.end - region.start;
         const eventItem = {duration: duration, syllable_count: syllableCount, ps: ps, text: text, type: type, id: region.id};
         if (!stutteredEvents[region.id]) {
             setStutteredEvents(prevEvents => ({...prevEvents, [region.id]: eventItem}));
             setStutteredEventsCount(prevCount => prevCount + 1);
         }
+        let changeRegion = kiStutteredRegions[region.id];
+        changeRegion.color = "rgba(255, 153, 10, .5)";
+        setkiStutteredRegions(prevRegions => {
+            return {
+                ...prevRegions,
+                [region.id]: changeRegion
+            }
+        });
+
     };
 
     const updateStutteredEventWaveForm = (region, syllable_count, ps, text, type) => {

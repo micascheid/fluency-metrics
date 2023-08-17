@@ -147,7 +147,7 @@ const WordComponent = ({word, word_obj, onUpdateWord, index, style}) => {
                     horizontal: 'center',
                 }}
                 onClose={closePopover}
-                transitionDuration={0}
+                transitionDuration={150}
             >
 
                 <div onMouseLeave={closePopover}>
