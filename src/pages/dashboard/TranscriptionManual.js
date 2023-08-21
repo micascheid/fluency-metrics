@@ -17,11 +17,33 @@ const TranscriptionManual = () => {
         setTranscriptionObj,
         handleWordUpdate,
         currentWordIndex,
-        fileChosen} = useContext(StutteredContext);
+        fileChosen,
+        audioPlayerControl,
+        setPlayBackSpeed
+    } = useContext(StutteredContext);
 
     //FUNCTIONS
     const handleKeyPress = (event) => {
         event.stopPropagation();
+
+        if (event.shiftKey && event.key === " ") {
+            event.preventDefault();
+            if (audioPlayerControl) {
+                audioPlayerControl.playPause();
+            }
+        }
+
+        if (event.key.match(/[0-9]/)) {
+            event.preventDefault();
+            console.log("SETTING PLAYBACK SPEED");
+            if (event.key === "0"){
+                setPlayBackSpeed(1);
+            } else {
+                setPlayBackSpeed(Number(event.key)/10);
+                console.log(Number(event.key)/10);
+            }
+        }
+
     };
 
     const manualTranscriptionHandler = () => {
@@ -88,7 +110,7 @@ const TranscriptionManual = () => {
                     {transcriptionObj && Object.keys(transcriptionObj).map((key) => (
                         <Fragment key={key}>
                             <WordComponent
-                                word={transcriptionObj[key].text}
+                                word={transcriptionObj[key].punctuated_word}
                                 word_obj={transcriptionObj[key]}
                                 onUpdateWord={handleWordUpdate}
                                 index={key}

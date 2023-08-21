@@ -2,7 +2,7 @@ import React, {useContext} from 'react';
 import MainCard from "../../components/MainCard";
 import {Divider, List, Stack, Typography} from "@mui/material";
 import {StutteredContext} from "../../context/StutteredContext";
-import {styled} from "@mui/material/styles";
+
 
 const dividerStyles = {
     "&::before, &::after": {
@@ -11,7 +11,7 @@ const dividerStyles = {
     pt: 3,
 }
 const FluencyCounts = () => {
-    const { totalSyllableCount, stutteredEventCount, ss, averageDuration, psList, longest3Durations } = useContext(StutteredContext);
+    const { totalSyllableCount, stutteredEventsCount, ss, averageDuration, psList, longest3Durations } = useContext(StutteredContext);
 
 
     return (
@@ -20,7 +20,7 @@ const FluencyCounts = () => {
             <Stack direction={"column"}>
                 <Divider textAlign={"left"} sx={dividerStyles}><Typography variant={"h5"}>Frequency</Typography></Divider>
                 <Typography>Total Syllables: {totalSyllableCount}</Typography>
-                <Typography>Stuttered Events: {stutteredEventCount}</Typography>
+                <Typography>Stuttered Events: {stutteredEventsCount}</Typography>
                 <Typography>%SS: {ss}</Typography>
                 <Divider textAlign={"left"} sx={dividerStyles}><Typography variant={"h5"}>Duration</Typography></Divider>
                 <Typography>Average: {averageDuration}</Typography>

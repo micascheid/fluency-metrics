@@ -10,25 +10,30 @@ import "./styles.css";
 import RegionsPlugin from "wavesurfer.js/dist/plugin/wavesurfer.regions.min";
 import TimelinePlugin from "wavesurfer.js/dist/plugin/wavesurfer.timeline.min";
 import MarkersPlugin from "wavesurfer.js/src/plugin/markers";
-import {Box, Button, Slider, Stack, Typography} from "@mui/material";
+import {Box, Button, Popover, Slider, Stack, Typography} from "@mui/material";
 import MainCard from "../../components/MainCard";
 import ZoomIn from '@mui/icons-material/ZoomIn';
 import ZoomOut from '@mui/icons-material/ZoomOut';
 import Speed from '@mui/icons-material/Speed';
 import axios from 'axios';
 import {StutteredContext} from "../../context/StutteredContext";
-import {MANUAL} from "../../constants";
+import {BASE_URL, MANUAL} from "../../constants";
+import AudioPlayerPopover from "./popovers/AudioPlayerPopover";
 
-const AudioPlayer = ({setSS, setNSS}) => {
+const AudioPlayer = () => {
     // VARIABLES
     const [timelineVis, setTimelineVis] = useState(true);
-    const [playbackSpeed, setPlaybackSpeed] = useState(1);
     const [zoomLevel, setZoomLevel] = useState(1);
     const [markers, setMarkers] = useState([]);
     const [creatingRegion, setCreatingRegion] = useState(null);
     const [isCreatingRegion, setIsCreatingRegion] = useState(false);
+    const [popoverOpen, setPopoverOpen] = useState(false);
+    const [anchorEl, setAnchorEl] = useState(null);
     const wavesurferRef = useRef();
-
+    const [currentRegion, setCurrentRegion] = useState(null);
+    const [stutteredWords, setStutteredWords] = useState({});
+    const [popoverKey, setPopoverKey] = useState(null);
+    const [popoverColor, setPopoverColor] = useState(false);
 
     const {
         countTotalSyllables,
@@ -41,7 +46,10 @@ const AudioPlayer = ({setSS, setNSS}) => {
         audioFile,
         kiStutteredRegions,
         setkiStutteredRegions,
-        setFileChosen,
+        setAudioPlayerControl,
+        setPlayBackSpeed,
+        playBackSpeed,
+        stutteredEvents
     } = useContext(StutteredContext);
 
     const waveformProps = {
@@ -112,20 +120,25 @@ const AudioPlayer = ({setSS, setNSS}) => {
         [wavesurferRef]
     );
 
-    const removeLastMarker = useCallback(() => {
-        setMarkers(prevMarkers => {
-            let nextMarkers = [...prevMarkers];
-            nextMarkers.pop();
-            return nextMarkers;
-        });
-    }, []);
+    const handlePopoverOpen = (region, smth) => {
+        console.log("Stuttered words:", )
+        const anchorElement = smth.currentTarget;
+        if (anchorElement) {
+            console.log("REGION", region);
+            setPopoverOpen(true);
+            setAnchorEl(anchorElement);
+            setCurrentRegion(region);
+            setPopoverKey(region.id);
+        }
+        setStutteredWords(getStutteredWordsFromRegion(region));
+    }
 
     const play = useCallback(() => {
         if (wavesurferRef.current) {
             wavesurferRef.current.playPause();
-            wavesurferRef.current.setPlaybackRate(playbackSpeed);
+            wavesurferRef.current.setPlaybackRate(playBackSpeed);
         }
-    }, [playbackSpeed]);
+    }, [playBackSpeed]);
 
     const loadAudioFile = (file) => {
         console.log("Setting Audio File");
@@ -142,12 +155,12 @@ const AudioPlayer = ({setSS, setNSS}) => {
         return value;
     };
 
-    const playbackSpeedHandler = (event, value) => {
+    const playbackSpeedHandler = useCallback((event, value) => {
         console.log("Playback Speed", value);
         console.log(wavesurferRef.current.getCurrentTime());
         wavesurferRef.current.setPlaybackRate(value);
-        setPlaybackSpeed(value);
-    };
+        setPlayBackSpeed(value);
+    }, [playBackSpeed]);
 
     // BACKEND CALLS
     const get_transcription = () => {
@@ -155,7 +168,7 @@ const AudioPlayer = ({setSS, setNSS}) => {
         const formData = new FormData();
         console.log(audioFile.name);
         formData.append('file', audioFile);
-        axios.post('http://127.0.0.1:5000/get_transcription', formData, {
+        axios.post(`${BASE_URL}/get_transcription2`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
@@ -172,6 +185,12 @@ const AudioPlayer = ({setSS, setNSS}) => {
         });
     };
 
+    const playPause = () => {
+        if (wavesurferRef.current !== null) {
+            wavesurferRef.current.playPause();
+        }
+    }
+
     const handleKeyPress = (event) => {
         if (wavesurferRef.current) {
             if (event.key === 's') {
@@ -186,8 +205,8 @@ const AudioPlayer = ({setSS, setNSS}) => {
                         start: creatingRegion.start,
                         end: time,
                         duration: duration,
+                        color: "rgba(0, 0, 0, .2)"
                     };
-
                     const id = Object.keys(kiStutteredRegions).length;
                     setkiStutteredRegions(prevRegions => ({
                         ...prevRegions,
@@ -199,21 +218,15 @@ const AudioPlayer = ({setSS, setNSS}) => {
                 }
             }
 
-            if (event.key === 'n') {
-                setNSS(prevValue => prevValue + 1);
-            }
             if (event.key === " ") {
                 event.preventDefault();
-                wavesurferRef.current.playPause();
+                playPause();
             }
         }
     };
 
     const handleRegionUpdate = useCallback((region, smth) => {
         console.log("Dragging Region", region.id);
-        // console.log(smth);
-        console.log("WAVESURFER REGION", region);
-        console.log("KISTUTTEREDREGION", kiStutteredRegions);
         let changeRegion = kiStutteredRegions[region.id];
         console.log("Change regions", changeRegion);
         const duration = region.end - region.start;
@@ -221,16 +234,37 @@ const AudioPlayer = ({setSS, setNSS}) => {
         changeRegion.end = region.end;
         changeRegion.duration = duration;
         setkiStutteredRegions(prevRegions => {
-           return {
-               ...prevRegions,
-               [region.id]: changeRegion
-           }
+            return {
+                ...prevRegions,
+                [region.id]: changeRegion
+            }
         });
     }, [kiStutteredRegions]);
+
+
+    const getStutteredWordsFromRegion = (region) => {
+        const words =  Object.keys(transcriptionObj).filter(key => {
+            const regionStart = region.start;
+            const regionEnd = region.end;
+            const word = transcriptionObj[key];
+            return (word.start >= regionStart && word.start <= regionEnd) ||
+                (word.end >= regionStart && word.end <= regionEnd);
+        }).reduce((result, key) => {
+            result[key] = transcriptionObj[key];
+            return result;
+        }, {})
+        return words;
+    };
+
 
     // USE EFFECTS
     useEffect(() => {
         loadAudioFile(audioFile);
+        if (wavesurferRef.current !== null) {
+            setAudioPlayerControl({
+                playPause: playPause
+            });
+        }
     }, [audioFile]);
 
     useEffect(() => {
@@ -266,6 +300,10 @@ const AudioPlayer = ({setSS, setNSS}) => {
             });
         }
 
+        if (wavesurferRef.current) {
+            wavesurferRef.current.setPlaybackRate(playBackSpeed);
+        }
+
         window.addEventListener('keypress', handleKeyPress);
         return () => {
             window.removeEventListener('keypress', handleKeyPress);
@@ -276,7 +314,7 @@ const AudioPlayer = ({setSS, setNSS}) => {
                 }
             }
         }
-    }, [wavesurferRef, transcriptionObj, handleKeyPress]);
+    }, [wavesurferRef, transcriptionObj, handleKeyPress, playBackSpeed, kiStutteredRegions]);
 
     return (
         <MainCard>
@@ -290,16 +328,32 @@ const AudioPlayer = ({setSS, setNSS}) => {
                                     {...marker}
                                 />
                             ))}
-                            {Object.entries(kiStutteredRegions).map(([id,regionProps]) => {
+                            {Object.entries(kiStutteredRegions).map(([id, regionProps]) => {
                                 return (
                                     <Region
                                         key={id}
                                         id={id}
                                         {...regionProps}
                                         onUpdateEnd={handleRegionUpdate}
+                                        onClick={handlePopoverOpen}
+
                                     />
                                 )
                             })}
+                            {anchorEl && currentRegion && (
+                                <AudioPlayerPopover
+                                    key={popoverKey}
+                                    anchorEl={anchorEl}
+                                    setAnchorEl={setAnchorEl}
+                                    popoverOpen={Boolean(anchorEl)}
+                                    setPopoverOpen={setPopoverOpen}
+                                    stutteredWords={stutteredWords}
+                                    region={currentRegion}
+                                    exists={stutteredEvents[currentRegion.id]}
+                                    // setPopoverColor={setPopoverColor}
+                                />
+                            )}
+
                         </WaveForm>
                         <div id="timeline"/>
                     </WaveSurfer>
@@ -320,10 +374,13 @@ const AudioPlayer = ({setSS, setNSS}) => {
                             valueLabelDisplay="auto"
                             step={.1}
                             marks
-                            min={.3}
+                            min={.4}
                             max={1}
-                            value={playbackSpeed}
-                            onChange={playbackSpeedHandler}
+                            value={playBackSpeed}
+                            onChange={(event, value) => {
+                                console.log("Getting hit here?");
+                                playbackSpeedHandler(event, value);
+                            }}
                             disabled={!audioFile}
                             sx={{width: 90, mr: 10}}
                         />

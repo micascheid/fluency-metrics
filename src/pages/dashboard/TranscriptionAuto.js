@@ -5,8 +5,17 @@ import {StutteredContext} from "../../context/StutteredContext";
 
 
 const TranscriptionAuto = () => {
-    const {transcriptionObj, handleWordUpdate, currentWordIndex} = useContext(StutteredContext);
+    const {
+        transcriptionObj,
+        handleWordUpdate,
+        currentWordIndex,
+        kiStutteredRegions,
+    } = useContext(StutteredContext);
 
+    useEffect(() => {
+
+    },[kiStutteredRegions]);
+    // console.log("HEY GETTING RE RENDERED HERE:", transcriptionObj);
     // console.log("CURRENT WORD INDEX: " + typeof currentWordIndex);
 
     return (
@@ -14,11 +23,12 @@ const TranscriptionAuto = () => {
             {Object.keys(transcriptionObj).map((key) => (
                 <Fragment key={key}>
                     <WordComponent
-                        word={transcriptionObj[key].text}
+                        word={transcriptionObj[key].punctuated_word}
                         word_obj={transcriptionObj[key]}
                         onUpdateWord={handleWordUpdate}
                         index={key}
-                        style={{backgroundColor: currentWordIndex === parseInt(key) ? '#ADD8E6' : 'transparent'}}
+                        style={{textDecoration: currentWordIndex === parseInt(key) ? 'underline' : 'none',
+                                backgroundColor: transcriptionObj[key].stuttered ? "#ADD8E6" : 'transparent'}}
                     >
                     </WordComponent>{" "}
                 </Fragment>
