@@ -17,7 +17,7 @@ import ZoomOut from '@mui/icons-material/ZoomOut';
 import Speed from '@mui/icons-material/Speed';
 import axios from 'axios';
 import {StutteredContext} from "../../context/StutteredContext";
-import {MANUAL} from "../../constants";
+import {BASE_URL, MANUAL} from "../../constants";
 import AudioPlayerPopover from "./popovers/AudioPlayerPopover";
 
 const AudioPlayer = () => {
@@ -168,13 +168,13 @@ const AudioPlayer = () => {
         const formData = new FormData();
         console.log(audioFile.name);
         formData.append('file', audioFile);
-        axios.post('http://127.0.0.1:5000/get_transcription', formData, {
+        axios.post(`${BASE_URL}/get_transcription2`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
         }).then(response => {
             const transcriptionObj = response.data.transcription_obj;
-            // console.log("TRANSCRIPTION OBJ: ", transcriptionObj);
+            console.log("TRANSCRIPTION OBJ: ", transcriptionObj);
             setTranscriptionObj(transcriptionObj);
             countTotalSyllables();
             setLoadingTranscription(false);

@@ -23,7 +23,7 @@ const TranscriptionAuto = () => {
             {Object.keys(transcriptionObj).map((key) => (
                 <Fragment key={key}>
                     <WordComponent
-                        word={transcriptionObj[key].text}
+                        word={transcriptionObj[key].punctuated_word}
                         word_obj={transcriptionObj[key]}
                         onUpdateWord={handleWordUpdate}
                         index={key}

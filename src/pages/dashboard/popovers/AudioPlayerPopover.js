@@ -33,7 +33,7 @@ const AudioPlayerPopover = ({anchorEl, setAnchorEl, popoverOpen, setPopoverOpen,
     const typeList = ["Repetition", "Prolongation", "Block", "Interjection"];
     const pcList = [0, 1, 2, 3, 4, 5];
     const stutteredWordsDisplay = (words) => {
-        return Object.values(words).map(word_obj => word_obj.text).join(' ');
+        return Object.values(words).map(word_obj => word_obj.punctuated_word).join(' ');
     };
     const [localStutteredWords, setLocalStutteredWords] = useState('');
 
@@ -87,7 +87,7 @@ const AudioPlayerPopover = ({anchorEl, setAnchorEl, popoverOpen, setPopoverOpen,
             start: start,
             stuttered: true,
             syllable_count: 1,
-            text: localStutteredWords
+            punctuated_word: localStutteredWords
         }
         newTranscriptionObj = reIndexKeys(newTranscriptionObj);
         setTranscriptionObj(newTranscriptionObj);
