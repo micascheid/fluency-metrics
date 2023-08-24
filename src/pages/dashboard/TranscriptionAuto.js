@@ -25,7 +25,7 @@ const TranscriptionAuto = () => {
                     <WordComponent
                         word={transcriptionObj[key].punctuated_word}
                         word_obj={transcriptionObj[key]}
-                        onUpdateWord={handleWordUpdate}
+                        // onUpdateWord={handleWordUpdate}
                         index={key}
                         style={{textDecoration: currentWordIndex === parseInt(key) ? 'underline' : 'none',
                                 backgroundColor: transcriptionObj[key].stuttered ? "#ADD8E6" : 'transparent'}}

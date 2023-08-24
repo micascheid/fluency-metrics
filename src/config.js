@@ -6,7 +6,7 @@ const config = {
     i18n: 'en',
     miniDrawer: false,
     container: true,
-    mode: 'asdf',
+    mode: 'light',
     presetColor: 'default',
     themeDirection: 'ltr'
 };

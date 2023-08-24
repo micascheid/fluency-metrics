@@ -97,13 +97,14 @@ const AudioPlayerPopover = ({anchorEl, setAnchorEl, popoverOpen, setPopoverOpen,
         updateTranscriptionObj();
         const wordKeys = Object.keys(stutteredWords);
         const insertKey = wordKeys[0];
-
         if (!(stutteredEvents.length === 0) && stutteredEvents[region.id]){
             updateStutteredEventWaveForm(region, syllableCount, pcVal, localStutteredWords, stutterType);
         } else {
             addStutteredEventWaveForm(region, syllableCount, pcVal, localStutteredWords, stutterType, insertKey);
             let changeRegion = kiStutteredRegions[region.id];
             changeRegion.color = "rgba(255, 153, 10, .5)";
+            changeRegion.resize = false;
+            changeRegion.drag = false;
             setkiStutteredRegions(prevRegions => {
                 return {
                     ...prevRegions,

@@ -1,9 +1,10 @@
-import React, {useState, useRef, useContext, useEffect} from 'react';
-import {Popover, TextField, styled, Stack, Divider, Typography, Button, Box} from '@mui/material';
+import React, {useState, useContext, useEffect} from 'react';
+import {Popover, TextField, styled, Stack, Divider, Button, Box} from '@mui/material';
 import {Checkbox, FormControlLabel} from '@mui/material';
 import {StutteredContext} from "../../context/StutteredContext";
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 
 const CustomWordInput = styled(TextField)(({theme}) => ({
     ...theme.typography.h5,
@@ -40,7 +41,7 @@ const WordComponent = ({word, word_obj, onUpdateWord, index, style}) => {
     const [isClicked, setIsClicked] = useState(false);
     const {
         addStutteredEvent,
-        removeStutteredEvent,
+        setTranscriptionObj,
         setAdjustedSyllableCount,
         mode,
     } = useContext(StutteredContext);
@@ -52,17 +53,22 @@ const WordComponent = ({word, word_obj, onUpdateWord, index, style}) => {
 
     // FUNCTIONS
     const handlePopoverOpen = (event) => {
-        console.log("KEY: ", typeof index);
         console.log(event.currentTarget);
         setAnchorEl(event.currentTarget);
         setIsClicked(true);
     };
 
-    const handlePopoverClose = () => {
-        if (syllableCount === 0) {
-            setSyllableCount(word_obj.syllable_count);
-        }
+    const handleDonePopoverClose = () => {
+        // if (syllableCount === 0) {
+        //     setSyllableCount(word_obj.syllable_count);
+        // }
         handleStutteredEvent();
+        handleBlur();
+        setAnchorEl(null);
+        setIsClicked(false);
+    };
+
+    const handlePopoverClose = () => {
         handleBlur();
         setAnchorEl(null);
         setIsClicked(false);
@@ -93,7 +99,7 @@ const WordComponent = ({word, word_obj, onUpdateWord, index, style}) => {
     };
 
     const handleBlur = () => {
-        onUpdateWord(index, newWord);
+        // onUpdateWord(index, newWord);
     };
 
     const handleKeyDown = (event) => {
@@ -110,9 +116,25 @@ const WordComponent = ({word, word_obj, onUpdateWord, index, style}) => {
     const handleStutteredEvent = () => {
         if (isStuttered) {
             addStutteredEvent(word_obj, typeMap[type], ps, newWord, index);
-        } else {
-            removeStutteredEvent(index);
         }
+    };
+
+    const handleWordDeletion = () => {
+        setTranscriptionObj(prevTranscription => {
+            let newTranscription = {...prevTranscription};
+            delete newTranscription[index];
+            const finalTranscription = reIndexKeys(newTranscription);
+            return finalTranscription;
+        });
+        handlePopoverClose();
+    }
+
+    const reIndexKeys = (obj) => {
+        return Object.keys(obj).reduce((newObj, currentObj, index) => {
+            const val = obj[currentObj];
+            newObj[index+1] = val;
+            return newObj;
+        }, {});
     };
 
     useEffect(() => {
@@ -123,10 +145,12 @@ const WordComponent = ({word, word_obj, onUpdateWord, index, style}) => {
     return (
         <>
             <span
-                onClick={() => {
+                onClick={(event) => {
                     if (mode !== "auto") {
                         handlePopoverOpen();
                     }
+
+                    handlePopoverOpen(event);
                 }
                 }
                 style={{
@@ -152,9 +176,18 @@ const WordComponent = ({word, word_obj, onUpdateWord, index, style}) => {
 
                 <div onMouseLeave={closePopover}>
                     <Stack direction={"column"} sx={{pl: 1, pb: 1}}>
-                        <IconButton sx={{mb: '-1'}} onClick={closePopover}>
-                            <CloseIcon/>
-                        </IconButton>
+                        <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
+                            <IconButton sx={{mb: '-1'}} onClick={closePopover}>
+                                <CloseIcon/>
+                            </IconButton>
+                            <IconButton onClick={()=> {
+                                handleWordDeletion();
+                            }
+                            }>
+                                <DeleteForeverIcon sx={{color: 'red'}}/>
+                            </IconButton>
+                        </Box>
+
                         <Divider textAlign={"left"} sx={dividerStyles}>Stuttered Event</Divider>
                         <Box sx={{ display: 'flex', alignItems: "center", justifyContent: "left"}}>
                             <Checkbox
@@ -209,7 +242,7 @@ const WordComponent = ({word, word_obj, onUpdateWord, index, style}) => {
                             ))}
                         </Stack>
                         <Button variant={"contained"} sx={{width: '40px', mb: 1}}
-                                onClick={handlePopoverClose}>Done</Button>
+                                onClick={handleDonePopoverClose}>Done</Button>
                     </Stack>
                 </div>
             </Popover>

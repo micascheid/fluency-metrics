@@ -1,7 +1,22 @@
 import React, {useState, createContext, useEffect} from "react";
-
-
 export const StutteredContext = createContext();
+const initialState = {
+    stutteredEventsCounts: 0,
+    stutteredEvents: {},
+    totalSyllableCount: 0,
+    transcriptionObj: null,
+    currentWordIndex: 1,
+    averageDuration: 0,
+    loadingTranscription: false,
+    mode: '',
+    audioFileName: '',
+    audioFile: null,
+    kiStutteredRegions: {},
+    fileChosen: false,
+    longest3Durations: [0, 0, 0],
+    audioPlayerControl: null,
+    playBackSpeed: 1
+}
 
 export const StutteredProvider = ({children}) => {
     // VARIABLES
@@ -85,6 +100,7 @@ export const StutteredProvider = ({children}) => {
     };
 
     const removeStutteredEvent = (wordIndex) => {
+        console.log(stutteredEvents);
         setStutteredEvents(prevList => prevList.filter(word_obj => word_obj.id !== wordIndex));
         if (stutteredEvents) {
             setStutteredEventsCount(prevCount => prevCount-1)
@@ -130,7 +146,7 @@ export const StutteredProvider = ({children}) => {
     const handleWordUpdate = (index, newWord) => {
         setTranscriptionObj(prevTranscription => {
             const updatedTranscription = {...prevTranscription};
-            updatedTranscription[index].text = newWord;
+            updatedTranscription[index].punctuated_word = newWord;
             return updatedTranscription;
         });
     };

@@ -10,18 +10,29 @@ import "./styles.css";
 import RegionsPlugin from "wavesurfer.js/dist/plugin/wavesurfer.regions.min";
 import TimelinePlugin from "wavesurfer.js/dist/plugin/wavesurfer.timeline.min";
 import MarkersPlugin from "wavesurfer.js/src/plugin/markers";
-import {Box, Button, Popover, Slider, Stack, Typography} from "@mui/material";
+import {Box, Button, Slider, Stack, Typography} from "@mui/material";
 import MainCard from "../../components/MainCard";
 import ZoomIn from '@mui/icons-material/ZoomIn';
 import ZoomOut from '@mui/icons-material/ZoomOut';
 import Speed from '@mui/icons-material/Speed';
-import axios from 'axios';
 import {StutteredContext} from "../../context/StutteredContext";
-import {BASE_URL, MANUAL} from "../../constants";
 import AudioPlayerPopover from "./popovers/AudioPlayerPopover";
 
 const AudioPlayer = () => {
     // VARIABLES
+    const {
+            transcriptionObj,
+            setCurrentWordIndex,
+            currentWordIndex,
+            audioFile,
+            kiStutteredRegions,
+            setkiStutteredRegions,
+            setAudioPlayerControl,
+            setPlayBackSpeed,
+            playBackSpeed,
+            stutteredEvents
+        } = useContext(StutteredContext);
+
     const [timelineVis, setTimelineVis] = useState(true);
     const [zoomLevel, setZoomLevel] = useState(1);
     const [markers, setMarkers] = useState([]);
@@ -33,24 +44,7 @@ const AudioPlayer = () => {
     const [currentRegion, setCurrentRegion] = useState(null);
     const [stutteredWords, setStutteredWords] = useState({});
     const [popoverKey, setPopoverKey] = useState(null);
-    const [popoverColor, setPopoverColor] = useState(false);
-
-    const {
-        countTotalSyllables,
-        setTranscriptionObj,
-        transcriptionObj,
-        setLoadingTranscription,
-        setCurrentWordIndex,
-        currentWordIndex,
-        mode,
-        audioFile,
-        kiStutteredRegions,
-        setkiStutteredRegions,
-        setAudioPlayerControl,
-        setPlayBackSpeed,
-        playBackSpeed,
-        stutteredEvents
-    } = useContext(StutteredContext);
+    const isDisabled = transcriptionObj === null;
 
     const waveformProps = {
         id: "waveform",
@@ -63,13 +57,13 @@ const AudioPlayer = () => {
         return [
             {
                 plugin: RegionsPlugin,
-                options: {dragSelection: false}
+                options: {enableDragSelection: false}
             },
             timelineVis && {
                 plugin: TimelinePlugin,
                 options: {
                     container: "#timeline",
-                    timeInterval: .1
+                    timeInterval: .5
                 }
             },
             {
@@ -121,7 +115,7 @@ const AudioPlayer = () => {
     );
 
     const handlePopoverOpen = (region, smth) => {
-        console.log("Stuttered words:", )
+        console.log("Stuttered words:",)
         const anchorElement = smth.currentTarget;
         if (anchorElement) {
             console.log("REGION", region);
@@ -162,29 +156,6 @@ const AudioPlayer = () => {
         setPlayBackSpeed(value);
     }, [playBackSpeed]);
 
-    // BACKEND CALLS
-    const get_transcription = () => {
-        setLoadingTranscription(true);
-        const formData = new FormData();
-        console.log(audioFile.name);
-        formData.append('file', audioFile);
-        axios.post(`${BASE_URL}/get_transcription2`, formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-        }).then(response => {
-            const transcriptionObj = response.data.transcription_obj;
-            console.log("TRANSCRIPTION OBJ: ", transcriptionObj);
-            setTranscriptionObj(transcriptionObj);
-            countTotalSyllables();
-            setLoadingTranscription(false);
-
-        }).catch(error => {
-            console.log("ERROR handling get_transcription:", error);
-            setLoadingTranscription(false);
-        });
-    };
-
     const playPause = () => {
         if (wavesurferRef.current !== null) {
             wavesurferRef.current.playPause();
@@ -192,7 +163,7 @@ const AudioPlayer = () => {
     }
 
     const handleKeyPress = (event) => {
-        if (wavesurferRef.current) {
+        if (wavesurferRef.current && !isDisabled) {
             if (event.key === 's') {
                 const time = wavesurferRef.current.getCurrentTime();
                 if (!isCreatingRegion) {
@@ -241,9 +212,17 @@ const AudioPlayer = () => {
         });
     }, [kiStutteredRegions]);
 
+    const handleOnOver = () => {
+        // console.log("on over");
+    }
+
+    const handleUpdate = useCallback((region, smth) => {
+        // console.log("updating");
+    }, [kiStutteredRegions])
+
 
     const getStutteredWordsFromRegion = (region) => {
-        const words =  Object.keys(transcriptionObj).filter(key => {
+        const words = Object.keys(transcriptionObj).filter(key => {
             const regionStart = region.start;
             const regionEnd = region.end;
             const word = transcriptionObj[key];
@@ -268,6 +247,11 @@ const AudioPlayer = () => {
     }, [audioFile]);
 
     useEffect(() => {
+        console.log("USE EFFECT ", kiStutteredRegions.length);
+        // if (Object.keys(kiStutteredRegions).length > 0) {
+        //     console.log("UNDRAGGABLE");
+        //     kiStutteredRegions[0].resize = false;
+        // }
         if (transcriptionObj) {
             wavesurferRef.current.on('audioprocess', function (time) {
                 let newWordIndex = null;
@@ -316,6 +300,7 @@ const AudioPlayer = () => {
         }
     }, [wavesurferRef, transcriptionObj, handleKeyPress, playBackSpeed, kiStutteredRegions]);
 
+
     return (
         <MainCard>
             <Stack>
@@ -335,7 +320,9 @@ const AudioPlayer = () => {
                                         id={id}
                                         {...regionProps}
                                         onUpdateEnd={handleRegionUpdate}
+                                        onUpdate={handleUpdate}
                                         onClick={handlePopoverOpen}
+                                        onOver={handleOnOver}
 
                                     />
                                 )
@@ -381,7 +368,7 @@ const AudioPlayer = () => {
                                 console.log("Getting hit here?");
                                 playbackSpeedHandler(event, value);
                             }}
-                            disabled={!audioFile}
+                            disabled={isDisabled}
                             sx={{width: 90, mr: 10}}
                         />
                     </Box>
@@ -389,21 +376,13 @@ const AudioPlayer = () => {
                         play();
                         event.currentTarget.blur();
                     }}
-                            disabled={!audioFile}>Play / Pause</Button>
+                            disabled={isDisabled}>Play / Pause</Button>
                     <Button variant={"contained"} onClick={(event) => {
                         toggleTimeline();
                         event.currentTarget.blur();
-                    }} disabled={!audioFile}>
+                    }} disabled={isDisabled}>
                         Toggle
                         timeline</Button>
-                    <Button variant={"contained"}
-                            onClick={(event) => {
-                                get_transcription();
-                                event.currentTarget.blur();
-                            }}
-                            disabled={audioFile === null || mode === MANUAL}>
-                        Get Transcription
-                    </Button>
                     <ZoomOut/>
                     <Box sx={{width: 100}}>
                         <Slider
@@ -413,14 +392,14 @@ const AudioPlayer = () => {
                             max={100} // Adjust the maximum zoom level according to your needs
                             value={zoomLevel}
                             onChange={zoomInHandler}
-                            disabled={!audioFile}
+                            disabled={isDisabled}
                         />
                     </Box>
                     <ZoomIn/>
                 </Stack>
             </Stack>
         </MainCard>
-    );
-}
+    )
+};
 
 export default AudioPlayer;
