@@ -1,11 +1,17 @@
-import react, {useState} from 'react';
+import react, {useContext, useState} from 'react';
 import {Box, Button, Modal, Stack, Typography} from "@mui/material";
 import MainCard from "../../../components/MainCard";
+import {StutteredContext} from "../../../context/StutteredContext";
 
 const AreYouSure = ({setAreYouSure, setYesNo}) => {
+    const {
+        resetTransAndSE,
+    } = useContext(StutteredContext);
     const [open, setOpen] = useState(true);
     // const handleOpen = () => setOpen(true);
-    const handleClose = () => setAreYouSure(false);
+    const handleClose = () => {
+        setAreYouSure(false);
+    };
     const style = {
         position: 'absolute',
         top:'50%',
@@ -31,6 +37,7 @@ const AreYouSure = ({setAreYouSure, setYesNo}) => {
                         <Button variant={"contained"} onClick={() => {
                                 setYesNo(true);
                                 handleClose();
+                                resetTransAndSE();
                             }}
                         >
                             Yes

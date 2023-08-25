@@ -36,15 +36,19 @@ export const StutteredProvider = ({children}) => {
     const [audioPlayerControl, setAudioPlayerControl] = useState(null);
     const [playBackSpeed, setPlayBackSpeed] = useState(1);
 
-    /*
-        Repetition: 0
-        Prolongation: 1
-        Block: 2
-        Interjection: 3
-        stutteredEventList={1:{start: <>,end: <>}, {2:{start: <>,end: <>}}
-     */
     //FUNCTIONS
+    const resetTransAndSE = () => {
+        setStutteredEventsCount(initialState.stutteredEventsCounts);
+        setStutteredEvents(initialState.stutteredEvents);
+        setTotalSyllableCount(initialState.totalSyllableCount);
+        setTranscriptionObj(initialState.transcriptionObj);
+        setCurrentWordIndex(initialState.currentWordIndex);
+        setAverageDuration(initialState.averageDuration);
+        setLoadingTranscription(initialState.loadingTranscription);
+        setkiStutteredRegions(initialState.kiStutteredRegions);
+        setLongest3Durations(initialState.longest3Durations);
 
+    }
     const handleStutteredChange = (change) => {
         setStutteredEventsCount(prevCount => prevCount + change);
     };
@@ -226,7 +230,8 @@ export const StutteredProvider = ({children}) => {
         transcriptError,
         randomFunction,
         addStutteredEventWaveForm,
-        removeStutteredEventsWaveForm
+        removeStutteredEventsWaveForm,
+        resetTransAndSE,
     }
 
     return (

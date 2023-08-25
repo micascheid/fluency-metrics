@@ -5,6 +5,7 @@ import {StutteredContext} from "../../context/StutteredContext";
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import AreYouSure from "./popovers/AreYouSure";
 
 const CustomWordInput = styled(TextField)(({theme}) => ({
     ...theme.typography.h5,
@@ -182,6 +183,7 @@ const WordComponent = ({word, word_obj, onUpdateWord, index, style}) => {
                             </IconButton>
                             <IconButton onClick={()=> {
                                 handleWordDeletion();
+                                <AreYouSure />
                             }
                             }>
                                 <DeleteForeverIcon sx={{color: 'red'}}/>
