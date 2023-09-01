@@ -27,9 +27,9 @@ const app = initializeApp(firebaseConfig);
 
 const db = getFirestore(app);
 
-// connectFirestoreEmulator(db, 'localhost', 8080);
+connectFirestoreEmulator(db, 'localhost', 8080);
 const auth = getAuth(app);
-// connectAuthEmulator(auth, "http://localhost:9099");
+connectAuthEmulator(auth, "http://localhost:9099");
 // Export firestore database
 // It will be imported into your react app whenever it is needed
 

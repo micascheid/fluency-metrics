@@ -6,7 +6,7 @@ import {StutteredContext} from "../../context/StutteredContext";
 
 const dividerStyles = {
     "&::before, &::after": {
-        borderColor: "lightgray",
+        borderColor: "#000",
     },
     pt: 3,
 }
@@ -16,7 +16,7 @@ const FluencyCounts = () => {
 
     return (
         <MainCard>
-            <Typography variant={"h4"}>Fluency Counts</Typography>
+            <Typography variant={"h4"}>Fluency Metrics</Typography>
             <Stack direction={"column"}>
                 <Divider textAlign={"left"} sx={dividerStyles}><Typography variant={"h5"}>Frequency</Typography></Divider>
                 <Typography>Total Syllables: {totalSyllableCount}</Typography>

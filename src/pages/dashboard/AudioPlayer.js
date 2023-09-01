@@ -30,7 +30,8 @@ const AudioPlayer = () => {
             setAudioPlayerControl,
             setPlayBackSpeed,
             playBackSpeed,
-            stutteredEvents
+            stutteredEvents,
+            workspaceName,
         } = useContext(StutteredContext);
 
     const [timelineVis, setTimelineVis] = useState(true);
@@ -247,11 +248,7 @@ const AudioPlayer = () => {
     }, [audioFile]);
 
     useEffect(() => {
-        console.log("USE EFFECT ", kiStutteredRegions.length);
-        // if (Object.keys(kiStutteredRegions).length > 0) {
-        //     console.log("UNDRAGGABLE");
-        //     kiStutteredRegions[0].resize = false;
-        // }
+
         if (transcriptionObj) {
             wavesurferRef.current.on('audioprocess', function (time) {
                 let newWordIndex = null;
@@ -305,6 +302,11 @@ const AudioPlayer = () => {
         <MainCard>
             <Stack>
                 {audioFile ? (
+                    <React.Fragment>
+                        <Stack direction={"row"} alignItems={"center"} spacing={1} sx={{mb: 2}}>
+                            <Typography variant={"h4"} fontWeight={"lighter"}>Current Analysis:</Typography>
+                            <Typography variant={"h4"} fontWeight={"medium"}>{workspaceName}</Typography>
+                        </Stack>
                     <WaveSurfer plugins={plugins} onMount={handleWSMount}>
                         <WaveForm {...waveformProps}>
                             {markers.map((marker) => (
@@ -344,6 +346,7 @@ const AudioPlayer = () => {
                         </WaveForm>
                         <div id="timeline"/>
                     </WaveSurfer>
+                    </React.Fragment>
                 ) : (
                     <Box sx={{height: 128, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
                         <Typography variant={"h2"}>Upload an audio file to get started!</Typography>

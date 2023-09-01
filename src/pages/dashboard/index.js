@@ -6,6 +6,7 @@ import KeyboardLegend from "./KeyboardLegend";
 import StutteredEvents from "./StutteredEvents";
 import Mode from "./Mode";
 import Transcription from "./Transcription";
+import SaveWorkSpace from "./SaveWorkSpace";
 
 
 const DefaultDashboard = () => {
@@ -16,6 +17,9 @@ const DefaultDashboard = () => {
             <Grid item xs={12} sm={12} md={12} lg={12}>
                 <Mode />
             </Grid>
+            {/*<Grid item xs={12} sm={12} md={12} lg={12}>*/}
+            {/*    <SaveWorkSpace/>*/}
+            {/*</Grid>*/}
             <Grid item xs={12} sm={12} md={12} lg={12}>
                 <AudioPlayer/>
             </Grid>

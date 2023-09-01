@@ -1,10 +1,26 @@
-import {Box, Button, FormControl, Grid, InputLabel, MenuItem, Select, Stack, Typography} from "@mui/material";
+import {
+    Box,
+    Button, Divider,
+    FormControl,
+    Grid,
+    InputLabel,
+    MenuItem,
+    Select,
+    Stack, styled,
+    Tab,
+    Tabs, TextField,
+    Typography
+} from "@mui/material";
 import React, {useContext, useEffect, useState} from "react";
 import MainCard from "../../components/MainCard";
 import {StutteredContext} from "../../context/StutteredContext";
 import {BASE_URL, MANUAL} from "../../constants";
 import axios from "axios";
 import AreYouSure from "./popovers/AreYouSure";
+import * as PropTypes from "prop-types";
+import NewAnalysisStepper from "./NewAnalysisStepper";
+import ResumeAnalysisStepper from "./ResumeAnalysisStepper";
+import InstructionsAutoMode from "./InstructionsAutoMode";
 
 
 const Mode = () => {
@@ -16,7 +32,8 @@ const Mode = () => {
     const [tempVal, setTempVal] = useState(null);
     const [path, setPath] = useState(null);
     const [startNew, setStartNew] = useState(false);
-    const [selectedResume, setSelectedResume] = useState('None');
+    const [tabValue, setTabValue] = useState(0);
+
     const {
         setLoadingTranscription,
         audioFile,
@@ -26,6 +43,32 @@ const Mode = () => {
     } = useContext(StutteredContext);
     const handleMode = (event) => {
         setMode(event.target.value);
+    };
+
+    const CustomTabPanel = (props) => {
+        const { children, value, index, ...other } = props;
+
+        return (
+            <div
+                role="tabpanel"
+                hidden={value !== index}
+                id={`simple-tabpanel-${index}`}
+                aria-labelledby={`simple-tab-${index}`}
+                {...other}
+            >
+                {value === index && (
+                    <Box sx={{ pt: 0 }}>
+                        {children}
+                    </Box>
+                )}
+            </div>
+        );
+    }
+
+    CustomTabPanel.propTypes = {
+        children: PropTypes.node,
+        index: PropTypes.number.isRequired,
+        value: PropTypes.number.isRequired,
     };
 
     const handleFileChange = (event) => {
@@ -39,129 +82,47 @@ const Mode = () => {
         setFileChosen(true);
     };
 
-    const get_transcription = async () => {
-        console.log("GETTING CALLED?")
-        setLoadingTranscription(true);
-        const formData = new FormData();
-        console.log(audioFile.name);
-        formData.append('file', audioFile);
-        const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-        await delay(1500);
-        axios.post(`${BASE_URL}/get_transcription2`, formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-        }).then(response => {
-            const transcriptionObj = response.data.transcription_obj;
-            setTranscriptionObj(transcriptionObj);
-            countTotalSyllables();
-            setLoadingTranscription(false);
-            setYesNo(false);
-
-        }).catch(error => {
-            console.log("ERROR handling get_transcription:", error);
-            setLoadingTranscription(false);
-            setYesNo(false);
-        });
+    const handleTabChange = (event, newValue) => {
+      setTabValue(newValue);
     };
-
-
-    const handleStartNew = () => {
-        setStartNew(true);
-        setSelectedResume(null);
-    };
-
-    const handleResumeSelection = (event) => {
-        setSelectedResume(event.target.value);
-        setStartNew(false);
-    };
-
-    useEffect(() => {
-        if (yesNo) {
-            get_transcription();
-        }
-    }, [yesNo])
 
     return (
-        <MainCard>
+        <MainCard sx={{minHeight: "335px", maxHeight: "335px"}}>
             {showAreYouSure && <AreYouSure setAreYouSure={setShowAreYouSure} setYesNo={setYesNo}/>}
             <Grid container spacing={2}>
-                <Grid item xs={6} sm={6} md={6} lg={6}>
-                    <Box sx={{display: 'flex'}} gap={2} width={"100%"}>
-                        <Stack>
-                            <Button variant={"contained"} disabled={selectedResume !== 'None'} onClick={handleStartNew}>
-                                Start New
-                            </Button>
-                            <FormControl sx={{mt: 2}} disabled={!startNew || selectedResume}>
-                                <InputLabel>Mode</InputLabel>
-                                <Select
-                                    sx={{minWidth: 100}}
-                                    label={"Mode"}
-                                    value={mode}
-                                    onChange={handleMode}
-                                >
-                                    <MenuItem value={"manual"}>Manual</MenuItem>
-                                    <MenuItem value={"auto"}>Semi-Auto</MenuItem>
-                                </Select>
-                            </FormControl>
-                            <Button sx={{mt: 2}} disabled={mode === '' || !startNew || selectedResume}
-                                    variant={"contained"} component={"label"} onClick={(event) => {
-                                event.currentTarget.blur();
-                            }}>
-                                Choose File
-                                <input
-                                    type={"file"}
-                                    hidden
-                                    onChange={handleFileChange}
-                                />
-                            </Button>
-                            <Typography variant={"body1"}>{audioFileName}</Typography>
-                            <Button sx={{mt: 2}} variant={"contained"}
-                                    onClick={(event) => {
-                                        if (transcriptionObj) {
-                                            setShowAreYouSure(true);
-                                        } else if (transcriptionObj && !yesNo) {
-                                            get_transcription();
-                                            event.currentTarget.blur();
-                                        } else {
-                                            get_transcription();
-                                            event.currentTarget.blur();
-                                        }
-                                    }}
-                                    disabled={!startNew || selectedResume || audioFile === null || mode === MANUAL}>
-                                Get Transcript
-                            </Button>
-                        </Stack>
-                        <Typography>Or</Typography>
-                        <Stack>
-                            <FormControl >
-                                <InputLabel>Resume</InputLabel>
-                                <Select
-                                    sx={{minWidth: '120px'}}
-                                    id={"resume-label"}
-                                    value={selectedResume}
-                                    onChange={handleResumeSelection}
-                                >
-                                    <MenuItem value={'None'}>
-                                        <em>None</em>
-                                    </MenuItem>
-                                    <MenuItem value={10}>10</MenuItem>
-                                    <MenuItem value={20}>20</MenuItem>
-                                    <MenuItem value={30}>30</MenuItem>
-                                </Select>
-                                <Button sx={{mt: 2}} variant={"contained"} disabled={startNew || selectedResume === 'None'}>
-                                    Load
-                                </Button>
-                            </FormControl>
-                        </Stack>
+                <Grid item xs={5} sm={5} md={5} lg={5}>
+                    <Box width={"100%"}>
+                        <Box sx={{mb: 2}} >
+                            <Tabs value={tabValue} onChange={handleTabChange} variant={'fullWidth'} sx={{boxShadow: '0px 2px 4px rgba(0,0,0,0.2)'}}>
+                                <Tab  label={"New Analysis"}/>
+                                <Tab label={"Resume Analysis"}/>
+                            </Tabs>
+                        </Box>
+                        <Box>
+                            <CustomTabPanel value={tabValue} index={0}>
+                                <NewAnalysisStepper />
+                            </CustomTabPanel>
+                            <CustomTabPanel value={tabValue} index={1}>
+                                <ResumeAnalysisStepper/>
+                            </CustomTabPanel>
+                        </Box>
                     </Box>
                 </Grid>
-                <Grid item xs={3} sm={3} md={3} lg={3}>
-                    <Typography>{autoModeText}</Typography>
+                <Grid item xs={7} sm={7} md={7} lg={7}>
+                    <Grid container style={{height: '100%'}} spacing={2}>
+                        <Grid item xs={1} sm={1} md={1} lg={1}>
+                            <Divider orientation={"vertical"} style={{borderColor: "darkgray"}}/>
+                        </Grid>
+                        <Grid item xs={11} sm={11} md={11} lg={11}>
+                            <Box style={{ overflowY: 'scroll', maxHeight: '335px' }}>
+                                <InstructionsAutoMode />
+                            </Box>
+                        </Grid>
+                    </Grid>
                 </Grid>
-                <Grid item xs={3} sm={3} md={3} lg={3}>
-                    <Typography>{manualModeText}</Typography>
-                </Grid>
+                {/*<Grid item xs={3} sm={3} md={3} lg={3}>*/}
+                {/*    <Typography>{manualModeText}</Typography>*/}
+                {/*</Grid>*/}
             </Grid>
         </MainCard>
 
