@@ -325,16 +325,6 @@ export const StutteredProvider = ({children}) => {
 
     }, [totalSyllableCount, stutteredEventsCount, kiStutteredRegions]);
 
-    // useEffect(() => {
-    //     const saveData = async () => {
-    //         try {
-    //             await saveWorkspace();
-    //         } catch (e) {
-    //             console.log("trouble saving workspace: ", e);
-    //         }
-    //     }
-    //     saveData();
-    // }, [workspaceName]);
 
     useEffect(() => {
        setStutteredEventsCount(Object.keys(stutteredEvents).length);

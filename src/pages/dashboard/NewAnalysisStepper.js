@@ -79,7 +79,7 @@ const NewAnalysisStepper = () => {
                         onChange={handleMode}
                     >
                         <MenuItem value={"auto"}>Semi-Auto</MenuItem>
-                        <MenuItem value={"manual"} disabled={"true"}>Manual (Coming Soon)</MenuItem>
+                        <MenuItem value={"manual"} disabled>Manual (Coming Soon)</MenuItem>
                     </Select>
                 </FormControl>
                 <Box>

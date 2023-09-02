@@ -1,26 +1,54 @@
 import react, {useContext, useEffect, useState} from 'react';
-import {Button, FormControl, InputLabel, MenuItem, Select, Stack} from "@mui/material";
+import {Button, FormControl, InputLabel, MenuItem, Select, Stack, Typography} from "@mui/material";
 import React from "react";
 import UserContext from "../../context/UserContext";
-import {collection, getDocs} from "firebase/firestore";
+import {collection, doc, getDoc, getDocs} from "firebase/firestore";
 import {db} from "../../FirebaseConfig";
 
 const ResumeAnalysisStepper = () => {
     const { user } = useContext(UserContext);
     const workspacesColRef = collection(db, 'users', user.uid, 'workspaces');
+    const workspacesIndexRef = collection(db, 'users', user.uid, 'workspaces_index');
     const [selectedResume, setSelectedResume] = useState('None');
     const [workspacesIndex, setWorkspacesIndex] = useState();
+    const [workspaceId, setWorkspaceId] = useState();
     const handleResumeSelection = (event) => {
+        console.log()
         setSelectedResume(event.target.value);
+
+    };
+
+    const formatTimestamp =(timestamp) => {
+      const date = timestamp.toDate();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const year = String(date.getFullYear()).slice(-2);
+      let hours = date.getHours();
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+
+      const amOrPm = hours >=12 ? 'PM' : 'AM';
+
+      hours = hours % 12;
+      hours = hours || 12;
+      hours = String(hours).padStart(2, '0');
+      return `${month}/${day}/${year} ${hours}:${minutes} ${amOrPm}`;
+    };
+
+    const handleLoadWorkSpace = () => {
+        //load in workspace dock from db
+        const docRef = doc(workspacesColRef, workspaceId);
+        getDoc(docRef).then((doc) => {
+
+        })
     };
 
     useEffect(() => {
-        getDocs(workspacesColRef).then((docs) => {
-            console.log(typeof docs);
+        getDocs(workspacesIndexRef).then((docs) => {
+            const docsObject = {};
             docs.forEach((doc) => {
-                // console.log(doc);
+                docsObject[doc.id] = doc.data();
             });
-            setWorkspacesIndex(docs);
+            setWorkspacesIndex(docsObject);
         });
     },[]);
 
@@ -37,15 +65,23 @@ const ResumeAnalysisStepper = () => {
                     <MenuItem value={'None'}>
                         <em>None</em>
                     </MenuItem>
-
-                    <MenuItem value={10}>Analysis 1</MenuItem>
-                    <MenuItem value={20}>Analysis 2</MenuItem>
-                    <MenuItem value={30}>Analysis 3</MenuItem>
+                    {workspacesIndex &&
+                        Object.entries(workspacesIndex).map(([id, data], index) => {
+                            const time = formatTimestamp(data.creation_time);
+                                return (
+                                    <MenuItem key={index} value={id} onClick={()=>setWorkspaceId(id)}>
+                                        <Typography><strong>Name:</strong> {data.name}, <strong>Date Created:</strong> {time} </Typography>
+                                    </MenuItem>
+                                )
+                            }
+                        )
+                    }
                 </Select>
                 <Button
                     sx={{mt: 2, maxWidth: 125}}
                     variant={"contained"}
                     disabled={selectedResume === 'None'}
+                    onClick={handleLoadWorkSpace}
                 >
                     Load
                 </Button>
