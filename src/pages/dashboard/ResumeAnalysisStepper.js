@@ -4,9 +4,13 @@ import React from "react";
 import UserContext from "../../context/UserContext";
 import {collection, doc, getDoc, getDocs} from "firebase/firestore";
 import {db} from "../../FirebaseConfig";
+import {StutteredContext} from "../../context/StutteredContext";
 
 const ResumeAnalysisStepper = () => {
     const { user } = useContext(UserContext);
+    const {
+        updateStateFromObject,
+    } = useContext(StutteredContext);
     const workspacesColRef = collection(db, 'users', user.uid, 'workspaces');
     const workspacesIndexRef = collection(db, 'users', user.uid, 'workspaces_index');
     const [selectedResume, setSelectedResume] = useState('None');
@@ -38,7 +42,8 @@ const ResumeAnalysisStepper = () => {
         //load in workspace dock from db
         const docRef = doc(workspacesColRef, workspaceId);
         getDoc(docRef).then((doc) => {
-
+            console.log("Data: ", doc.data());
+            updateStateFromObject(doc.data());
         })
     };
 

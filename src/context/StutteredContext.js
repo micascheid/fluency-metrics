@@ -24,6 +24,8 @@ const initialState = {
     playBackSpeed: 1
 }
 
+
+
 export const StutteredProvider = ({children}) => {
     // VARIABLES
     const [workspaceName, setWorkspaceName] = useState('');
@@ -57,6 +59,32 @@ export const StutteredProvider = ({children}) => {
         setLongest3Durations(initialState.longest3Durations);
 
     }
+
+    const stateSetters = {
+        stutteredEventsCount: setStutteredEventsCount,
+        stutteredEvents: setStutteredEvents,
+        totalSyllableCount: setTotalSyllableCount,
+        transcriptionObj: setTranscriptionObj,
+        currentWordIndex: setCurrentWordIndex,
+        averageDuration: setAverageDuration,
+        loadingTranscription: setLoadingTranscription,
+        mode: setMode,
+        audioFileName: setAudioFileName,
+        audioFile: setAudioFile,
+        kiStutteredRegions: setkiStutteredRegions,
+        fileChosen: setFileChosen,
+        longest3Durations: setLongest3Durations,
+        audioPlayerControl: setAudioPlayerControl,
+        playBackSpeed: setPlayBackSpeed
+    }
+
+    const updateStateFromObject = (dbWorkspaceObj) => {
+        for (let key in dbWorkspaceObj){
+            if (stateSetters[key]){
+                stateSetters[key](dbWorkspaceObj[key]);
+            }
+        }
+    };
 
     const checkWorkspaceExists = async (name) => {
         // TODO: need to setWorkspaceId to doc.id if it already exists
@@ -394,6 +422,7 @@ export const StutteredProvider = ({children}) => {
         transcriptionObj,
         transcriptError,
         updateStutteredEventWaveForm,
+        updateStateFromObject,
         workspaceName,
     }
 
