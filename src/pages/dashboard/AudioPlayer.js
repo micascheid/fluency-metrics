@@ -17,22 +17,23 @@ import ZoomOut from '@mui/icons-material/ZoomOut';
 import Speed from '@mui/icons-material/Speed';
 import {StutteredContext} from "../../context/StutteredContext";
 import AudioPlayerPopover from "./popovers/AudioPlayerPopover";
+import SaveWorkspace from "./SaveWorkspace";
 
 const AudioPlayer = () => {
     // VARIABLES
     const {
-            transcriptionObj,
-            setCurrentWordIndex,
-            currentWordIndex,
-            audioFile,
-            kiStutteredRegions,
-            setkiStutteredRegions,
-            setAudioPlayerControl,
-            setPlayBackSpeed,
-            playBackSpeed,
-            stutteredEvents,
-            workspaceName,
-        } = useContext(StutteredContext);
+        transcriptionObj,
+        setCurrentWordIndex,
+        currentWordIndex,
+        audioFile,
+        kiStutteredRegions,
+        setkiStutteredRegions,
+        setAudioPlayerControl,
+        setPlayBackSpeed,
+        playBackSpeed,
+        stutteredEvents,
+        workspaceName,
+    } = useContext(StutteredContext);
 
     const [timelineVis, setTimelineVis] = useState(true);
     const [zoomLevel, setZoomLevel] = useState(1);
@@ -282,7 +283,7 @@ const AudioPlayer = () => {
         }
 
         if (wavesurferRef.current) {
-            wavesurferRef.current.setPlaybackRate(playBackSpeed);
+            wavesurferRef.current.setPlaybackRate(1);
         }
 
         window.addEventListener('keypress', handleKeyPress);
@@ -303,53 +304,50 @@ const AudioPlayer = () => {
             <Stack>
                 {audioFile ? (
                     <React.Fragment>
-                        <Stack direction={"row"} alignItems={"center"} spacing={1} sx={{mb: 2}}>
-                            <Typography variant={"h4"} fontWeight={"lighter"}>Current Analysis:</Typography>
-                            <Typography variant={"h4"} fontWeight={"medium"}>{workspaceName}</Typography>
-                        </Stack>
-                    <WaveSurfer plugins={plugins} onMount={handleWSMount}>
-                        <WaveForm {...waveformProps}>
-                            {markers.map((marker) => (
-                                <Marker
-                                    key={marker.label}
-                                    {...marker}
-                                />
-                            ))}
-                            {Object.entries(kiStutteredRegions).map(([id, regionProps]) => {
-                                return (
-                                    <Region
-                                        key={id}
-                                        id={id}
-                                        {...regionProps}
-                                        onUpdateEnd={handleRegionUpdate}
-                                        onUpdate={handleUpdate}
-                                        onClick={handlePopoverOpen}
-                                        onOver={handleOnOver}
-
+                        <SaveWorkspace sx={{mb: 3}} name={workspaceName}/>
+                        <WaveSurfer plugins={plugins} onMount={handleWSMount}>
+                            <WaveForm {...waveformProps}>
+                                {markers.map((marker) => (
+                                    <Marker
+                                        key={marker.label}
+                                        {...marker}
                                     />
-                                )
-                            })}
-                            {anchorEl && currentRegion && (
-                                <AudioPlayerPopover
-                                    key={popoverKey}
-                                    anchorEl={anchorEl}
-                                    setAnchorEl={setAnchorEl}
-                                    popoverOpen={Boolean(anchorEl)}
-                                    setPopoverOpen={setPopoverOpen}
-                                    stutteredWords={stutteredWords}
-                                    region={currentRegion}
-                                    exists={stutteredEvents[currentRegion.id]}
-                                    // setPopoverColor={setPopoverColor}
-                                />
-                            )}
+                                ))}
+                                {Object.entries(kiStutteredRegions).map(([id, regionProps]) => {
+                                    return (
+                                        <Region
+                                            key={id}
+                                            id={id}
+                                            {...regionProps}
+                                            onUpdateEnd={handleRegionUpdate}
+                                            onUpdate={handleUpdate}
+                                            onClick={handlePopoverOpen}
+                                            onOver={handleOnOver}
 
-                        </WaveForm>
-                        <div id="timeline"/>
-                    </WaveSurfer>
+                                        />
+                                    )
+                                })}
+                                {anchorEl && currentRegion && (
+                                    <AudioPlayerPopover
+                                        key={popoverKey}
+                                        anchorEl={anchorEl}
+                                        setAnchorEl={setAnchorEl}
+                                        popoverOpen={Boolean(anchorEl)}
+                                        setPopoverOpen={setPopoverOpen}
+                                        stutteredWords={stutteredWords}
+                                        region={currentRegion}
+                                        exists={stutteredEvents[currentRegion.id]}
+                                        // setPopoverColor={setPopoverColor}
+                                    />
+                                )}
+
+                            </WaveForm>
+                            <div id="timeline"/>
+                        </WaveSurfer>
                     </React.Fragment>
                 ) : (
                     <Box sx={{height: 128, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                        <Typography variant={"h2"}>Upload an audio file to get started!</Typography>
+                        <Typography variant={"h2"} fontWeight={"medium"}>Start or load a new Analysis to get started!</Typography>
                     </Box>
                 )}
 

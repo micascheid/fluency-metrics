@@ -5,6 +5,8 @@ import UserContext from "../../context/UserContext";
 import {collection, doc, getDoc, getDocs} from "firebase/firestore";
 import {db} from "../../FirebaseConfig";
 import {StutteredContext} from "../../context/StutteredContext";
+import Loader from "../../components/Loader";
+import LoadPreviousAudioFile from "./LoadPreviousAudioFile";
 
 const ResumeAnalysisStepper = () => {
     const { user } = useContext(UserContext);
@@ -16,6 +18,7 @@ const ResumeAnalysisStepper = () => {
     const [selectedResume, setSelectedResume] = useState('None');
     const [workspacesIndex, setWorkspacesIndex] = useState();
     const [workspaceId, setWorkspaceId] = useState();
+    const [isLoadingModal, setIsLoadingModal] = useState(false);
     const handleResumeSelection = (event) => {
         console.log()
         setSelectedResume(event.target.value);
@@ -40,11 +43,14 @@ const ResumeAnalysisStepper = () => {
 
     const handleLoadWorkSpace = () => {
         //load in workspace dock from db
-        const docRef = doc(workspacesColRef, workspaceId);
-        getDoc(docRef).then((doc) => {
-            console.log("Data: ", doc.data());
-            updateStateFromObject(doc.data());
-        })
+        console.log("Workspace ID:", workspaceId);
+        // const docRef = doc(workspacesColRef, workspaceId);
+        // getDoc(docRef).then((doc) => {
+        //     console.log("Data: ", doc.data());
+        //     updateStateFromObject(doc.data());
+        // })
+
+        setIsLoadingModal(true);
     };
 
     useEffect(() => {
@@ -82,6 +88,7 @@ const ResumeAnalysisStepper = () => {
                         )
                     }
                 </Select>
+                <LoadPreviousAudioFile open={isLoadingModal} setIsLoadingModal={setIsLoadingModal}/>
                 <Button
                     sx={{mt: 2, maxWidth: 125}}
                     variant={"contained"}

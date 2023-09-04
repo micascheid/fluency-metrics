@@ -1,9 +1,10 @@
-import react, {useContext, useState} from 'react';
+import react, {useContext, useEffect, useState} from 'react';
 import {Box, Button, FormControl, InputLabel, MenuItem, Select, Stack, TextField, Typography} from "@mui/material";
 import {MANUAL} from "../../constants";
 import React from "react";
 import {StutteredContext} from "../../context/StutteredContext";
-import saveWorkSpace from "./SaveWorkSpace";
+import saveWorkSpace from "./SaveWorkspace";
+import AreYouSure from "./popovers/AreYouSure";
 
 
 const NewAnalysisStepper = () => {
@@ -16,10 +17,14 @@ const NewAnalysisStepper = () => {
         setAudioFileName,
         audioFileName,
         saveWorkspace,
+        workspaceName,
+        createNewWorkspace,
+        updateWorkspace,
     } = useContext(StutteredContext);
     const [localWorkspaceName, setLocalWorkspaceName] = useState('');
     const [nameError, setNameError] = useState('');
-
+    const [showAreYouSure, setShowAreYouSure] = useState(false);
+    const [yesNo, setYesNo] = useState(false);
     const handleMode = (event) => {
         setMode(event.target.value);
     }
@@ -52,23 +57,46 @@ const NewAnalysisStepper = () => {
         event.stopPropagation();
     }
 
-    const handleCreateWorkspace = async () => {
-        //get the transcription
-        console.log("ABOUT TO CREATE WORKSPACE");
-        get_transcription().then(() => {
-            //then can save off workspace
-            console.log("TRANSCRIPTION COMPLETE")
-            saveWorkspace(localWorkspaceName).catch(error => {
-                console.log("couldn't save workspace: ", error);
-            })
-        }).catch(error => {
-            console.log("unable to get transcription:", error)
-        })
-
+    const handleCreateWorkspace = () => {
+        if (workspaceName !== '') {
+            setShowAreYouSure(true);
+        } else {
+            setYesNo(true);
+        }
     };
+
+    const initiateWorkspaceSaveProcess = async () => {
+        try {
+            await get_transcription().then(() => {
+                if (workspaceName === '' || yesNo){
+                    console.log("CREATING WORKSPACE");
+                    createNewWorkspace(localWorkspaceName);
+                } else {
+                    console.log("UPDATING WORKSPACE");
+                    updateWorkspace(localWorkspaceName);
+                }
+
+            });
+            setYesNo(false);
+        } catch (error) {
+            console.log("Unable to get transcription:", error);
+        }
+    }
+
+    useEffect(() => {
+        const createWorkspace = async () => {
+            if (yesNo) {
+                await initiateWorkspaceSaveProcess();
+            }
+        }
+        createWorkspace().catch(console.error);
+
+
+    }, [yesNo])
 
     return (
         <Box maxWidth={"150px"}>
+            {showAreYouSure && <AreYouSure setAreYouSure={setShowAreYouSure} setYesNo={setYesNo}/>}
             <Stack spacing={2}>
                 <FormControl sx={{mt: 2}}>
                     <InputLabel>Mode</InputLabel>
@@ -98,7 +126,6 @@ const NewAnalysisStepper = () => {
                 </Box>
 
                 <Stack direction={"row"} alignItems={"center"} spacing={1}>
-                    {/*<Typography variant={"h4"}>Workspace Name: </Typography>*/}
                     <TextField
                         sx={{minWidth: "350px"}}
                         value={localWorkspaceName}
@@ -107,7 +134,8 @@ const NewAnalysisStepper = () => {
                         error={!!nameError}
                         helperText={nameError || ' '}
                         onKeyPress={handleKeyPress}
-                    ></TextField>
+                        disabled={audioFileName === ''}
+                    />
                 </Stack>
                 <Button
                     variant={"contained"}

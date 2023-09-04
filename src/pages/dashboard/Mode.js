@@ -120,9 +120,6 @@ const Mode = () => {
                         </Grid>
                     </Grid>
                 </Grid>
-                {/*<Grid item xs={3} sm={3} md={3} lg={3}>*/}
-                {/*    <Typography>{manualModeText}</Typography>*/}
-                {/*</Grid>*/}
             </Grid>
         </MainCard>
 

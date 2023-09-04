@@ -7,8 +7,9 @@ const AreYouSure = ({setAreYouSure, setYesNo}) => {
     const {
         resetTransAndSE,
     } = useContext(StutteredContext);
-    const [open, setOpen] = useState(true);
-    // const handleOpen = () => setOpen(true);
+
+    const [isOpen, setIsOpen] = useState(false);
+
     const handleClose = () => {
         setAreYouSure(false);
     };
@@ -19,6 +20,18 @@ const AreYouSure = ({setAreYouSure, setYesNo}) => {
         transform: 'translate(-50%,-50%)',
         width: 400,
     }
+
+    const handleYesClick = () => {
+        // resetTransAndSE();
+        setYesNo(true);
+        handleClose();
+    };
+
+
+    const handleNoClick = () => {
+        setYesNo(false);
+        handleClose();
+    };
 
     return (
         <Modal
@@ -34,18 +47,10 @@ const AreYouSure = ({setAreYouSure, setYesNo}) => {
                         you want to continue?
                     </Typography>
                     <Stack direction={"row"} spacing={1}>
-                        <Button variant={"contained"} onClick={() => {
-                                setYesNo(true);
-                                handleClose();
-                                resetTransAndSE();
-                            }}
-                        >
+                        <Button variant={"contained"} onClick={handleYesClick}>
                             Yes
                         </Button>
-                        <Button variant={"contained"} onClick={() => {
-                            setYesNo(false);
-                            handleClose();
-                            }}
+                        <Button variant={"contained"} onClick={handleNoClick}
                         >
                             No
                         </Button>
