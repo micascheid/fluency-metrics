@@ -28,7 +28,6 @@ const Mode = () => {
     const autoModeText = "Some text about auto mode";
     const manualModeText = "Some text about manual mode";
     const [showAreYouSure, setShowAreYouSure] = useState(false);
-    const [yesNo, setYesNo] = useState(false);
     const [tempVal, setTempVal] = useState(null);
     const [path, setPath] = useState(null);
     const [startNew, setStartNew] = useState(false);
@@ -88,7 +87,7 @@ const Mode = () => {
 
     return (
         <MainCard sx={{minHeight: "335px", maxHeight: "335px"}}>
-            {showAreYouSure && <AreYouSure setAreYouSure={setShowAreYouSure} setYesNo={setYesNo}/>}
+            {showAreYouSure && <AreYouSure setAreYouSure={setShowAreYouSure}/>}
             <Grid container spacing={2}>
                 <Grid item xs={5} sm={5} md={5} lg={5}>
                     <Box width={"100%"}>

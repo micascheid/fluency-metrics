@@ -2,17 +2,19 @@ import react, {useContext} from 'react';
 import {Box, Button, Modal, Stack, Typography} from "@mui/material";
 import {StutteredContext} from "../../context/StutteredContext";
 import MainCard from "../../components/MainCard";
+import {UserContext} from "../../context/UserContext";
+import {doc, getDoc} from "firebase/firestore";
+import {db} from '../../FirebaseConfig';
 
 
 
-const LoadPreviousAudioFile = ({open, setIsLoadingModal}) => {
+const LoadPreviousAudioFile = ({open, setIsLoadingModal, handleFile}) => {
     const {
-        setFileChosen,
-        setAudioFile,
-        setAudioFileName,
+        updateStateFromObject,
     } = useContext(StutteredContext);
-
-    let file;
+    const {
+        user
+    } = useContext(UserContext);
     let audioFile;
     let audioFileName;
     const helperText = "Please select the file associated with the workspace you have chosen";
@@ -34,17 +36,18 @@ const LoadPreviousAudioFile = ({open, setIsLoadingModal}) => {
          if (file) {
              audioFile = file;
              audioFileName = file.name;
-             // setFileChosen(false);
          }
-         // setAudioFile(file);
-         // setAudioFileName(file.name);
-         // setFileChosen(true);
-
     };
 
-    const handleLoadWorkspace = () => {
-        setAudioFile(audioFile);
-        setAudioFileName(audioFileName);
+    const handleLoadFile = () => {
+        const fileObj = {
+            audioFile: audioFile,
+            audioFileName: audioFileName,
+            fileChosen: true
+        }
+        handleFile(fileObj);
+        handleOnClose();
+
     };
 
     const handleOnClose = () => {
@@ -60,8 +63,8 @@ const LoadPreviousAudioFile = ({open, setIsLoadingModal}) => {
                         type={"file"}
                         onChange={handleFileChange}
                     />
-                    <Button variant={"contained"} onClick={handleLoadWorkspace}>
-                        Load Workspace
+                    <Button variant={"contained"} onClick={handleLoadFile}>
+                        Done
                     </Button>
                 </Stack>
 

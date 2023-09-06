@@ -1,7 +1,17 @@
-import react, {useContext, useEffect, useState} from 'react';
-import {Button, FormControl, InputLabel, MenuItem, Select, Stack, Typography} from "@mui/material";
+import react, {useContext, useEffect, useMemo, useState} from 'react';
+import {
+    Box,
+    Button,
+    CircularProgress,
+    FormControl,
+    InputLabel,
+    MenuItem,
+    Select,
+    Stack,
+    Typography
+} from "@mui/material";
 import React from "react";
-import UserContext from "../../context/UserContext";
+import {UserContext} from "../../context/UserContext";
 import {collection, doc, getDoc, getDocs} from "firebase/firestore";
 import {db} from "../../FirebaseConfig";
 import {StutteredContext} from "../../context/StutteredContext";
@@ -9,64 +19,86 @@ import Loader from "../../components/Loader";
 import LoadPreviousAudioFile from "./LoadPreviousAudioFile";
 
 const ResumeAnalysisStepper = () => {
-    const { user } = useContext(UserContext);
     const {
+        user,
+        workspacesIndex,
+    } = useContext(UserContext);
+    const {
+        audioFileName,
+        workspaceId,
+        setWorkspaceId,
+        setAudioFile,
+        setAudioFileName,
+        setFileChosen,
         updateStateFromObject,
     } = useContext(StutteredContext);
+
     const workspacesColRef = collection(db, 'users', user.uid, 'workspaces');
     const workspacesIndexRef = collection(db, 'users', user.uid, 'workspaces_index');
-    const [selectedResume, setSelectedResume] = useState('None');
-    const [workspacesIndex, setWorkspacesIndex] = useState();
-    const [workspaceId, setWorkspaceId] = useState();
+    const [selectedResume, setSelectedResume] = useState(workspaceId || 'None');
+    const [localWorkspaceId, setLocalWorkspaceId] = useState();
     const [isLoadingModal, setIsLoadingModal] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [workspaceObj, setWorkspaceObj] = useState({});
+    // console.log("workspaceID", workspaceId);
+
     const handleResumeSelection = (event) => {
-        console.log()
-        setSelectedResume(event.target.value);
+        // console.log("selectedResume:", event.target.value);
+        const id = event.target.value;
+        setSelectedResume(id);
+        setWorkspaceId(id);
 
     };
 
-    const formatTimestamp =(timestamp) => {
-      const date = timestamp.toDate();
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
-      const year = String(date.getFullYear()).slice(-2);
-      let hours = date.getHours();
-      const minutes = String(date.getMinutes()).padStart(2, '0');
+    const formatTimestamp = (timestamp) => {
+        const date = timestamp.toDate();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const year = String(date.getFullYear()).slice(-2);
+        let hours = date.getHours();
+        const minutes = String(date.getMinutes()).padStart(2, '0');
 
-      const amOrPm = hours >=12 ? 'PM' : 'AM';
+        const amOrPm = hours >= 12 ? 'PM' : 'AM';
 
-      hours = hours % 12;
-      hours = hours || 12;
-      hours = String(hours).padStart(2, '0');
-      return `${month}/${day}/${year} ${hours}:${minutes} ${amOrPm}`;
+        hours = hours % 12;
+        hours = hours || 12;
+        hours = String(hours).padStart(2, '0');
+        return `${month}/${day}/${year} ${hours}:${minutes} ${amOrPm}`;
     };
 
     const handleLoadWorkSpace = () => {
         //load in workspace dock from db
-        console.log("Workspace ID:", workspaceId);
-        // const docRef = doc(workspacesColRef, workspaceId);
-        // getDoc(docRef).then((doc) => {
-        //     console.log("Data: ", doc.data());
-        //     updateStateFromObject(doc.data());
-        // })
 
         setIsLoadingModal(true);
     };
 
-    useEffect(() => {
-        getDocs(workspacesIndexRef).then((docs) => {
-            const docsObject = {};
-            docs.forEach((doc) => {
-                docsObject[doc.id] = doc.data();
-            });
-            setWorkspacesIndex(docsObject);
-        });
-    },[]);
+    const handleFileChange = (event) => {
+        const file = event.target.files[0];
+        console.log(file.name);
+
+        if (!file) {
+            setFileChosen(false);
+            return;
+        }
+        setAudioFile(file);
+        setAudioFileName(file.name);
+        setFileChosen(true);
+    }
+
+    const handleLoadObj = async () => {
+        const workspaceRef = doc(db, 'users', user.uid, 'workspaces', workspaceId);
+        try {
+            const workspaceObj = await getDoc(workspaceRef);
+            updateStateFromObject(workspaceObj.data());
+        } catch (error) {
+            console.log("Trouble fetching workspace,", error);
+        }
+    };
 
     return (
-        <Stack>
+        <Stack spacing={2}>
             <FormControl>
-                <InputLabel>Resume...</InputLabel>
+                <InputLabel>None</InputLabel>
                 <Select
                     sx={{minWidth: '120px'}}
                     id={"resume-label"}
@@ -78,26 +110,48 @@ const ResumeAnalysisStepper = () => {
                     </MenuItem>
                     {workspacesIndex &&
                         Object.entries(workspacesIndex).map(([id, data], index) => {
-                            const time = formatTimestamp(data.creation_time);
+                                const time = formatTimestamp(data.creation_time);
                                 return (
-                                    <MenuItem key={index} value={id} onClick={()=>setWorkspaceId(id)}>
-                                        <Typography><strong>Name:</strong> {data.name}, <strong>Date Created:</strong> {time} </Typography>
+                                    <MenuItem key={index} value={id}>
+                                        <Typography><strong>Name:</strong> {data.name}, <strong>Date
+                                            Created:</strong> {time} </Typography>
                                     </MenuItem>
                                 )
                             }
                         )
                     }
                 </Select>
-                <LoadPreviousAudioFile open={isLoadingModal} setIsLoadingModal={setIsLoadingModal}/>
+                {/*{isLoadingModal &&*/}
+                {/*    <LoadPreviousAudioFile*/}
+                {/*        open={isLoadingModal}*/}
+                {/*        setIsLoadingModal={setIsLoadingModal}*/}
+                {/*        workspaceId={workspaceId}*/}
+                {/*        handleFile={handleFile}*/}
+                {/*    />}*/}
+            </FormControl>
+            <Box>
                 <Button
-                    sx={{mt: 2, maxWidth: 125}}
+                    sx={{maxWidth: 135}}
                     variant={"contained"}
                     disabled={selectedResume === 'None'}
-                    onClick={handleLoadWorkSpace}
+                    onClick={(event) => {
+                        event.currentTarget.blur();
+                    }}
+                    component={"label"}
                 >
-                    Load
+                    Link AudioFile...
+                    <input
+                        type={"file"}
+                        hidden
+                        onChange={handleFileChange}
+                    />
                 </Button>
-            </FormControl>
+                <Typography variant={"body1"}>{audioFileName}</Typography>
+            </Box>
+
+            <Button variant={"contained"} disabled={!audioFileName} onClick={handleLoadObj}>
+                Load Workspace
+            </Button>
         </Stack>
     );
 };

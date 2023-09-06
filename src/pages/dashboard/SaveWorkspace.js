@@ -5,16 +5,21 @@ import MainCard from "../../components/MainCard";
 import {Checkbox, FormControlLabel} from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
 import {useTheme} from '@mui/material/styles';
+import {UserContext} from "../../context/UserContext";
 
-const SaveWorkspace = ({sx, name}) => {
+const SaveWorkspace = ({sx}) => {
     const {
         workspaceName,
         setWorkspaceName,
     } = useContext(StutteredContext);
+    const {
+        workspacesIndex,
+    } = useContext(UserContext);
     const [editWorkspaceName, setEditWorkspaceName] = useState(false);
     const [localName, setLocalName] = useState(workspaceName);
     const theme = useTheme();
     const [isNameError, setIsNameError] = useState(false);
+    const [nameError, setNameError] = useState("");
 
     const handleOnClick = () => {
         if (localName.trim() === "") {
@@ -28,7 +33,17 @@ const SaveWorkspace = ({sx, name}) => {
     };
 
     const handleOnChange = (event) => {
-        setLocalName(event.target.value);
+        const value = (event.target.value);
+        console.log("VALUE:", workspacesIndex);
+        const doesExist = Object.values(workspacesIndex).some(workspace => workspace.name === value);
+        if (doesExist){
+            setNameError("Name already in use");
+        } else {
+            setNameError('');
+        }
+        setLocalName(value);
+
+
     }
 
     const handleKeyPress = (event) => {
@@ -42,7 +57,7 @@ const SaveWorkspace = ({sx, name}) => {
     return (
         <Box sx={sx}>
             <Stack direction={"row"} sx={{alignItems: 'center'}} spacing={1}>
-                <Button variant={"contained"} onClick={handleOnClick} disabled={workspaceName === ''}>
+                <Button variant={"contained"} onClick={handleOnClick} disabled={workspaceName === '' || !!nameError}>
                     Save Work
                 </Button>
                 <Typography variant={"h4"} fontWeight={"lighter"}>Current Analysis: </Typography>

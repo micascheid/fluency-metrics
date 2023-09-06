@@ -12,33 +12,35 @@ import {
     where
 } from "firebase/firestore";
 import {db} from "../FirebaseConfig";
-import UserContext from "./UserContext";
+import {UserContext} from "./UserContext";
 import axios from "axios";
 import {BASE_URL} from "../constants";
 
 export const StutteredContext = createContext();
-const initialState = {
-    stutteredEventsCount: 0,
-    stutteredEvents: {},
-    totalSyllableCount: 0,
-    transcriptionObj: null,
-    currentWordIndex: 1,
-    averageDuration: 0,
-    loadingTranscription: false,
-    mode: '',
-    audioFileName: '',
-    audioFile: null,
-    kiStutteredRegions: {},
-    fileChosen: false,
-    longest3Durations: [0, 0, 0],
-    audioPlayerControl: null,
-    playBackSpeed: 1,
-    workspaceId: null,
-}
+
 
 
 export const StutteredProvider = ({children}) => {
         // VARIABLES
+    const initialState = {
+        stutteredEventsCount: 0,
+        stutteredEvents: {},
+        totalSyllableCount: 0,
+        transcriptionObj: null,
+        currentWordIndex: 1,
+        averageDuration: 0,
+        loadingTranscription: false,
+        mode: '',
+        audioFileName: '',
+        audioFile: null,
+        kiStutteredRegions: {},
+        fileChosen: false,
+        longest3Durations: [0, 0, 0],
+        audioPlayerControl: null,
+        playBackSpeed: 1,
+        workspaceId: null,
+        globalYesNo: false,
+    }
         const [workspaceName, setWorkspaceName] = useState('');
         const [stutteredEventsCount, setStutteredEventsCount] = useState(initialState.stutteredEventsCount);
         const [stutteredEvents, setStutteredEvents] = useState({});
@@ -56,9 +58,11 @@ export const StutteredProvider = ({children}) => {
         const [audioPlayerControl, setAudioPlayerControl] = useState(initialState.audioPlayerControl);
         const [playBackSpeed, setPlayBackSpeed] = useState(initialState.playBackSpeed);
         const [workspaceId, setWorkspaceId] = useState(initialState.workspaceId);
+        const [isLoadingWorkspace, setIsLoadingWorkspace] = useState(false);
+        // const [globalYesNo, setGlobalYesNo] = useState(initialState.globalYesNo);
         const {user} = useContext(UserContext);
         //FUNCTIONS
-        const resetTransAndSE = () => {
+        const resetTransAndSE = async () => {
             setStutteredEventsCount(initialState.stutteredEventsCount);
             setStutteredEvents(initialState.stutteredEvents);
             setTotalSyllableCount(initialState.totalSyllableCount);
@@ -68,10 +72,10 @@ export const StutteredProvider = ({children}) => {
             setLoadingTranscription(initialState.loadingTranscription);
             setkiStutteredRegions(initialState.kiStutteredRegions);
             setLongest3Durations(initialState.longest3Durations);
-
         }
 
         const stateSetters = {
+            workspaceName: setWorkspaceName,
             stutteredEventsCount: setStutteredEventsCount,
             stutteredEvents: setStutteredEvents,
             totalSyllableCount: setTotalSyllableCount,
@@ -86,7 +90,7 @@ export const StutteredProvider = ({children}) => {
             fileChosen: setFileChosen,
             longest3Durations: setLongest3Durations,
             audioPlayerControl: setAudioPlayerControl,
-            playBackSpeed: setPlayBackSpeed
+            playBackSpeed: setPlayBackSpeed,
         }
 
         const updateStateFromObject = (dbWorkspaceObj) => {
@@ -95,18 +99,6 @@ export const StutteredProvider = ({children}) => {
                     stateSetters[key](dbWorkspaceObj[key]);
                 }
             }
-        };
-
-        const checkWorkspaceExists = async (name) => {
-            // TODO: need to setWorkspaceId to doc.id if it already exists
-            if (workspaceId === null) {
-                const workspaceMetaColRef = collection(db, 'users', user.uid, 'workspaces_index');
-                const q = query(workspaceMetaColRef, where("name", "==", name));
-                const querySnapshot = await getDocs(q);
-                return querySnapshot.size !== 0;
-            }
-
-            return true;
         };
 
         const updateWorkspace = async (name) => {
@@ -171,45 +163,13 @@ export const StutteredProvider = ({children}) => {
                 const docRef = doc(db, "users", user.uid, "workspaces_index", docData.id);
                 setDoc(docRef, data).then(() => {
                     setWorkspaceId(docData.id);
+                    console.log("NAME:", name);
                     setWorkspaceName(name);
-                    console.log("created new index entry");
                 }).catch(e => {
                     alert("trouble saving" + e);
                 });
             });
-
         };
-        /*
-            Journey 1:
-                - User creates new workspace
-                - At save, query workspaces collection to see if name exists:
-                    -If not exists then create new workspace and get ID of new workspace
-                        -Then add new id and meta data to index
-                    -otherwise tell user to pick another name
-            Journey 2:
-                - User selects a workspace from the drop down in which case I will get the doc id from the indexes
-                    -If user changes name then go into the workspaces index and update metadata
-                    -
-         */
-
-        // const saveWorkspace = async (name, createNew) => {
-        //     console.log("SAVE WORK SPACE FUNCTION");
-        //     const workspaceExists = await checkWorkspaceExists(name);
-        //     try {
-        //         if (createNew){
-        //             await createNewWorkspace(name);
-        //         } else if (workspaceExists && !createNew){
-        //             await updateWorkspace(name);
-        //         } else {
-        //             await createNewWorkspace(name);
-        //         }
-        //         setWorkspaceName(name);
-        //
-        //     } catch (error) {
-        //         console.log("having trouble saving workspace: ", error);
-        //     }
-        // };
-
 
         const handleStutteredChange = (change) => {
             setStutteredEventsCount(prevCount => prevCount + change);
@@ -339,12 +299,10 @@ export const StutteredProvider = ({children}) => {
                 setTranscriptionObj(transcriptionObj);
                 countTotalSyllables();
                 setLoadingTranscription(false);
-                // setYesNo(false);
 
             }).catch(error => {
                 console.log("ERROR handling get_transcription:", error);
                 setLoadingTranscription(false);
-                // setYesNo(false);
             });
         };
 
@@ -365,7 +323,7 @@ export const StutteredProvider = ({children}) => {
             setStutteredEventsCount(Object.keys(stutteredEvents).length);
         }, [stutteredEvents]);
 
-        //This use Effect handles the updating of a workpace when user manually saves
+        //This use Effect handles the updating of a workspace when user manually saves
         useEffect(() => {
             (async () => {
                 try {
@@ -396,7 +354,6 @@ export const StutteredProvider = ({children}) => {
             setTranscriptionObj(transcriptionNew);
         };
 
-
         const contextValues = {
             addStutteredEvent,
             addStutteredEventWaveForm,
@@ -419,7 +376,6 @@ export const StutteredProvider = ({children}) => {
             removeStutteredEvent,
             removeStutteredEventsWaveForm,
             resetTransAndSE,
-            // saveWorkspace,
             setAdjustedSyllableCount,
             setAudioFile,
             setAudioFileName,
@@ -443,6 +399,10 @@ export const StutteredProvider = ({children}) => {
             updateStateFromObject,
             workspaceName,
             createNewWorkspace,
+            isLoadingWorkspace,
+            setIsLoadingWorkspace,
+            setWorkspaceId,
+            workspaceId,
         }
 
         return (

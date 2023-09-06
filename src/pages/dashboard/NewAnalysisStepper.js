@@ -5,6 +5,7 @@ import React from "react";
 import {StutteredContext} from "../../context/StutteredContext";
 import saveWorkSpace from "./SaveWorkspace";
 import AreYouSure from "./popovers/AreYouSure";
+import {UserContext} from "../../context/UserContext";
 
 
 const NewAnalysisStepper = () => {
@@ -16,11 +17,14 @@ const NewAnalysisStepper = () => {
         setAudioFile,
         setAudioFileName,
         audioFileName,
-        saveWorkspace,
         workspaceName,
         createNewWorkspace,
         updateWorkspace,
+        resetTransAndSE,
     } = useContext(StutteredContext);
+    const {
+        workspacesIndex,
+    } = useContext(UserContext);
     const [localWorkspaceName, setLocalWorkspaceName] = useState('');
     const [nameError, setNameError] = useState('');
     const [showAreYouSure, setShowAreYouSure] = useState(false);
@@ -50,6 +54,11 @@ const NewAnalysisStepper = () => {
         } else {
             setNameError('');
         }
+        const doesExist = Object.values(workspacesIndex).some(workspace => workspace.name === value);
+        if (doesExist){
+            setNameError('You are already using this workspace name.');
+        }
+
         setLocalWorkspaceName(value);
     };
 
@@ -68,9 +77,10 @@ const NewAnalysisStepper = () => {
     const initiateWorkspaceSaveProcess = async () => {
         try {
             await get_transcription().then(() => {
-                if (workspaceName === '' || yesNo){
+                if (localWorkspaceName === '' || yesNo){
                     console.log("CREATING WORKSPACE");
                     createNewWorkspace(localWorkspaceName);
+                    resetTransAndSE();
                 } else {
                     console.log("UPDATING WORKSPACE");
                     updateWorkspace(localWorkspaceName);
@@ -89,10 +99,12 @@ const NewAnalysisStepper = () => {
                 await initiateWorkspaceSaveProcess();
             }
         }
+
         createWorkspace().catch(console.error);
 
 
     }, [yesNo])
+
 
     return (
         <Box maxWidth={"150px"}>

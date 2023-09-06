@@ -21,8 +21,8 @@ const AreYouSure = ({setAreYouSure, setYesNo}) => {
         width: 400,
     }
 
-    const handleYesClick = () => {
-        // resetTransAndSE();
+    const handleYesClick = async () => {
+        // await resetTransAndSE();
         setYesNo(true);
         handleClose();
     };
