@@ -130,9 +130,9 @@ const Mode = (props) => {
                             <CustomTabPanel value={tabValue} index={0}>
                                 <NewAnalysisStepper {...props}/>
                             </CustomTabPanel>
-                            {/*<CustomTabPanel value={tabValue} index={1}>*/}
-                            {/*    <ResumeAnalysisStepper/>*/}
-                            {/*</CustomTabPanel>*/}
+                            <CustomTabPanel value={tabValue} index={1}>
+                                <ResumeAnalysisStepper {...props}/>
+                            </CustomTabPanel>
                         </Box>
                     </Box>
                 </Grid>

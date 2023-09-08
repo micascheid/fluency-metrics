@@ -31,22 +31,9 @@ export const StutteredProvider = ({children,
                                       setAudioFile,
                                       isCreateNewWorkspace,
                                       setIsCreateNewWorkspace,
-                                      isGetTranscription,}) => {
+                                      isGetTranscription,
+                                  loadWorkspaceByObj}) => {
     // VARIABLES
-    // const {
-    //     children,
-    //     mode,
-    //     workspaceName,
-    //     setWorkspaceName,
-    //     setMode,
-    //     audioFileName,
-    //     setAudioFileName,
-    //     audioFile,
-    //     setAudioFile,
-    //     isCreateNewWorkspace,
-    //     setIsCreateNewWorkspace,
-    //     isGetTranscription,
-    // } = props;
 
     const initialState = {
         stutteredEventsCount: 0,
@@ -163,7 +150,11 @@ export const StutteredProvider = ({children,
         const workspacesIndexColRef = collection(db, 'users', user.uid, 'workspaces_index');
         const firestoreTime = serverTimestamp();
         //handle workspaces collections
-        const data = {name: name, creation_time: firestoreTime};
+        const data = {
+            name: name,
+            creation_time: firestoreTime,
+            audio_file_name: audioFileName
+        };
         const workspaceObject = {
             workspaceName: name,
             stutteredEventsCount: stutteredEventsCount,
@@ -398,6 +389,12 @@ export const StutteredProvider = ({children,
 
 
     }, [isCreateNewWorkspace]);
+
+    useEffect(() => {
+        if (loadWorkspaceByObj) {
+            updateStateFromObject(loadWorkspaceByObj);
+        }
+    }, [loadWorkspaceByObj])
 
 
     const transcriptError = () => {

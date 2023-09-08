@@ -18,7 +18,7 @@ import {StutteredContext} from "../../context/StutteredContext";
 import Loader from "../../components/Loader";
 import LoadPreviousAudioFile from "./LoadPreviousAudioFile";
 
-const ResumeAnalysisStepper = () => {
+const ResumeAnalysisStepper = (props) => {
     console.log("RESUME ANALYSIS STEPPER");
     const {
         user,
@@ -26,20 +26,30 @@ const ResumeAnalysisStepper = () => {
         setWorkspacesIndex,
     } = useContext(UserContext);
     const {
+        workspaceName,
+        setWorkspaceName,
+        mode,
+        setMode,
         audioFileName,
+        setAudioFileName,
+        audioFile,
+        setAudioFile,
+        fileChosen,
+        setFileChosen,
         workspaceId,
         setWorkspaceId,
-        setAudioFile,
-        setAudioFileName,
-        setFileChosen,
-        updateStateFromObject,
-    } = useContext(StutteredContext);
+        isCreateNewWorkspace,
+        setIsGetTranscription,
+        setIsCreateNewWorkspace,
+        setIsUpdateWorkspace,
+        setLoadWorkspaceByObj,
+    } = props;
 
     const workspacesColRef = collection(db, 'users', user.uid, 'workspaces');
     const workspacesIndexRef = collection(db, 'users', user.uid, 'workspaces_index');
-    const [selectedResume, setSelectedResume] = useState(workspaceId || 'None');
+    const [selectedResume, setSelectedResume] = useState(workspacesIndex);
     const [localWorkspacesIndex, setLocalWorkspacesIndex] = useState(workspacesIndex);
-    const [localWorkspaceId, setLocalWorkspaceId] = useState();
+    const [localWorkspaceId, setLocalWorkspaceId] = useState(workspaceId);
     const [isLoadingModal, setIsLoadingModal] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [workspaceObj, setWorkspaceObj] = useState({});
@@ -49,6 +59,7 @@ const ResumeAnalysisStepper = () => {
         // console.log("selectedResume:", event.target.value);
         const id = event.target.value;
         setSelectedResume(id);
+        setLocalWorkspaceId(id);
         setWorkspaceId(id);
 
     };
@@ -83,31 +94,33 @@ const ResumeAnalysisStepper = () => {
             setFileChosen(false);
             return;
         }
+        if (!isSameAudioFile(file.name)){
+            console.log("YOU SURE ABOUT THAT BOSS?");
+        }
         setAudioFile(file);
         setAudioFileName(file.name);
         setFileChosen(true);
     }
 
+    const isSameAudioFile = (audio_file_name) => {
+        return workspacesIndex[localWorkspaceId].audio_file_name === audio_file_name;
+
+    }
+
     const handleLoadObj = async () => {
-        const workspaceRef = doc(db, 'users', user.uid, 'workspaces', workspaceId);
+        const workspaceRef = doc(db, 'users', user.uid, 'workspaces', localWorkspaceId);
         try {
             const workspaceObj = await getDoc(workspaceRef);
-            updateStateFromObject(workspaceObj.data());
+            setLoadWorkspaceByObj(workspaceObj.data());
         } catch (error) {
             console.log("Trouble fetching workspace,", error);
         }
     };
 
-    // useEffect(() => {
-    //     console.log("EFFECT");
-    //     getDocs(workspacesIndexRef).then((docs) => {
-    //         const docsObject = {};
-    //         docs.forEach((doc) => {
-    //             docsObject[doc.id] = doc.data();
-    //         });
-    //         setLocalWorkspacesIndex(docsObject);
-    //     });
-    // },[]);
+    useEffect(() => {
+        setLocalWorkspaceId(workspaceId);
+    }, [localWorkspaceId]);
+
 
     return (
         <Stack spacing={2}>
@@ -116,14 +129,14 @@ const ResumeAnalysisStepper = () => {
                 <Select
                     sx={{minWidth: '120px'}}
                     id={"resume-label"}
-                    value={selectedResume}
+                    value={localWorkspaceId}
                     onChange={handleResumeSelection}
                 >
                     <MenuItem value={'None'}>
                         <em>None</em>
                     </MenuItem>
-                    {localWorkspacesIndex &&
-                        Object.entries(localWorkspacesIndex).map(([id, data], index) => {
+                    {workspacesIndex &&
+                        Object.entries(workspacesIndex).map(([id, data], index) => {
                                 const time = formatTimestamp(data.creation_time);
                                 return (
                                     <MenuItem key={index} value={id}>
@@ -135,13 +148,6 @@ const ResumeAnalysisStepper = () => {
                         )
                     }
                 </Select>
-                {/*{isLoadingModal &&*/}
-                {/*    <LoadPreviousAudioFile*/}
-                {/*        open={isLoadingModal}*/}
-                {/*        setIsLoadingModal={setIsLoadingModal}*/}
-                {/*        workspaceId={workspaceId}*/}
-                {/*        handleFile={handleFile}*/}
-                {/*    />}*/}
             </FormControl>
             <Box>
                 <Button

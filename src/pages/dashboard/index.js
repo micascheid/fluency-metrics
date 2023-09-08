@@ -25,6 +25,8 @@ const DefaultDashboard = () => {
     const [isGetTranscription, setIsGetTranscription] = useState(false);
     const [isCreateNewWorkspace, setIsCreateNewWorkspace] = useState(false);
     const [isUpdateWorkspace, setIsUpdateWorkspace] = useState(false);
+    const [loadWorkspaceByObj, setLoadWorkspaceByObj] = useState(null);
+    const [workspaceId, setWorkspaceId] = useState('None');
 
     const propValues = {
         mode: mode,
@@ -35,6 +37,8 @@ const DefaultDashboard = () => {
         setAudioFileName: setAudioFileName,
         workspaceName: workspaceName,
         setWorkspaceName: setWorkspaceName,
+        workspaceId: workspaceId,
+        setWorkspaceId: setWorkspaceId,
         audioFile: audioFile,
         setAudioFile: setAudioFile,
         isCreateNewWorkspace: isCreateNewWorkspace,
@@ -42,7 +46,9 @@ const DefaultDashboard = () => {
         isGetTranscription: isGetTranscription,
         setIsCreateNewWorkspace: setIsCreateNewWorkspace,
         setIsUpdateWorkspace: setIsUpdateWorkspace,
-        isUpdateWorkspace: isUpdateWorkspace
+        isUpdateWorkspace: isUpdateWorkspace,
+        setLoadWorkspaceByObj: setLoadWorkspaceByObj,
+        loadWorkspaceByObj: loadWorkspaceByObj,
     }
 
 
