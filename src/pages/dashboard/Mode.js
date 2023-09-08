@@ -23,26 +23,55 @@ import ResumeAnalysisStepper from "./ResumeAnalysisStepper";
 import InstructionsAutoMode from "./InstructionsAutoMode";
 
 
-const Mode = () => {
-    const {mode, setMode, setFileChosen, setAudioFile, setAudioFileName, audioFileName} = useContext(StutteredContext);
-    const autoModeText = "Some text about auto mode";
-    const manualModeText = "Some text about manual mode";
+const Mode = (props) => {
+    const {
+        mode,
+        setMode,
+        audioFileName,
+        setAudioFileName,
+        audioFile,
+        setAudioFile,
+        fileChosen,
+        setFileChosen,
+        workspaceName,
+        setWorkspaceName,
+        isGetTranscription,
+        setIsGetTranscription,
+        setIsCreateNewWorkspace,
+        isCreateNewWorkspace,
+        setIsUpdateWorkspace
+
+    } = props;
     const [showAreYouSure, setShowAreYouSure] = useState(false);
-    const [tempVal, setTempVal] = useState(null);
-    const [path, setPath] = useState(null);
     const [startNew, setStartNew] = useState(false);
     const [tabValue, setTabValue] = useState(0);
 
-    const {
-        setLoadingTranscription,
-        audioFile,
-        transcriptionObj,
-        setTranscriptionObj,
-        countTotalSyllables,
-    } = useContext(StutteredContext);
+
     const handleMode = (event) => {
         setMode(event.target.value);
     };
+
+    // const propsForChildren = {
+    //     mode: mode,
+    //     setMode: setMode,
+    //     fileChosen: fileChosen,
+    //     setFileChosen: setFileChosen,
+    //     audioFileName: audioFileName,
+    //     setAudioFileName: setAudioFileName,
+    //     workspaceName: workspaceName,
+    //     setWorkspaceName: setWorkspaceName,
+    //     audioFile: audioFile,
+    //     setAudioFile: setAudioFileName,
+    //     isCreateNewWorkspace: isCreateNewWorkspace,
+    //     setIsGetTranscription: setIsGetTranscription,
+    //     isGetTranscription: isGetTranscription,
+    //     setIsCreateNewWorkspace: setIsCreateNewWorkspace,
+    //     setIsUpdateWorkspace: setIsUpdateWorkspace
+    // }
+
+    useEffect(() => {
+        console.log("MODE CREATE NEW WORKSPACE:", isCreateNewWorkspace);
+    },[isCreateNewWorkspace])
 
     const CustomTabPanel = (props) => {
         const { children, value, index, ...other } = props;
@@ -99,11 +128,11 @@ const Mode = () => {
                         </Box>
                         <Box>
                             <CustomTabPanel value={tabValue} index={0}>
-                                <NewAnalysisStepper />
+                                <NewAnalysisStepper {...props}/>
                             </CustomTabPanel>
-                            <CustomTabPanel value={tabValue} index={1}>
-                                <ResumeAnalysisStepper/>
-                            </CustomTabPanel>
+                            {/*<CustomTabPanel value={tabValue} index={1}>*/}
+                            {/*    <ResumeAnalysisStepper/>*/}
+                            {/*</CustomTabPanel>*/}
                         </Box>
                     </Box>
                 </Grid>

@@ -8,27 +8,32 @@ import AreYouSure from "./popovers/AreYouSure";
 import {UserContext} from "../../context/UserContext";
 
 
-const NewAnalysisStepper = () => {
+const NewAnalysisStepper = (props) => {
     const {
-        get_transcription,
+        workspaceName,
+        setWorkspaceName,
         mode,
         setMode,
-        setFileChosen,
-        setAudioFile,
-        setAudioFileName,
         audioFileName,
-        workspaceName,
-        createNewWorkspace,
-        updateWorkspace,
-        resetTransAndSE,
-    } = useContext(StutteredContext);
+        setAudioFileName,
+        audioFile,
+        setAudioFile,
+        fileChosen,
+        setFileChosen,
+        isCreateNewWorkspace,
+        setIsGetTranscription,
+        setIsCreateNewWorkspace,
+        setIsUpdateWorkspace,
+    } = props;
     const {
         workspacesIndex,
+        setWorkspacesIndex,
     } = useContext(UserContext);
     const [localWorkspaceName, setLocalWorkspaceName] = useState('');
     const [nameError, setNameError] = useState('');
     const [showAreYouSure, setShowAreYouSure] = useState(false);
     const [yesNo, setYesNo] = useState(false);
+
     const handleMode = (event) => {
         setMode(event.target.value);
     }
@@ -72,36 +77,17 @@ const NewAnalysisStepper = () => {
         } else {
             setYesNo(true);
         }
+
     };
 
-    const initiateWorkspaceSaveProcess = async () => {
-        try {
-            await get_transcription().then(() => {
-                if (localWorkspaceName === '' || yesNo){
-                    console.log("CREATING WORKSPACE");
-                    createNewWorkspace(localWorkspaceName);
-                    resetTransAndSE();
-                } else {
-                    console.log("UPDATING WORKSPACE");
-                    updateWorkspace(localWorkspaceName);
-                }
-
-            });
-            setYesNo(false);
-        } catch (error) {
-            console.log("Unable to get transcription:", error);
-        }
-    }
-
     useEffect(() => {
-        const createWorkspace = async () => {
+        (async () => {
             if (yesNo) {
-                await initiateWorkspaceSaveProcess();
+                console.log("local workspace name", localWorkspaceName);
+                setWorkspaceName(localWorkspaceName);
+                setIsCreateNewWorkspace(true);
             }
-        }
-
-        createWorkspace().catch(console.error);
-
+        })();
 
     }, [yesNo])
 

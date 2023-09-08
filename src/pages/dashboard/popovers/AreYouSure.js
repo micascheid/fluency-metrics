@@ -4,9 +4,6 @@ import MainCard from "../../../components/MainCard";
 import {StutteredContext} from "../../../context/StutteredContext";
 
 const AreYouSure = ({setAreYouSure, setYesNo}) => {
-    const {
-        resetTransAndSE,
-    } = useContext(StutteredContext);
 
     const [isOpen, setIsOpen] = useState(false);
 

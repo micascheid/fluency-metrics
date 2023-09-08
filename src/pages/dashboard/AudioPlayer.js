@@ -26,6 +26,7 @@ const AudioPlayer = () => {
         setCurrentWordIndex,
         currentWordIndex,
         audioFile,
+        audioFileName,
         kiStutteredRegions,
         setkiStutteredRegions,
         setAudioPlayerControl,
@@ -35,6 +36,7 @@ const AudioPlayer = () => {
         workspaceName,
     } = useContext(StutteredContext);
 
+    // console.log("AUDIO FILE NAME", audioFile);
     const [timelineVis, setTimelineVis] = useState(true);
     const [zoomLevel, setZoomLevel] = useState(1);
     const [markers, setMarkers] = useState([]);
@@ -240,6 +242,7 @@ const AudioPlayer = () => {
 
     // USE EFFECTS
     useEffect(() => {
+        console.log("Load file");
         loadAudioFile(audioFile);
         if (wavesurferRef.current !== null) {
             setAudioPlayerControl({

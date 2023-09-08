@@ -30,9 +30,9 @@ const MainRoutes = {
         {
             path: '/',
             element:
-                <StutteredProvider>
+                // <StutteredProvider>
                     <DashboardDefault/>
-                </StutteredProvider>
+                // </StutteredProvider>
         },
         {
             path: 'dashboard',
@@ -40,9 +40,9 @@ const MainRoutes = {
                 {
                     path: 'default',
                     element:
-                        <StutteredProvider>
+                        // <StutteredProvider>
                             <DashboardDefault/>
-                        </StutteredProvider>
+                        // </StutteredProvider>
                 }
             ]
         },

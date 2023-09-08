@@ -19,9 +19,11 @@ import Loader from "../../components/Loader";
 import LoadPreviousAudioFile from "./LoadPreviousAudioFile";
 
 const ResumeAnalysisStepper = () => {
+    console.log("RESUME ANALYSIS STEPPER");
     const {
         user,
         workspacesIndex,
+        setWorkspacesIndex,
     } = useContext(UserContext);
     const {
         audioFileName,
@@ -36,6 +38,7 @@ const ResumeAnalysisStepper = () => {
     const workspacesColRef = collection(db, 'users', user.uid, 'workspaces');
     const workspacesIndexRef = collection(db, 'users', user.uid, 'workspaces_index');
     const [selectedResume, setSelectedResume] = useState(workspaceId || 'None');
+    const [localWorkspacesIndex, setLocalWorkspacesIndex] = useState(workspacesIndex);
     const [localWorkspaceId, setLocalWorkspaceId] = useState();
     const [isLoadingModal, setIsLoadingModal] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -95,6 +98,17 @@ const ResumeAnalysisStepper = () => {
         }
     };
 
+    // useEffect(() => {
+    //     console.log("EFFECT");
+    //     getDocs(workspacesIndexRef).then((docs) => {
+    //         const docsObject = {};
+    //         docs.forEach((doc) => {
+    //             docsObject[doc.id] = doc.data();
+    //         });
+    //         setLocalWorkspacesIndex(docsObject);
+    //     });
+    // },[]);
+
     return (
         <Stack spacing={2}>
             <FormControl>
@@ -108,8 +122,8 @@ const ResumeAnalysisStepper = () => {
                     <MenuItem value={'None'}>
                         <em>None</em>
                     </MenuItem>
-                    {workspacesIndex &&
-                        Object.entries(workspacesIndex).map(([id, data], index) => {
+                    {localWorkspacesIndex &&
+                        Object.entries(localWorkspacesIndex).map(([id, data], index) => {
                                 const time = formatTimestamp(data.creation_time);
                                 return (
                                     <MenuItem key={index} value={id}>

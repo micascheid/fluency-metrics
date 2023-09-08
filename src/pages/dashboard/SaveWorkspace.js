@@ -11,6 +11,7 @@ const SaveWorkspace = ({sx}) => {
     const {
         workspaceName,
         setWorkspaceName,
+        updateWorkspace,
     } = useContext(StutteredContext);
     const {
         workspacesIndex,
@@ -29,6 +30,8 @@ const SaveWorkspace = ({sx}) => {
 
         if (localName !== workspaceName){
             setWorkspaceName(localName);
+        } else {
+            updateWorkspace(localName);
         }
     };
 
