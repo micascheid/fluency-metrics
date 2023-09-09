@@ -11,31 +11,31 @@ import { Provider as ReduxProvider } from 'react-redux';
 import { BrowserRouter } from "react-router-dom";
 
 
-// const container = document.getElementById('root');
-// const root = createRoot(container); // createRoot(container!) if you use TypeScript
+const container = document.getElementById('root');
+const root = createRoot(container); // createRoot(container!) if you use TypeScript
 // The below is the React 18 way of mounting react to the root element but doesn't work in local testing evironment.
 // Works in production just fine be sure to use the below code in production
-// root.render(
+root.render(
+    // <StrictMode>
+        <ReduxProvider store={store}>
+            <BrowserRouter basename="/">
+                <App />
+            </BrowserRouter>
+        </ReduxProvider>
+    // </StrictMode>
+);
+
+// Only use for local testing
+// const rootElement = document.getElementById("root");
+// render(
 //     <StrictMode>
 //         <ReduxProvider store={store}>
 //             <BrowserRouter basename="/">
 //                 <App />
 //             </BrowserRouter>
 //         </ReduxProvider>
-//     </StrictMode>
-// );
-
-// Only use for local testing
-const rootElement = document.getElementById("root");
-render(
-    <StrictMode>
-        <ReduxProvider store={store}>
-            <BrowserRouter basename="/">
-                <App />
-            </BrowserRouter>
-        </ReduxProvider>
-    </StrictMode>, rootElement
-)
+//     </StrictMode>, rootElement
+// )
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals

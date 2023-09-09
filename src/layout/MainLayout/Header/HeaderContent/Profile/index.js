@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import {useEffect, useRef, useState, useContext} from 'react';
-import UserContext from "../../../../../context/UserContext";
+import {UserContext} from "../../../../../context/UserContext";
 // material-ui
 import { useTheme } from '@mui/material/styles';
 import {

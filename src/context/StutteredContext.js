@@ -1,34 +1,193 @@
-import React, {useState, createContext, useEffect} from "react";
-
+import React, {useState, createContext, useEffect, useContext} from "react";
+import {
+    addDoc,
+    collection,
+    doc,
+    getDoc,
+    getDocs,
+    query,
+    serverTimestamp,
+    setDoc,
+    updateDoc,
+    where
+} from "firebase/firestore";
+import {db} from "../FirebaseConfig";
+import {UserContext} from "./UserContext";
+import axios from "axios";
+import {BASE_URL} from "../constants";
 
 export const StutteredContext = createContext();
 
-export const StutteredProvider = ({children}) => {
-    // VARIABLES
-    const [stutteredEventsCount, setStutteredEventsCount] = useState(0);
-    const [stutteredEvents, setStutteredEvents] = useState({});
-    const [totalSyllableCount, setTotalSyllableCount] = useState(0);
-    const [transcriptionObj, setTranscriptionObj] = useState(null);
-    const [currentWordIndex, setCurrentWordIndex] = useState(1);
-    const [averageDuration, setAverageDuration] = useState(0);
-    const [loadingTranscription, setLoadingTranscription] = useState(false);
-    const [mode, setMode] = useState('');
-    const [audioFileName, setAudioFileName] = useState('');
-    const [audioFile, setAudioFile] = useState(null);
-    const [kiStutteredRegions, setkiStutteredRegions] = useState({});
-    const [fileChosen, setFileChosen] = useState(false);
-    const [longest3Durations, setLongest3Durations] = useState([0, 0, 0]);
-    const [audioPlayerControl, setAudioPlayerControl] = useState(null);
-    const [playBackSpeed, setPlayBackSpeed] = useState(1);
 
-    /*
-        Repetition: 0
-        Prolongation: 1
-        Block: 2
-        Interjection: 3
-        stutteredEventList={1:{start: <>,end: <>}, {2:{start: <>,end: <>}}
-     */
+
+export const StutteredProvider = (props) => {
+    // VARIABLES
+
+    const {
+        children,
+        mode,
+        workspaceName,
+        setWorkspaceName,
+        setMode,
+        audioFileName,
+        setAudioFileName,
+        audioFile,
+        setAudioFile,
+        isCreateNewWorkspace,
+        setIsCreateNewWorkspace,
+        isGetTranscription,
+        loadWorkspaceByObj,
+        workspaceId,
+    } = props;
+
+    const initialState = {
+        stutteredEventsCount: 0,
+        stutteredEvents: {},
+        totalSyllableCount: 0,
+        transcriptionObj: null,
+        currentWordIndex: 1,
+        averageDuration: 0,
+        loadingTranscription: false,
+        mode: mode,
+        audioFileName: audioFileName,
+        audioFile: audioFile,
+        kiStutteredRegions: {},
+        fileChosen: false,
+        longest3Durations: [0, 0, 0],
+        audioPlayerControl: null,
+        playBackSpeed: 1,
+        workspaceId: null,
+        globalYesNo: false,
+    }
+    // const [workspaceName, setWorkspaceName] = useState('');
+    const [stutteredEventsCount, setStutteredEventsCount] = useState(initialState.stutteredEventsCount);
+    const [stutteredEvents, setStutteredEvents] = useState({});
+    const [totalSyllableCount, setTotalSyllableCount] = useState(initialState.totalSyllableCount);
+    const [transcriptionObj, setTranscriptionObj] = useState(initialState.transcriptionObj);
+    const [currentWordIndex, setCurrentWordIndex] = useState(initialState.currentWordIndex);
+    const [averageDuration, setAverageDuration] = useState(initialState.averageDuration);
+    const [loadingTranscription, setLoadingTranscription] = useState(initialState.loadingTranscription);
+    const [kiStutteredRegions, setkiStutteredRegions] = useState(initialState.kiStutteredRegions);
+    const [fileChosen, setFileChosen] = useState(initialState.fileChosen);
+    const [longest3Durations, setLongest3Durations] = useState(initialState.longest3Durations);
+    const [audioPlayerControl, setAudioPlayerControl] = useState(initialState.audioPlayerControl);
+    const [playBackSpeed, setPlayBackSpeed] = useState(initialState.playBackSpeed);
+    const [isLoadingWorkspace, setIsLoadingWorkspace] = useState(false);
+    const {user, setWorkspacesIndex} = useContext(UserContext);
+
     //FUNCTIONS
+    const resetTransAndSE = async () => {
+        setStutteredEventsCount(initialState.stutteredEventsCount);
+        setStutteredEvents(initialState.stutteredEvents);
+        setTotalSyllableCount(initialState.totalSyllableCount);
+        setTranscriptionObj(initialState.transcriptionObj);
+        setCurrentWordIndex(initialState.currentWordIndex);
+        setAverageDuration(initialState.averageDuration);
+        setLoadingTranscription(initialState.loadingTranscription);
+        setkiStutteredRegions(initialState.kiStutteredRegions);
+        setLongest3Durations(initialState.longest3Durations);
+    }
+
+    const stateSetters = {
+        workspaceName: setWorkspaceName,
+        stutteredEventsCount: setStutteredEventsCount,
+        stutteredEvents: setStutteredEvents,
+        totalSyllableCount: setTotalSyllableCount,
+        transcriptionObj: setTranscriptionObj,
+        currentWordIndex: setCurrentWordIndex,
+        averageDuration: setAverageDuration,
+        loadingTranscription: setLoadingTranscription,
+        mode: setMode,
+        audioFileName: setAudioFileName,
+        audioFile: setAudioFile,
+        kiStutteredRegions: setkiStutteredRegions,
+        fileChosen: setFileChosen,
+        longest3Durations: setLongest3Durations,
+        audioPlayerControl: setAudioPlayerControl,
+        playBackSpeed: setPlayBackSpeed,
+    }
+
+    const updateStateFromObject = (dbWorkspaceObj) => {
+        for (let key in dbWorkspaceObj) {
+            if (stateSetters[key]) {
+                stateSetters[key](dbWorkspaceObj[key]);
+            }
+        }
+    };
+
+    const updateWorkspace = async (name) => {
+        console.log("updating workspace: ", name);
+        const workspaceColDocRef = doc(db, 'users', user.uid, 'workspaces', workspaceId);
+        const workspaceIndexDocRef = doc(db, 'users', user.uid, 'workspaces_index', workspaceId);
+        const workspaceObject = {
+            workspaceName: name,
+            stutteredEventsCount: stutteredEventsCount,
+            stutteredEvents: stutteredEvents,
+            totalSyllableCount: totalSyllableCount,
+            transcriptionObj: transcriptionObj,
+            currentWordIndex: currentWordIndex,
+            averageDuration: averageDuration,
+            loadingTranscription: loadingTranscription,
+            mode: mode,
+            audioFileName: audioFileName,
+            kiStutteredRegions: kiStutteredRegions,
+            fileChosen: fileChosen,
+            longest3Durations: longest3Durations,
+            playBackSpeed: playBackSpeed
+        }
+        try {
+            await updateDoc(workspaceColDocRef, workspaceObject);
+            await updateDoc(workspaceIndexDocRef, {name: name});
+        } catch (e) {
+            console.log("trouble updating doc:", e);
+        }
+
+        //update workspace data
+
+
+        //update workspace_index
+    };
+
+    const createNewWorkspace = async (name, transcriptionObj) => {
+        //db references
+        const workspacesColRef = collection(db, 'users', user.uid, 'workspaces');
+        const workspacesIndexColRef = collection(db, 'users', user.uid, 'workspaces_index');
+        const firestoreTime = serverTimestamp();
+        //handle workspaces collections
+        const data = {
+            name: name,
+            creation_time: firestoreTime,
+            audio_file_name: audioFileName
+        };
+        const workspaceObject = {
+            workspaceName: name,
+            stutteredEventsCount: stutteredEventsCount,
+            stutteredEvents: stutteredEvents,
+            totalSyllableCount: totalSyllableCount,
+            transcriptionObj: transcriptionObj,
+            currentWordIndex: currentWordIndex,
+            averageDuration: averageDuration,
+            loadingTranscription: loadingTranscription,
+            mode: mode,
+            audioFileName: audioFileName,
+            kiStutteredRegions: kiStutteredRegions,
+            fileChosen: fileChosen,
+            longest3Durations: longest3Durations,
+            playBackSpeed: playBackSpeed
+        }
+        //add workspace first then if successful add workspace_index doc
+        try {
+            const docData = await addDoc(workspacesColRef, workspaceObject)
+            const docRef = doc(workspacesIndexColRef, docData.id);
+            await setDoc(docRef, data);
+            // setWorkspaceId(docData.id);
+            console.log("NAME:", name);
+            setWorkspaceName(name);
+        } catch (error) {
+            console.log("Trouble with workspaces or workspaces index:", error)
+        }
+
+    };
 
     const handleStutteredChange = (change) => {
         setStutteredEventsCount(prevCount => prevCount + change);
@@ -46,7 +205,14 @@ export const StutteredProvider = ({children}) => {
 
     const addStutteredEventWaveForm = (region, syllableCount, ps, text, type) => {
         const duration = region.end - region.start;
-        const eventItem = {duration: duration, syllable_count: syllableCount, ps: ps, text: text, type: type, id: region.id};
+        const eventItem = {
+            duration: duration,
+            syllable_count: syllableCount,
+            ps: ps,
+            text: text,
+            type: type,
+            id: region.id
+        };
         if (!stutteredEvents[region.id]) {
             setStutteredEvents(prevEvents => ({...prevEvents, [region.id]: eventItem}));
             setStutteredEventsCount(prevCount => prevCount + 1);
@@ -64,30 +230,31 @@ export const StutteredProvider = ({children}) => {
 
     const updateStutteredEventWaveForm = (region, syllable_count, ps, text, type) => {
         setStutteredEvents(prevEvents => {
-                    const duration = region.end - region.start;
-                    const eventItem = {
-                        duration: duration,
-                        syllable_count: syllable_count,
-                        ps: ps,
-                        text: text,
-                        type: type,
-                        id: region.id
-                    };
-                    return {
-                        ...prevEvents,
-                        [region.id]: eventItem
-                    };
-            });
+            const duration = region.end - region.start;
+            const eventItem = {
+                duration: duration,
+                syllable_count: syllable_count,
+                ps: ps,
+                text: text,
+                type: type,
+                id: region.id
+            };
+            return {
+                ...prevEvents,
+                [region.id]: eventItem
+            };
+        });
     };
 
     const randomFunction = () => {
-      console.log("RANDOM FUNCTION");
+        console.log("RANDOM FUNCTION");
     };
 
     const removeStutteredEvent = (wordIndex) => {
+        console.log(stutteredEvents);
         setStutteredEvents(prevList => prevList.filter(word_obj => word_obj.id !== wordIndex));
         if (stutteredEvents) {
-            setStutteredEventsCount(prevCount => prevCount-1)
+            setStutteredEventsCount(prevCount => prevCount - 1)
         }
     };
 
@@ -130,9 +297,34 @@ export const StutteredProvider = ({children}) => {
     const handleWordUpdate = (index, newWord) => {
         setTranscriptionObj(prevTranscription => {
             const updatedTranscription = {...prevTranscription};
-            updatedTranscription[index].text = newWord;
+            updatedTranscription[index].punctuated_word = newWord;
             return updatedTranscription;
         });
+    };
+
+    const get_transcription = async () => {
+        setLoadingTranscription(true);
+        const formData = new FormData();
+        formData.append('file', audioFile);
+        const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+        await delay(1500);
+        try {
+            const response = await axios.post(`${BASE_URL}/get_transcription2`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            const transcriptionObj = response.data.transcription_obj;
+            setTranscriptionObj(transcriptionObj);
+            countTotalSyllables();
+            setLoadingTranscription(false);
+
+            return transcriptionObj;
+        } catch (error) {
+            console.log("ERROR handling get_transcription:", error);
+            setLoadingTranscription(false);
+            return null;
+        }
     };
 
     useEffect(() => {
@@ -147,9 +339,67 @@ export const StutteredProvider = ({children}) => {
 
     }, [totalSyllableCount, stutteredEventsCount, kiStutteredRegions]);
 
+
     useEffect(() => {
-       setStutteredEventsCount(stutteredEvents.length);
+        setStutteredEventsCount(Object.keys(stutteredEvents).length);
     }, [stutteredEvents]);
+
+    //This use Effect handles the updating of a workspace when user manually saves
+    // useEffect(() => {
+    //     (async () => {
+    //         try {
+    //             await updateWorkspace(workspaceName);
+    //         } catch (error) {
+    //             console.log("TROUBLE UPDATING WORKSPACE:", error);
+    //         }
+    //     })();
+    // }, [workspaceName]);
+    const updateWorkspacesIndex = async () => {
+        console.log()
+        const workspacesIndexTemp = {};
+        const workspacesIndexRef = collection(db, 'users', user.uid, 'workspaces_index');
+        const workspacesIndexDocs = await getDocs(workspacesIndexRef);
+        workspacesIndexDocs.docs.forEach((doc) => {
+            workspacesIndexTemp[doc.id] = doc.data();
+        });
+
+        setWorkspacesIndex(workspacesIndexTemp);
+    }
+
+    useEffect(() => {
+        (async () => {
+            if (isCreateNewWorkspace) {
+                try {
+                    setStutteredEventsCount(initialState.stutteredEventsCount);
+                    setStutteredEvents(initialState.stutteredEvents);
+                    setTotalSyllableCount(initialState.totalSyllableCount);
+                    setTranscriptionObj(initialState.transcriptionObj);
+                    setCurrentWordIndex(initialState.currentWordIndex);
+                    setAverageDuration(initialState.averageDuration);
+                    setLoadingTranscription(initialState.loadingTranscription);
+                    setkiStutteredRegions(initialState.kiStutteredRegions);
+                    setLongest3Durations(initialState.longest3Durations);
+
+                    const transcriptObj = await get_transcription();
+                    await createNewWorkspace(workspaceName, transcriptObj);
+                    await updateWorkspacesIndex();
+                    setIsCreateNewWorkspace(false);
+                } catch (error) {
+                    console.log("TROUBLE CREATING WORKSPACE", error);
+                }
+
+            }
+        })();
+
+
+    }, [isCreateNewWorkspace]);
+
+    useEffect(() => {
+        if (loadWorkspaceByObj) {
+            updateStateFromObject(loadWorkspaceByObj);
+        }
+    }, [loadWorkspaceByObj])
+
 
     const transcriptError = () => {
         let transcriptionNew = JSON.parse(JSON.stringify(transcriptionObj));
@@ -161,7 +411,7 @@ export const StutteredProvider = ({children}) => {
                 const regionStart = kiStutteredRegions[regionKey].start;
                 const regionEnd = kiStutteredRegions[regionKey].end;
                 if ((wordStart >= regionStart && wordStart <= regionEnd) ||
-                    (wordEnd >= regionStart && wordEnd <= regionEnd)){
+                    (wordEnd >= regionStart && wordEnd <= regionEnd)) {
                     transcriptionNew[tKey].stuttered = true;
                     return true;
                 }
@@ -171,51 +421,60 @@ export const StutteredProvider = ({children}) => {
         setTranscriptionObj(transcriptionNew);
     };
 
-
     const contextValues = {
-        averageDuration,
-        transcriptionObj,
-        totalSyllableCount,
-        stutteredEventsCount,
-        stutteredEvents,
-        setTranscriptionObj,
-        setStutteredEventsCount,
-        setTotalSyllableCount,
-        loadingTranscription,
-        setLoadingTranscription,
-        setCurrentWordIndex,
-        currentWordIndex,
-        kiStutteredRegions,
-        setkiStutteredRegions,
-        setFileChosen,
-        fileChosen,
-        mode,
-        setMode,
-        audioFileName,
-        setAudioFileName,
-        setAudioFile,
-        audioFile,
-        handleWordUpdate,
-        setAdjustedSyllableCount,
-        countTotalSyllables,
-        handleStutteredChange,
-        addStutteredEvent,
-        updateStutteredEventWaveForm,
-        removeStutteredEvent,
-        longest3Durations,
-        setAudioPlayerControl,
-        audioPlayerControl,
-        setPlayBackSpeed,
-        playBackSpeed,
-        transcriptError,
-        randomFunction,
-        addStutteredEventWaveForm,
-        removeStutteredEventsWaveForm
+            addStutteredEvent,
+            addStutteredEventWaveForm,
+            audioFile,
+            audioFileName,
+            audioPlayerControl,
+            averageDuration,
+            countTotalSyllables,
+            currentWordIndex,
+            fileChosen,
+            get_transcription,
+            handleStutteredChange,
+            handleWordUpdate,
+            kiStutteredRegions,
+            loadingTranscription,
+            longest3Durations,
+            mode,
+            playBackSpeed,
+            randomFunction,
+            removeStutteredEvent,
+            removeStutteredEventsWaveForm,
+            resetTransAndSE,
+            setAdjustedSyllableCount,
+            setAudioFile,
+            setAudioFileName,
+            setAudioPlayerControl,
+            setCurrentWordIndex,
+            setFileChosen,
+            setLoadingTranscription,
+            setkiStutteredRegions,
+            setMode,
+            setPlayBackSpeed,
+            setStutteredEventsCount,
+            setTotalSyllableCount,
+            setTranscriptionObj,
+            setWorkspaceName,
+            stutteredEvents,
+            stutteredEventsCount,
+            totalSyllableCount,
+            transcriptionObj,
+            transcriptError,
+            updateStutteredEventWaveForm,
+            updateStateFromObject,
+            updateWorkspace,
+            workspaceName,
+            createNewWorkspace,
+            isLoadingWorkspace,
+            setIsLoadingWorkspace,
+            workspaceId,
+        }
+        return (
+            <StutteredContext.Provider value={contextValues}>
+                {children}
+            </StutteredContext.Provider>
+        );
     }
-
-    return (
-        <StutteredContext.Provider value={contextValues}>
-            {children}
-        </StutteredContext.Provider>
-    );
-};
+;

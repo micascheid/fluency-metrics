@@ -32,7 +32,7 @@ import {EyeOutlined, EyeInvisibleOutlined} from '@ant-design/icons';
 // firebase auth
 import {getAuth, createUserWithEmailAndPassword, updateProfile} from 'firebase/auth';
 import {initializeApp} from "firebase/app";
-import {doc, setDoc} from "firebase/firestore";
+import {doc, setDoc, getDoc} from "firebase/firestore";
 import {db, auth} from "../../../FirebaseConfig";
 
 // ============================|| FIREBASE - REGISTER ||============================ //
@@ -41,7 +41,19 @@ const AuthRegister = () => {
     const navigate = useNavigate();
     const [level, setLevel] = useState();
     const [showPassword, setShowPassword] = useState(false);
-    const [isRegeristering, setIsRegistering] = useState(false);
+    const [isRegistering, setIsRegistering] = useState(false);
+
+    const addUserIfNotExists = async (userId, userData) => {
+        const userRef = doc(db, 'users', `${userId}`)
+        const userSnap = await getDoc(userRef);
+
+        if (!userSnap.exists()){
+            await setDoc(userRef, userData);
+        } else {
+            console.log("user already exists")
+        }
+    };
+
     const handleClickShowPassword = () => {
         setShowPassword(!showPassword);
     };
@@ -85,7 +97,9 @@ const AuthRegister = () => {
                                 displayName: values.displayname, photoURL: ''
                             }).then(() => {
                                 setIsRegistering(true);
-                                navigate('/dashboard/default');
+                                addUserIfNotExists(user.uid, {}).then(() => {
+                                    navigate('/dashboard/default')
+                                });
                             })
                         })
                         .catch((error) => {
@@ -115,7 +129,7 @@ const AuthRegister = () => {
                                         name="displayname"
                                         onBlur={handleBlur}
                                         onChange={handleChange}
-                                        placeholder="John"
+                                        placeholder="Mica"
                                         fullWidth
                                         error={Boolean(touched.displayname && errors.displayname)}
                                     />
@@ -224,26 +238,17 @@ const AuthRegister = () => {
                                 <AnimateButton>
                                     <Button
                                         disableElevation
-                                        disabled={isRegeristering || Boolean(!touched.email)}
+                                        disabled={isRegistering || Boolean(!touched.email)}
                                         fullWidth
                                         size="large"
                                         type="submit"
                                         variant="contained"
                                         color="primary"
                                     >
-                                        {isRegeristering ? 'Creating Account' : 'Create Account'}
+                                        {isRegistering ? 'Creating Account' : 'Create Account'}
                                     </Button>
                                 </AnimateButton>
                             </Grid>
-                            {/* TODO after email auth is handled */}
-                            {/*<Grid item xs={12}>*/}
-                            {/*    <Divider>*/}
-                            {/*        <Typography variant="caption">Sign up with</Typography>*/}
-                            {/*    </Divider>*/}
-                            {/*</Grid>*/}
-                            {/*<Grid item xs={12}>*/}
-                            {/*    <FirebaseSocial />*/}
-                            {/*</Grid>*/}
                         </Grid>
                     </form>
                 )}

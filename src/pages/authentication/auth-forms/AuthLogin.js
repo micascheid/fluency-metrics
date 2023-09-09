@@ -31,7 +31,7 @@ import {EyeOutlined, EyeInvisibleOutlined} from '@ant-design/icons';
 //firebase import
 import {getAuth, signInWithEmailAndPassword, onAuthStateChanged} from "firebase/auth";
 import {auth} from '../../../FirebaseConfig';
-import UserContext from "../../../context/UserContext";
+import {UserContext} from "../../../context/UserContext";
 
 // ============================|| FIREBASE - LOGIN ||============================ //
 
