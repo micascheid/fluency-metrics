@@ -205,7 +205,7 @@ const AudioPlayerPopover = ({anchorEl, setAnchorEl, popoverOpen, setPopoverOpen,
                     <Divider textAlign={"left"} sx={dividerStyles}>Physical Concomitants</Divider>
                     <Box>
                         <FormControl sx={{minWidth: 100}}>
-                            <InputLabel id={"pc-type-select-label"}>Phys. Conc.</InputLabel>
+                            <InputLabel id={"pc-type-select-label"}>P. Conc.</InputLabel>
                             <Select
                                 labelId={"pc-type-select-label"}
                                 id={"select-pc"}

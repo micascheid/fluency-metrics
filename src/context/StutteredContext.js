@@ -20,20 +20,25 @@ export const StutteredContext = createContext();
 
 
 
-export const StutteredProvider = ({children,
-                                      mode,
-                                      workspaceName,
-                                      setWorkspaceName,
-                                      setMode,
-                                      audioFileName,
-                                      setAudioFileName,
-                                      audioFile,
-                                      setAudioFile,
-                                      isCreateNewWorkspace,
-                                      setIsCreateNewWorkspace,
-                                      isGetTranscription,
-                                  loadWorkspaceByObj}) => {
+export const StutteredProvider = (props) => {
     // VARIABLES
+
+    const {
+        children,
+        mode,
+        workspaceName,
+        setWorkspaceName,
+        setMode,
+        audioFileName,
+        setAudioFileName,
+        audioFile,
+        setAudioFile,
+        isCreateNewWorkspace,
+        setIsCreateNewWorkspace,
+        isGetTranscription,
+        loadWorkspaceByObj,
+        workspaceId,
+    } = props;
 
     const initialState = {
         stutteredEventsCount: 0,
@@ -67,7 +72,6 @@ export const StutteredProvider = ({children,
     const [longest3Durations, setLongest3Durations] = useState(initialState.longest3Durations);
     const [audioPlayerControl, setAudioPlayerControl] = useState(initialState.audioPlayerControl);
     const [playBackSpeed, setPlayBackSpeed] = useState(initialState.playBackSpeed);
-    const [workspaceId, setWorkspaceId] = useState(initialState.workspaceId);
     const [isLoadingWorkspace, setIsLoadingWorkspace] = useState(false);
     const {user, setWorkspacesIndex} = useContext(UserContext);
 
@@ -176,7 +180,7 @@ export const StutteredProvider = ({children,
             const docData = await addDoc(workspacesColRef, workspaceObject)
             const docRef = doc(workspacesIndexColRef, docData.id);
             await setDoc(docRef, data);
-            setWorkspaceId(docData.id);
+            // setWorkspaceId(docData.id);
             console.log("NAME:", name);
             setWorkspaceName(name);
         } catch (error) {
@@ -465,7 +469,6 @@ export const StutteredProvider = ({children,
             createNewWorkspace,
             isLoadingWorkspace,
             setIsLoadingWorkspace,
-            setWorkspaceId,
             workspaceId,
         }
         return (

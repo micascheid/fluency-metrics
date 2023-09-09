@@ -47,8 +47,7 @@ const ResumeAnalysisStepper = (props) => {
 
     const workspacesColRef = collection(db, 'users', user.uid, 'workspaces');
     const workspacesIndexRef = collection(db, 'users', user.uid, 'workspaces_index');
-    const [selectedResume, setSelectedResume] = useState(workspacesIndex);
-    const [localWorkspacesIndex, setLocalWorkspacesIndex] = useState(workspacesIndex);
+    const [selectedResume, setSelectedResume] = useState(workspaceId);
     const [localWorkspaceId, setLocalWorkspaceId] = useState(workspaceId);
     const [isLoadingModal, setIsLoadingModal] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -169,7 +168,7 @@ const ResumeAnalysisStepper = (props) => {
                 <Typography variant={"body1"}>{audioFileName}</Typography>
             </Box>
 
-            <Button variant={"contained"} disabled={!audioFileName} onClick={handleLoadObj}>
+            <Button variant={"contained"} disabled={!audioFileName || selectedResume === 'None'} onClick={handleLoadObj}>
                 Load Workspace
             </Button>
         </Stack>
