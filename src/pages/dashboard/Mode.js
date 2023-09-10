@@ -16,7 +16,7 @@ import MainCard from "../../components/MainCard";
 import {StutteredContext} from "../../context/StutteredContext";
 import {BASE_URL, MANUAL} from "../../constants";
 import axios from "axios";
-import AreYouSure from "./popovers/AreYouSure";
+import AreYouSure from "./modals/AreYouSure";
 import * as PropTypes from "prop-types";
 import NewAnalysisStepper from "./NewAnalysisStepper";
 import ResumeAnalysisStepper from "./ResumeAnalysisStepper";

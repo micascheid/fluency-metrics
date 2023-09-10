@@ -5,7 +5,8 @@ import {StutteredContext} from "../../context/StutteredContext";
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
-import AreYouSure from "./popovers/AreYouSure";
+import AreYouSure from "./modals/AreYouSure";
+// import styled from 'styled-components';
 
 const CustomWordInput = styled(TextField)(({theme}) => ({
     ...theme.typography.h5,
@@ -28,6 +29,16 @@ const dividerStyles = {
     },
     pt: 1
 }
+
+const WordSpan = styled('span')(({ isClicked, theme }) => ({
+    cursor: 'pointer',
+    // transition: 'background-color 0.3s',
+    backgroundColor: isClicked ? 'yellow' : 'inherit',
+    '&:hover': {
+        backgroundColor: 'yellow !important'
+    },
+    // ...theme.typography.body1 // assuming you want the same typography for the span
+}));
 
 const WordComponent = ({word, word_obj, onUpdateWord, index, style}) => {
     // VARIABLES
@@ -145,7 +156,7 @@ const WordComponent = ({word, word_obj, onUpdateWord, index, style}) => {
 
     return (
         <>
-            <span
+            <WordSpan
                 onClick={(event) => {
                     if (mode !== "auto") {
                         handlePopoverOpen();
@@ -156,10 +167,14 @@ const WordComponent = ({word, word_obj, onUpdateWord, index, style}) => {
                 }
                 style={{
                     ...style,
-                    backgroundColor: isClicked ? 'yellow' : style.backgroundColor}}
+                    backgroundColor: isClicked ? 'yellow' : style.backgroundColor,
+                    ':hover': {
+                        backgroundColor: 'yellow'
+                    }
+                }}
             >
                 {newWord}
-            </span>
+            </WordSpan>
             <Popover
                 open={Boolean(anchorEl)}
                 anchorEl={anchorEl}

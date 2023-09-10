@@ -4,8 +4,9 @@ import {MANUAL} from "../../constants";
 import React from "react";
 import {StutteredContext} from "../../context/StutteredContext";
 import saveWorkSpace from "./SaveWorkspace";
-import AreYouSure from "./popovers/AreYouSure";
+import AreYouSure from "./modals/AreYouSure";
 import {UserContext} from "../../context/UserContext";
+import PHIEntryChecker from "./modals/PHIEntryChecker";
 
 
 const NewAnalysisStepper = (props) => {
@@ -16,14 +17,9 @@ const NewAnalysisStepper = (props) => {
         setMode,
         audioFileName,
         setAudioFileName,
-        audioFile,
         setAudioFile,
-        fileChosen,
         setFileChosen,
-        isCreateNewWorkspace,
-        setIsGetTranscription,
         setIsCreateNewWorkspace,
-        setIsUpdateWorkspace,
     } = props;
     const {
         workspacesIndex,
@@ -33,10 +29,24 @@ const NewAnalysisStepper = (props) => {
     const [nameError, setNameError] = useState('');
     const [showAreYouSure, setShowAreYouSure] = useState(false);
     const [yesNo, setYesNo] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const handleMode = (event) => {
         setMode(event.target.value);
-    }
+    };
+
+    const handlePhiYes = () => {
+        setIsModalOpen(false);
+    };
+
+    const handlePhiNo = () => {
+        setIsModalOpen(false);
+        if (workspaceName !== '') {
+            setShowAreYouSure(true); // Open the AreYouSure modal
+        } else {
+            setYesNo(true);
+        }
+    };
 
     const handleFileChange = (event) => {
         const file = event.target.files[0];
@@ -72,11 +82,7 @@ const NewAnalysisStepper = (props) => {
     }
 
     const handleCreateWorkspace = () => {
-        if (workspaceName !== '') {
-            setShowAreYouSure(true);
-        } else {
-            setYesNo(true);
-        }
+        setIsModalOpen(true);
 
     };
 
@@ -95,6 +101,7 @@ const NewAnalysisStepper = (props) => {
     return (
         <Box maxWidth={"150px"}>
             {showAreYouSure && <AreYouSure setAreYouSure={setShowAreYouSure} setYesNo={setYesNo}/>}
+            <PHIEntryChecker isModalOpen={isModalOpen} onYes={handlePhiYes} onNo={handlePhiNo} />
             <Stack spacing={2}>
                 <FormControl sx={{mt: 2}}>
                     <InputLabel>Mode</InputLabel>
