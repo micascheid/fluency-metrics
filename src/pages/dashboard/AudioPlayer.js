@@ -154,11 +154,11 @@ const AudioPlayer = () => {
     };
 
     const playbackSpeedHandler = useCallback((event, value) => {
-        console.log("Playback Speed", value);
-        console.log(wavesurferRef.current.getCurrentTime());
-        wavesurferRef.current.setPlaybackRate(value);
         setPlayBackSpeed(value);
-    }, [playBackSpeed]);
+        if (wavesurferRef.current) {
+            wavesurferRef.current.setPlaybackRate(value);
+        }
+    },[playBackSpeed]);
 
     const playPause = () => {
         if (wavesurferRef.current !== null) {
@@ -285,9 +285,9 @@ const AudioPlayer = () => {
             });
         }
 
-        if (wavesurferRef.current) {
-            wavesurferRef.current.setPlaybackRate(1);
-        }
+        // if (wavesurferRef.current) {
+        //     wavesurferRef.current.setPlaybackRate(1);
+        // }
 
         window.addEventListener('keypress', handleKeyPress);
         return () => {
