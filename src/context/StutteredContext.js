@@ -41,6 +41,7 @@ export const StutteredProvider = (props) => {
     } = props;
 
     const initialState = {
+        percentSS: 0,
         stutteredEventsCount: 0,
         stutteredEvents: {},
         totalSyllableCount: 0,
@@ -59,7 +60,7 @@ export const StutteredProvider = (props) => {
         workspaceId: null,
         globalYesNo: false,
     }
-    // const [workspaceName, setWorkspaceName] = useState('');
+
     const [stutteredEventsCount, setStutteredEventsCount] = useState(initialState.stutteredEventsCount);
     const [stutteredEvents, setStutteredEvents] = useState({});
     const [totalSyllableCount, setTotalSyllableCount] = useState(initialState.totalSyllableCount);
@@ -73,11 +74,13 @@ export const StutteredProvider = (props) => {
     const [audioPlayerControl, setAudioPlayerControl] = useState(initialState.audioPlayerControl);
     const [playBackSpeed, setPlayBackSpeed] = useState(initialState.playBackSpeed);
     const [isLoadingWorkspace, setIsLoadingWorkspace] = useState(false);
+    const [percentSS, setPercentSS] = useState(0);
     const {user, setWorkspacesIndex} = useContext(UserContext);
 
     //FUNCTIONS
     const resetTransAndSE = async () => {
         setStutteredEventsCount(initialState.stutteredEventsCount);
+        setPercentSS(initialState.percentSS);
         setStutteredEvents(initialState.stutteredEvents);
         setTotalSyllableCount(initialState.totalSyllableCount);
         setTranscriptionObj(initialState.transcriptionObj);
@@ -91,6 +94,7 @@ export const StutteredProvider = (props) => {
     const stateSetters = {
         workspaceName: setWorkspaceName,
         stutteredEventsCount: setStutteredEventsCount,
+        percentSS: setPercentSS,
         stutteredEvents: setStutteredEvents,
         totalSyllableCount: setTotalSyllableCount,
         transcriptionObj: setTranscriptionObj,
@@ -122,6 +126,7 @@ export const StutteredProvider = (props) => {
         const workspaceObject = {
             workspaceName: name,
             stutteredEventsCount: stutteredEventsCount,
+            percentSS: percentSS,
             stutteredEvents: stutteredEvents,
             totalSyllableCount: totalSyllableCount,
             transcriptionObj: transcriptionObj,
@@ -190,7 +195,14 @@ export const StutteredProvider = (props) => {
     };
 
     const handleStutteredChange = (change) => {
-        setStutteredEventsCount(prevCount => prevCount + change);
+        setStutteredEventsCount(prevCount => {
+            const newCount = prevCount + change;
+            console.log("NEW COUNT: ", newCount, ", SYLLABLES: ", totalSyllableCount);
+            console.log("%SS:", (newCount/totalSyllableCount)*100);
+            const percent = (newCount/totalSyllableCount)*100
+            setPercentSS(parseFloat(Number((newCount/totalSyllableCount)*100).toFixed(2)));
+        });
+
     };
 
     const addStutteredEvent = (word_obj, type, syllable_count, ps, newWord, wordIndex) => {
@@ -198,7 +210,7 @@ export const StutteredProvider = (props) => {
         const eventItem = {type: type, duration: duration, ps: ps, text: newWord, uid: wordIndex};
         if (!stutteredEvents.some((obj) => obj.uid === wordIndex)) {
             setStutteredEvents(prevEvents => [...prevEvents, {...eventItem, id: prevEvents.length + 1}])
-            setStutteredEventsCount(prevCount => prevCount + 1);
+            handleStutteredChange(1)
         }
     };
 
@@ -215,7 +227,8 @@ export const StutteredProvider = (props) => {
         };
         if (!stutteredEvents[region.id]) {
             setStutteredEvents(prevEvents => ({...prevEvents, [region.id]: eventItem}));
-            setStutteredEventsCount(prevCount => prevCount + 1);
+            // setStutteredEventsCount(prevCount => prevCount + 1);
+            handleStutteredChange(1)
         }
         let changeRegion = kiStutteredRegions[region.id];
         changeRegion.color = "rgba(255, 153, 10, .5)";
@@ -254,7 +267,7 @@ export const StutteredProvider = (props) => {
         console.log(stutteredEvents);
         setStutteredEvents(prevList => prevList.filter(word_obj => word_obj.id !== wordIndex));
         if (stutteredEvents) {
-            setStutteredEventsCount(prevCount => prevCount - 1)
+            handleStutteredChange(-1);
         }
     };
 
@@ -264,7 +277,7 @@ export const StutteredProvider = (props) => {
             delete newEvents[region.id];
             return newEvents;
         });
-        setStutteredEventsCount(preCount => preCount - 1);
+        handleStutteredChange(-1);
     }
 
     const setAdjustedSyllableCount = (index, syllableCount) => {
@@ -344,16 +357,6 @@ export const StutteredProvider = (props) => {
         setStutteredEventsCount(Object.keys(stutteredEvents).length);
     }, [stutteredEvents]);
 
-    //This use Effect handles the updating of a workspace when user manually saves
-    // useEffect(() => {
-    //     (async () => {
-    //         try {
-    //             await updateWorkspace(workspaceName);
-    //         } catch (error) {
-    //             console.log("TROUBLE UPDATING WORKSPACE:", error);
-    //         }
-    //     })();
-    // }, [workspaceName]);
     const updateWorkspacesIndex = async () => {
         console.log()
         const workspacesIndexTemp = {};
@@ -470,6 +473,7 @@ export const StutteredProvider = (props) => {
             isLoadingWorkspace,
             setIsLoadingWorkspace,
             workspaceId,
+            percentSS,
         }
         return (
             <StutteredContext.Provider value={contextValues}>

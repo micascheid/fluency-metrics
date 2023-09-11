@@ -7,7 +7,7 @@ import { DataGrid } from '@mui/x-data-grid';
 const StutteredEvents = () => {
     const { stutteredEvents } = useContext(StutteredContext);
     const columns = [
-        {field: 'id', headerName: "Event #", flex: 1},
+        {field: 'id', headerName: "Event #", flex: 1, valueGetter: (param) => (Number(param.id)+1).toString()},
         {field: 'type', headerName: "Type", flex: 1},
         {field: 'syllable_count', headerName: "Syllables", flex: 1},
         {field: 'duration', headerName: "Duration", flex: 1, type: 'number', align: 'left', headerAlign: 'left'},
@@ -32,7 +32,6 @@ const StutteredEvents = () => {
                   }}
                   sx={{borderColor: '#000'}}
                   pageSizeOptions={[5,10]}
-                  checkboxSelection
               />
           ) : (
            <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>

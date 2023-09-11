@@ -19,7 +19,7 @@ const TranscriptionAuto = () => {
     // console.log("CURRENT WORD INDEX: " + typeof currentWordIndex);
 
     return (
-        <Typography variant={"h4"}>
+        <Typography variant={"h4"} style={{ cursor: 'cell' }} >
             {Object.keys(transcriptionObj).map((key) => (
                 <Fragment key={key}>
                     <WordComponent

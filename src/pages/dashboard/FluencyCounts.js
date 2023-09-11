@@ -11,7 +11,7 @@ const dividerStyles = {
     pt: 3,
 }
 const FluencyCounts = () => {
-    const { totalSyllableCount, stutteredEventsCount, ss, averageDuration, psList, longest3Durations } = useContext(StutteredContext);
+    const { totalSyllableCount, stutteredEventsCount, percentSS, averageDuration, psList, longest3Durations } = useContext(StutteredContext);
 
 
     return (
@@ -21,7 +21,7 @@ const FluencyCounts = () => {
                 <Divider textAlign={"left"} sx={dividerStyles}><Typography variant={"h5"}>Frequency</Typography></Divider>
                 <Typography>Total Syllables: {totalSyllableCount}</Typography>
                 <Typography>Stuttered Events: {stutteredEventsCount}</Typography>
-                <Typography>%SS: {ss}</Typography>
+                <Typography>%SS: {percentSS}</Typography>
                 <Divider textAlign={"left"} sx={dividerStyles}><Typography variant={"h5"}>Duration</Typography></Divider>
                 <Typography>Average: {averageDuration}</Typography>
                 <Stack direction={"row"}>

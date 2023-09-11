@@ -86,7 +86,7 @@ const AudioPlayerPopover = ({anchorEl, setAnchorEl, popoverOpen, setPopoverOpen,
             end: end,
             start: start,
             stuttered: true,
-            syllable_count: 1,
+            syllable_count: syllableCount,
             punctuated_word: localStutteredWords
         }
         newTranscriptionObj = reIndexKeys(newTranscriptionObj);
@@ -138,13 +138,9 @@ const AudioPlayerPopover = ({anchorEl, setAnchorEl, popoverOpen, setPopoverOpen,
         removeStutteredEventsWaveForm(region);
     };
 
-    // const stutteredWordsDisplay = (words) => {
-    //     return Object.values(words).map(word_obj => word_obj.text).join(' ');
-    // };
 
     useEffect(() => {
         setLocalStutteredWords(stutteredWordsDisplay(stutteredWords));
-
     }, [stutteredWords]);
 
     return (
@@ -165,7 +161,7 @@ const AudioPlayerPopover = ({anchorEl, setAnchorEl, popoverOpen, setPopoverOpen,
                             handleRegionDelete();
                             handlePopoverClose(event);
                         }}
-                                    // disabled={!exists}
+
                         >
                             <DeleteForeverIcon sx={{color: 'red'}}/>
                         </IconButton>
