@@ -51,6 +51,18 @@ const DefaultDashboard = () => {
         loadWorkspaceByObj: loadWorkspaceByObj,
     }
 
+    useEffect(() => {
+        const beforeUnloadListenter =(event) => {
+            event.preventDefault();
+            event.returnValue = 'Refreshing will result in loss of unsaved work';
+        };
+
+        window.addEventListener('beforeunload', beforeUnloadListenter);
+
+        return () => {
+            window.removeEventListener('beforeunload', beforeUnloadListenter);
+        }
+    }, []);
 
     //call data in here to get
 

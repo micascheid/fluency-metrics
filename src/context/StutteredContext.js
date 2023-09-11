@@ -35,7 +35,6 @@ export const StutteredProvider = (props) => {
         setAudioFile,
         isCreateNewWorkspace,
         setIsCreateNewWorkspace,
-        isGetTranscription,
         loadWorkspaceByObj,
         workspaceId,
     } = props;
@@ -200,7 +199,7 @@ export const StutteredProvider = (props) => {
             console.log("NEW COUNT: ", newCount, ", SYLLABLES: ", totalSyllableCount);
             console.log("%SS:", (newCount/totalSyllableCount)*100);
             const percent = (newCount/totalSyllableCount)*100
-            setPercentSS(parseFloat(Number((newCount/totalSyllableCount)*100).toFixed(2)));
+            setPercentSS(parseFloat(Number(percent).toFixed(2)));
         });
 
     };
@@ -403,6 +402,9 @@ export const StutteredProvider = (props) => {
         }
     }, [loadWorkspaceByObj])
 
+    // useEffect(() => {
+    //     handleStutteredChange(0);
+    // }, [totalSyllableCount]);
 
     const transcriptError = () => {
         let transcriptionNew = JSON.parse(JSON.stringify(transcriptionObj));

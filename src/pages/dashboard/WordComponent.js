@@ -191,7 +191,7 @@ const WordComponent = ({word, word_obj, onUpdateWord, index, style}) => {
             >
 
                 <div onMouseLeave={closePopover}>
-                    <Stack direction={"column"} sx={{pl: 1, pb: 1}}>
+                    <Stack direction={"column"} sx={{pl: 1, pb: 1, pr: 1}}>
                         <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
                             <IconButton sx={{mb: '-1'}} onClick={closePopover}>
                                 <CloseIcon/>
@@ -205,14 +205,14 @@ const WordComponent = ({word, word_obj, onUpdateWord, index, style}) => {
                             </IconButton>
                         </Box>
 
-                        <Divider textAlign={"left"} sx={dividerStyles}>Stuttered Event</Divider>
-                        <Box sx={{ display: 'flex', alignItems: "center", justifyContent: "left"}}>
-                            <Checkbox
-                                checked={isStuttered}
-                                onChange={()=>setIsStuttered(prevState => !prevState)}
-                                onClick={(e) => e.stopPropagation()}
-                            />
-                        </Box>
+                        {/*<Divider textAlign={"left"} sx={dividerStyles}>Stuttered Event</Divider>*/}
+                        {/*<Box sx={{ display: 'flex', alignItems: "center", justifyContent: "left"}}>*/}
+                        {/*    <Checkbox*/}
+                        {/*        checked={isStuttered}*/}
+                        {/*        onChange={()=>setIsStuttered(prevState => !prevState)}*/}
+                        {/*        onClick={(e) => e.stopPropagation()}*/}
+                        {/*    />*/}
+                        {/*</Box>*/}
                         <Divider textAlign={"left"} sx={dividerStyles}>Text</Divider>
                         <CustomWordInput
                             value={newWord}
@@ -227,37 +227,38 @@ const WordComponent = ({word, word_obj, onUpdateWord, index, style}) => {
                             value={syllableCount}
                             onChange={handleSyllableChange}
                             inputProps={{min: 0}}
+                            sx={{mb: 1}}
                         />
-                        <Divider textAlign={"left"} sx={dividerStyles}>Type</Divider>
-                        <Stack direction={"row"}>
-                            {Object.keys(typeMap).map((key, ind) => (
-                                <FormControlLabel
-                                    key={ind}
-                                    control={
-                                        <Checkbox
-                                            checked={key === type}
-                                            onChange={() => setType(key)}
-                                            disabled={!isStuttered}
-                                        />}
-                                    label={typeMap[key]}
-                                />
-                            ))}
-                        </Stack>
-                        <Divider textAlign={"left"} sx={dividerStyles}>Physical Concomitants</Divider>
-                        <Stack direction={"row"}>
-                            {Object.keys(psList).map((ind) => (
-                                <FormControlLabel
-                                    key={ind}
-                                    control={
-                                        <Checkbox
-                                            checked={ind === ps}
-                                            onChange={() => setps(ind)}
-                                            disabled={!isStuttered}
-                                        />}
-                                    label={ind}
-                                />
-                            ))}
-                        </Stack>
+                        {/*<Divider textAlign={"left"} sx={dividerStyles}>Type</Divider>*/}
+                        {/*<Stack direction={"row"}>*/}
+                        {/*    {Object.keys(typeMap).map((key, ind) => (*/}
+                        {/*        <FormControlLabel*/}
+                        {/*            key={ind}*/}
+                        {/*            control={*/}
+                        {/*                <Checkbox*/}
+                        {/*                    checked={key === type}*/}
+                        {/*                    onChange={() => setType(key)}*/}
+                        {/*                    disabled={!isStuttered}*/}
+                        {/*                />}*/}
+                        {/*            label={typeMap[key]}*/}
+                        {/*        />*/}
+                        {/*    ))}*/}
+                        {/*</Stack>*/}
+                        {/*<Divider textAlign={"left"} sx={dividerStyles}>Physical Concomitants</Divider>*/}
+                        {/*<Stack direction={"row"}>*/}
+                        {/*    {Object.keys(psList).map((ind) => (*/}
+                        {/*        <FormControlLabel*/}
+                        {/*            key={ind}*/}
+                        {/*            control={*/}
+                        {/*                <Checkbox*/}
+                        {/*                    checked={ind === ps}*/}
+                        {/*                    onChange={() => setps(ind)}*/}
+                        {/*                    disabled={!isStuttered}*/}
+                        {/*                />}*/}
+                        {/*            label={ind}*/}
+                        {/*        />*/}
+                        {/*    ))}*/}
+                        {/*</Stack>*/}
                         <Button variant={"contained"} sx={{width: '40px', mb: 1}}
                                 onClick={handleDonePopoverClose}>Done</Button>
                     </Stack>

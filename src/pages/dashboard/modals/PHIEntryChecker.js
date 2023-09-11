@@ -19,13 +19,13 @@ const PHIEntryChecker = ({isModalOpen, onYes, onNo}) => {
                   <Typography variant={"h4"} sx={{textAlign: 'center', pb: 1}}>
                       Have you entered any PHI information in the workspace name? If so please select yes and enter a different name
                   </Typography>
-                  <Stack direction={"row"} spacing={1}>
+                  <Stack spacing={1}>
                       <Button variant={"contained"} onClick={onYes}>
-                          Yes
+                          Yes, I did enter patient PHI
                       </Button>
                       <Button variant={"contained"} onClick={onNo}
                       >
-                          No
+                          No, I didn't enter patient PHI
                       </Button>
                   </Stack>
               </Box>
