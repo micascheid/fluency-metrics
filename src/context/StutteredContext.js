@@ -22,7 +22,6 @@ export const StutteredContext = createContext();
 
 export const StutteredProvider = (props) => {
     // VARIABLES
-
     const {
         children,
         mode,
@@ -37,6 +36,7 @@ export const StutteredProvider = (props) => {
         setIsCreateNewWorkspace,
         loadWorkspaceByObj,
         workspaceId,
+        setWorkspaceId,
     } = props;
 
     const initialState = {
@@ -56,7 +56,7 @@ export const StutteredProvider = (props) => {
         longest3Durations: [0, 0, 0],
         audioPlayerControl: null,
         playBackSpeed: 1,
-        workspaceId: null,
+        workspaceId: workspaceId,
         globalYesNo: false,
     }
 
@@ -146,10 +146,6 @@ export const StutteredProvider = (props) => {
             console.log("trouble updating doc:", e);
         }
 
-        //update workspace data
-
-
-        //update workspace_index
     };
 
     const createNewWorkspace = async (name, transcriptionObj) => {
@@ -184,8 +180,8 @@ export const StutteredProvider = (props) => {
             const docData = await addDoc(workspacesColRef, workspaceObject)
             const docRef = doc(workspacesIndexColRef, docData.id);
             await setDoc(docRef, data);
-            // setWorkspaceId(docData.id);
             console.log("NAME:", name);
+            setWorkspaceId(docData.id);
             setWorkspaceName(name);
         } catch (error) {
             console.log("Trouble with workspaces or workspaces index:", error)
@@ -196,9 +192,11 @@ export const StutteredProvider = (props) => {
     const handleStutteredChange = (change) => {
         setStutteredEventsCount(prevCount => {
             const newCount = prevCount + change;
-            console.log("NEW COUNT: ", newCount, ", SYLLABLES: ", totalSyllableCount);
-            console.log("%SS:", (newCount/totalSyllableCount)*100);
-            const percent = (newCount/totalSyllableCount)*100
+            console.log(transcriptionObj);
+            const syllables = countTotalSyllables();
+            console.log("NEW COUNT: ", newCount, ", SYLLABLES: ", syllables);
+            console.log("%SS:", (newCount/syllables)*100);
+            const percent = (newCount/syllables)*100
             setPercentSS(parseFloat(Number(percent).toFixed(2)));
         });
 
@@ -292,6 +290,7 @@ export const StutteredProvider = (props) => {
             sum += transcriptionObj[key].syllable_count;
         }
         setTotalSyllableCount(sum);
+        return sum;
     };
 
     const configureDurations = () => {
@@ -342,11 +341,14 @@ export const StutteredProvider = (props) => {
     useEffect(() => {
         //Set Duration
         if (Object.keys(kiStutteredRegions).length >= 3) {
+            // console.log("RUNNING DURATIONS");
             configureDurations();
         }
 
         if (Object.keys(kiStutteredRegions).length >= 0 && transcriptionObj) {
             transcriptError();
+            const percent = (stutteredEventsCount/totalSyllableCount)*100
+            // setPercentSS(parseFloat(Number(percent).toFixed(2)));
         }
 
     }, [totalSyllableCount, stutteredEventsCount, kiStutteredRegions]);
@@ -355,6 +357,7 @@ export const StutteredProvider = (props) => {
     useEffect(() => {
         setStutteredEventsCount(Object.keys(stutteredEvents).length);
     }, [stutteredEvents]);
+    console.log("STUTTERED CONTEXT:", workspaceId);
 
     const updateWorkspacesIndex = async () => {
         console.log()
@@ -402,9 +405,6 @@ export const StutteredProvider = (props) => {
         }
     }, [loadWorkspaceByObj])
 
-    // useEffect(() => {
-    //     handleStutteredChange(0);
-    // }, [totalSyllableCount]);
 
     const transcriptError = () => {
         let transcriptionNew = JSON.parse(JSON.stringify(transcriptionObj));

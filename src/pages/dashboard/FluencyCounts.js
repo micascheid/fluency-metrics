@@ -21,7 +21,7 @@ const FluencyCounts = () => {
                 <Divider textAlign={"left"} sx={dividerStyles}><Typography variant={"h5"}>Frequency</Typography></Divider>
                 <Typography>Total Syllables: {totalSyllableCount}</Typography>
                 <Typography>Stuttered Events: {stutteredEventsCount}</Typography>
-                <Typography>%SS: {percentSS}</Typography>
+                <Typography>%SS: {Number((stutteredEventsCount/totalSyllableCount)*100).toFixed(2)}</Typography>
                 <Divider textAlign={"left"} sx={dividerStyles}><Typography variant={"h5"}>Duration</Typography></Divider>
                 <Typography>Average: {averageDuration}</Typography>
                 <Stack direction={"row"}>
