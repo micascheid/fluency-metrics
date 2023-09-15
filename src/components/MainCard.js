@@ -27,6 +27,7 @@ const MainCard = forwardRef(
             darkTitle,
             divider = true,
             elevation,
+            help,
             secondary,
             shadow,
             sx = {},
@@ -63,10 +64,10 @@ const MainCard = forwardRef(
             >
                 {/* card header and action */}
                 {!darkTitle && title && (
-                    <CardHeader sx={headerSX} titleTypographyProps={{ variant: 'subtitle1' }} title={title} action={secondary} />
+                    <CardHeader sx={headerSX} titleTypographyProps={{ variant: 'subtitle1' }} title={title} action={help || secondary} />
                 )}
                 {darkTitle && title && (
-                    <CardHeader sx={headerSX} title={<Typography variant="h3">{title}</Typography>} action={secondary} />
+                    <CardHeader sx={headerSX} title={<Typography variant="h3">{title}</Typography>} action={help || secondary} />
                 )}
 
                 {/* content & header divider */}
@@ -100,7 +101,10 @@ MainCard.propTypes = {
     secondary: PropTypes.node,
     shadow: PropTypes.string,
     sx: PropTypes.object,
-    title: PropTypes.string,
+    title: PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.node,
+    ]),
     codeHighlight: PropTypes.bool,
     content: PropTypes.bool,
     children: PropTypes.node

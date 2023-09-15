@@ -1,73 +1,33 @@
 import {
     Box,
-    Button, Divider,
-    FormControl,
+    Divider,
     Grid,
-    InputLabel,
-    MenuItem,
-    Select,
-    Stack, styled,
     Tab,
-    Tabs, TextField,
-    Typography
+    Tabs,
 } from "@mui/material";
 import React, {useContext, useEffect, useState} from "react";
 import MainCard from "../../components/MainCard";
-import {StutteredContext} from "../../context/StutteredContext";
-import {BASE_URL, MANUAL} from "../../constants";
 import axios from "axios";
 import AreYouSure from "./modals/AreYouSure";
 import * as PropTypes from "prop-types";
 import NewAnalysisStepper from "./NewAnalysisStepper";
 import ResumeAnalysisStepper from "./ResumeAnalysisStepper";
 import InstructionsAutoMode from "./InstructionsAutoMode";
+import Help from "./Help";
+import HelpMode from "./help-components/HelpMode";
 
 
 const Mode = (props) => {
     const {
-        mode,
-        setMode,
-        audioFileName,
+        help,
         setAudioFileName,
-        audioFile,
         setAudioFile,
-        fileChosen,
         setFileChosen,
-        workspaceName,
-        setWorkspaceName,
-        isGetTranscription,
-        setIsGetTranscription,
-        setIsCreateNewWorkspace,
         isCreateNewWorkspace,
-        setIsUpdateWorkspace
-
     } = props;
     const [showAreYouSure, setShowAreYouSure] = useState(false);
-    const [startNew, setStartNew] = useState(false);
     const [tabValue, setTabValue] = useState(0);
 
-
-    const handleMode = (event) => {
-        setMode(event.target.value);
-    };
-
-    // const propsForChildren = {
-    //     mode: mode,
-    //     setMode: setMode,
-    //     fileChosen: fileChosen,
-    //     setFileChosen: setFileChosen,
-    //     audioFileName: audioFileName,
-    //     setAudioFileName: setAudioFileName,
-    //     workspaceName: workspaceName,
-    //     setWorkspaceName: setWorkspaceName,
-    //     audioFile: audioFile,
-    //     setAudioFile: setAudioFileName,
-    //     isCreateNewWorkspace: isCreateNewWorkspace,
-    //     setIsGetTranscription: setIsGetTranscription,
-    //     isGetTranscription: isGetTranscription,
-    //     setIsCreateNewWorkspace: setIsCreateNewWorkspace,
-    //     setIsUpdateWorkspace: setIsUpdateWorkspace
-    // }
 
     useEffect(() => {
         console.log("MODE CREATE NEW WORKSPACE:", isCreateNewWorkspace);
@@ -115,7 +75,11 @@ const Mode = (props) => {
     };
 
     return (
-        <MainCard sx={{minHeight: "335px", maxHeight: "335px"}}>
+        <MainCard sx={{minHeight: "335px", maxHeight: "400pxs"}} title={
+            <Help title={"Start/Resume Analysis"}>
+                <HelpMode />
+            </Help>
+        }>
             {showAreYouSure && <AreYouSure setAreYouSure={setShowAreYouSure}/>}
             <Grid container spacing={2}>
                 <Grid item xs={5} sm={5} md={5} lg={5}>

@@ -10,6 +10,7 @@ import SaveWorkspace from "./SaveWorkspace";
 import {UserContext} from "../../context/UserContext";
 import LoadingOverlay from "./LoadingOverlay";
 import {StutteredProvider} from "../../context/StutteredContext";
+import HelpMode from "./help-components/HelpMode";
 
 
 const DefaultDashboard = () => {
@@ -73,7 +74,7 @@ const DefaultDashboard = () => {
             ) : (
                 <Grid container spacing={2}>
                     <Grid item xs={12} sm={12} md={12} lg={12}>
-                        <Mode {...propValues}/>
+                        <Mode {...propValues} help={<HelpMode/>}/>
                     </Grid>
                     <StutteredProvider {...propValues}>
                         <Grid item xs={12} sm={12} md={12} lg={12}>

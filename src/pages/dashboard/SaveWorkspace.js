@@ -27,12 +27,13 @@ const SaveWorkspace = ({sx}) => {
             setIsNameError(true);
             return;
         }
-
-        if (localName !== workspaceName){
+        setWorkspaceName(localName);
+        updateWorkspace(localName);
+        /*if (localName !== workspaceName){
             setWorkspaceName(localName);
         } else {
             updateWorkspace(localName);
-        }
+        }*/
     };
 
     const handleOnChange = (event) => {

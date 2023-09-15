@@ -104,15 +104,15 @@ const NewAnalysisStepper = (props) => {
             <PHIEntryChecker isModalOpen={isModalOpen} onYes={handlePhiYes} onNo={handlePhiNo} />
             <Stack spacing={2}>
                 <FormControl sx={{mt: 2}}>
-                    <InputLabel>Mode</InputLabel>
+                    <InputLabel>Select Mode</InputLabel>
                     <Select
                         sx={{minWidth: 100}}
-                        label={"Mode"}
+                        label={"Select Mode"}
                         value={mode}
                         onChange={handleMode}
                     >
-                        <MenuItem value={"auto"}>Semi-Auto</MenuItem>
-                        <MenuItem value={"manual"} disabled>Manual (Coming Soon)</MenuItem>
+                        <MenuItem value={"auto"}>Automated-Transcriptions</MenuItem>
+                        {/*<MenuItem value={"manual"} disabled>Manual (Coming Soon)</MenuItem>*/}
                     </Select>
                 </FormControl>
                 <Box>

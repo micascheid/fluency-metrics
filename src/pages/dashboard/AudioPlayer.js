@@ -48,7 +48,9 @@ const AudioPlayer = () => {
     const [currentRegion, setCurrentRegion] = useState(null);
     const [stutteredWords, setStutteredWords] = useState({});
     const [popoverKey, setPopoverKey] = useState(null);
+    const [isFlashing, setIsFlashing] = useState(false);
     const isDisabled = transcriptionObj === null;
+
 
     const waveformProps = {
         id: "waveform",
@@ -166,31 +168,48 @@ const AudioPlayer = () => {
         }
     }
 
+    const isAudioCursorInsideAnyRegion = (cursorTime) => {
+        return Object.values(kiStutteredRegions).some((region) => {
+            return cursorTime >= region.start && cursorTime <= region.end;
+        })
+    }
+
     const handleKeyPress = (event) => {
         if (wavesurferRef.current && !isDisabled) {
+            console.log("WAVESURFER: ", wavesurferRef.current);
+            const audioTime = wavesurferRef.current.getCurrentTime();
             if (event.key === 's') {
-                const time = wavesurferRef.current.getCurrentTime();
-                if (!isCreatingRegion) {
-                    const newRegionTemp = {start: time};
-                    setIsCreatingRegion(true);
-                    setCreatingRegion(newRegionTemp);
-                } else {
-                    const duration = time - creatingRegion.start;
-                    const region = {
-                        start: creatingRegion.start,
-                        end: time,
-                        duration: duration,
-                        color: "rgba(0, 0, 0, .2)"
-                    };
-                    const id = Object.keys(kiStutteredRegions).length;
-                    setkiStutteredRegions(prevRegions => ({
-                        ...prevRegions,
-                        [id]: region
-                    }));
+                if (!isAudioCursorInsideAnyRegion(audioTime)) {
+                    if (!isCreatingRegion) {
+                        const newRegionTemp = {start: audioTime};
+                        setIsCreatingRegion(true);
+                        setCreatingRegion(newRegionTemp);
+                    } else {
+                        const duration = audioTime - creatingRegion.start;
+                        const region = {
+                            start: creatingRegion.start,
+                            end: audioTime,
+                            duration: duration,
+                            color: "rgba(0, 0, 0, .2)"
+                        };
+                        const id = Object.keys(kiStutteredRegions).length;
+                        setkiStutteredRegions(prevRegions => ({
+                            ...prevRegions,
+                            [id]: region
+                        }));
 
-                    setCreatingRegion(null);
-                    setIsCreatingRegion(false);
+                        setCreatingRegion(null);
+                        setIsCreatingRegion(false);
+                    }
+                } else {
+                    setIsFlashing(true);
                 }
+            }
+
+            if (event.key === 'r') {
+                console.log("r");
+                wavesurferRef.current.setBackgroundColor('rgba(255,0,0,.5)');
+                setIsFlashing(true);
             }
 
             if (event.key === " ") {
@@ -252,9 +271,39 @@ const AudioPlayer = () => {
     }, [audioFile]);
 
     useEffect(() => {
+        if (isFlashing && wavesurferRef.current) {
+            wavesurferRef.current.setBackgroundColor('rgba(255,0,0,.2)')
+            const timer = setTimeout(() => {
+                wavesurferRef.current.setBackgroundColor(null);
+                setIsFlashing(false);
+            }, 500);
+
+            return () => clearTimeout(timer);
+        }
+    }, [isFlashing])
+
+    useEffect(() => {
 
         if (transcriptionObj) {
             wavesurferRef.current.on('audioprocess', function (time) {
+                if (isCreatingRegion && isAudioCursorInsideAnyRegion(time)) {
+                    const duration = time - creatingRegion.start;
+                    const region = {
+                        start: creatingRegion.start,
+                        end: time,
+                        duration: duration,
+                        color: "rgba(0, 0, 0, .2)"
+                    };
+                    const id = Object.keys(kiStutteredRegions).length;
+                    setkiStutteredRegions(prevRegions => ({
+                        ...prevRegions,
+                        [id]: region
+                    }));
+
+                    setCreatingRegion(null);
+                    setIsCreatingRegion(false);
+                }
+
                 let newWordIndex = null;
                 Object.keys(transcriptionObj).forEach((key) => {
                     if (time >= transcriptionObj[key].start && time <= transcriptionObj[key].end) {

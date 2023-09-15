@@ -119,7 +119,6 @@ export const StutteredProvider = (props) => {
     };
 
     const updateWorkspace = async (name) => {
-        console.log("updating workspace: ", name);
         const workspaceColDocRef = doc(db, 'users', user.uid, 'workspaces', workspaceId);
         const workspaceIndexDocRef = doc(db, 'users', user.uid, 'workspaces_index', workspaceId);
         const workspaceObject = {
@@ -180,7 +179,6 @@ export const StutteredProvider = (props) => {
             const docData = await addDoc(workspacesColRef, workspaceObject)
             const docRef = doc(workspacesIndexColRef, docData.id);
             await setDoc(docRef, data);
-            console.log("NAME:", name);
             setWorkspaceId(docData.id);
             setWorkspaceName(name);
         } catch (error) {
@@ -192,10 +190,7 @@ export const StutteredProvider = (props) => {
     const handleStutteredChange = (change) => {
         setStutteredEventsCount(prevCount => {
             const newCount = prevCount + change;
-            console.log(transcriptionObj);
             const syllables = countTotalSyllables();
-            console.log("NEW COUNT: ", newCount, ", SYLLABLES: ", syllables);
-            console.log("%SS:", (newCount/syllables)*100);
             const percent = (newCount/syllables)*100
             setPercentSS(parseFloat(Number(percent).toFixed(2)));
         });
@@ -224,7 +219,6 @@ export const StutteredProvider = (props) => {
         };
         if (!stutteredEvents[region.id]) {
             setStutteredEvents(prevEvents => ({...prevEvents, [region.id]: eventItem}));
-            // setStutteredEventsCount(prevCount => prevCount + 1);
             handleStutteredChange(1)
         }
         let changeRegion = kiStutteredRegions[region.id];
@@ -256,12 +250,7 @@ export const StutteredProvider = (props) => {
         });
     };
 
-    const randomFunction = () => {
-        console.log("RANDOM FUNCTION");
-    };
-
     const removeStutteredEvent = (wordIndex) => {
-        console.log(stutteredEvents);
         setStutteredEvents(prevList => prevList.filter(word_obj => word_obj.id !== wordIndex));
         if (stutteredEvents) {
             handleStutteredChange(-1);
@@ -300,7 +289,6 @@ export const StutteredProvider = (props) => {
         durations.sort((a, b) => b - a);
         let topThree = durations.slice(0, 3);
         const average = Number((topThree.reduce((a, b) => a + b, 0) / topThree.length).toFixed(2));
-        console.log("AVERAGE", average);
         setLongest3Durations(topThree);
         setAverageDuration(average)
     };
@@ -341,7 +329,6 @@ export const StutteredProvider = (props) => {
     useEffect(() => {
         //Set Duration
         if (Object.keys(kiStutteredRegions).length >= 3) {
-            // console.log("RUNNING DURATIONS");
             configureDurations();
         }
 
@@ -357,10 +344,8 @@ export const StutteredProvider = (props) => {
     useEffect(() => {
         setStutteredEventsCount(Object.keys(stutteredEvents).length);
     }, [stutteredEvents]);
-    console.log("STUTTERED CONTEXT:", workspaceId);
 
     const updateWorkspacesIndex = async () => {
-        console.log()
         const workspacesIndexTemp = {};
         const workspacesIndexRef = collection(db, 'users', user.uid, 'workspaces_index');
         const workspacesIndexDocs = await getDocs(workspacesIndexRef);
@@ -444,7 +429,6 @@ export const StutteredProvider = (props) => {
             longest3Durations,
             mode,
             playBackSpeed,
-            randomFunction,
             removeStutteredEvent,
             removeStutteredEventsWaveForm,
             resetTransAndSE,
