@@ -11,6 +11,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import {dividerStyles, CustomSyllableInput, CustomWordInput} from "../../../components/PopoverStyling";
 import {StutteredContext} from "../../../context/StutteredContext";
+import {repSyllable, repWholeWord, block, prolongation, interjection} from "../../../constants";
 
 
 
@@ -30,7 +31,7 @@ const AudioPlayerPopover = ({anchorEl, setAnchorEl, popoverOpen, setPopoverOpen,
     const [stutterType, setStutterType] = useState(exists ? stutteredEvent["type"] : 'None');
     const [pcVal, setPcVal] = useState(exists ? stutteredEvent["ps"] : '');
     const [syllableCount, setSyllableCount] = useState(exists ? stutteredEvent["syllable_count"] : 0);
-    const typeList = ["Rep. Whole Word", "Rep. Syllable", "Prolongation", "Block", "Interjection"];
+    const typeList = [repWholeWord, repSyllable, prolongation, block, interjection];
     const pcList = [0, 1, 2, 3, 4, 5];
     const doneDisabled = !(syllableCount > 0 && stutterType !== 'None');
     const stutteredWordsDisplay = (words) => {
