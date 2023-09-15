@@ -5,7 +5,7 @@ import React, {
     useState,
     useMemo, useContext,
 } from "react";
-import {WaveSurfer, WaveForm, Marker, Region} from "wavesurfer-react";
+import {WaveSurfer, WaveForm, Marker, Region} from 'wavesurfer-react';
 import "./styles.css";
 import RegionsPlugin from "wavesurfer.js/dist/plugin/wavesurfer.regions.min";
 import TimelinePlugin from "wavesurfer.js/dist/plugin/wavesurfer.timeline.min";
@@ -56,6 +56,8 @@ const AudioPlayer = () => {
         id: "waveform",
         cursorColor: "#000",
         cursorWidth: 2,
+        scrollParent: true,
+        fillParent: true,
     }
 
     //FUNCTIONS
@@ -69,7 +71,7 @@ const AudioPlayer = () => {
                 plugin: TimelinePlugin,
                 options: {
                     container: "#timeline",
-                    timeInterval: .5
+                    timeInterval: .5,
                 }
             },
             {
@@ -190,7 +192,7 @@ const AudioPlayer = () => {
                             start: creatingRegion.start,
                             end: audioTime,
                             duration: duration,
-                            color: "rgba(0, 0, 0, .2)"
+                            color: "rgba(255, 0, 0, .2)",
                         };
                         const id = Object.keys(kiStutteredRegions).length;
                         setkiStutteredRegions(prevRegions => ({
@@ -276,7 +278,7 @@ const AudioPlayer = () => {
             const timer = setTimeout(() => {
                 wavesurferRef.current.setBackgroundColor(null);
                 setIsFlashing(false);
-            }, 500);
+            }, 200);
 
             return () => clearTimeout(timer);
         }
@@ -292,7 +294,7 @@ const AudioPlayer = () => {
                         start: creatingRegion.start,
                         end: time,
                         duration: duration,
-                        color: "rgba(0, 0, 0, .2)"
+                        color: "rgba(0, 0, 0, .2)",
                     };
                     const id = Object.keys(kiStutteredRegions).length;
                     setkiStutteredRegions(prevRegions => ({
@@ -349,6 +351,26 @@ const AudioPlayer = () => {
             }
         }
     }, [wavesurferRef, transcriptionObj, handleKeyPress, playBackSpeed, kiStutteredRegions]);
+
+    useEffect(() => {
+        if (wavesurferRef.current) {
+            const timelineElem = document.getElementById('timeline');
+
+            const handleTimelineClick = (event) => {
+                const clickPosition = event.offsetX / timelineElem.offsetWidth;
+                // const clickTime = clickPosition * wavesurferRef.current.getDuration();
+                wavesurferRef.current.seekTo(clickPosition);
+            };
+
+            timelineElem.addEventListener('click', handleTimelineClick);
+
+            return () => {
+                timelineElem.removeEventListener('click', handleTimelineClick);
+            };
+        }
+    }, [wavesurferRef]);
+
+
 
 
     return (
