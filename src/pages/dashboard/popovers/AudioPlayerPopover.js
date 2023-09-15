@@ -27,11 +27,12 @@ const AudioPlayerPopover = ({anchorEl, setAnchorEl, popoverOpen, setPopoverOpen,
     } = useContext(StutteredContext);
 
     const stutteredEvent = exists ? stutteredEvents[region.id] : null;
-    const [stutterType, setStutterType] = useState(exists ? stutteredEvent["type"] : '');
+    const [stutterType, setStutterType] = useState(exists ? stutteredEvent["type"] : 'None');
     const [pcVal, setPcVal] = useState(exists ? stutteredEvent["ps"] : '');
     const [syllableCount, setSyllableCount] = useState(exists ? stutteredEvent["syllable_count"] : 0);
-    const typeList = ["Repetition", "Prolongation", "Block", "Interjection"];
+    const typeList = ["Rep. Whole Word", "Rep. Syllable", "Prolongation", "Block", "Interjection"];
     const pcList = [0, 1, 2, 3, 4, 5];
+    const doneDisabled = !(syllableCount > 0 && stutterType !== 'None');
     const stutteredWordsDisplay = (words) => {
         return Object.values(words).map(word_obj => word_obj.punctuated_word).join(' ');
     };
@@ -152,16 +153,15 @@ const AudioPlayerPopover = ({anchorEl, setAnchorEl, popoverOpen, setPopoverOpen,
             transitionDuration={0}
         >
             <Box sx={{minWidth: 200}}>
-                <Stack direction={"column"} sx={{pl: 1}}>
+                <Stack direction={"column"} sx={{pl: 1, pr: 1}}>
                     <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
-                        <IconButton sx={{mb: '-1'}} onClick={handlePopoverClose}>
+                        <IconButton onClick={handlePopoverClose}>
                             <CloseIcon/>
                         </IconButton>
                         <IconButton onClick={(event) => {
                             handleRegionDelete();
                             handlePopoverClose(event);
                         }}
-
                         >
                             <DeleteForeverIcon sx={{color: 'red'}}/>
                         </IconButton>
@@ -172,32 +172,37 @@ const AudioPlayerPopover = ({anchorEl, setAnchorEl, popoverOpen, setPopoverOpen,
                             value={localStutteredWords}
                             onChange={handleChange}
                             onKeyPress={handleKeyPress}
-                            sx={{mb: 1}}
+                            style={{width: "100%"}}
                         />
                     </Box>
-                    <Divider textAlign={"left"} sx={dividerStyles}>Syllables</Divider>
-                    <CustomSyllableInput
-                        type={"number"}
-                        value={syllableCount}
-                        onChange={handleSyllableChange}
-                        inputProps={{min: 0}}
-                    />
-                    <Divider textAlign={"left"} sx={dividerStyles}>Type</Divider>
-                    <Box>
-                        <FormControl sx={{minWidth: 100}}>
-                            <InputLabel id={"stutter-type-select-label"}>Type</InputLabel>
-                            <Select
-                                labelId={"stutter-type-select-label"}
-                                id={"select-stutter"}
-                                value={stutterType}
-                                onChange={handleStutterTypeChange}
-                            >
-                                {typeList.map((type, ind) => (
-                                    <MenuItem key={ind} value={type}>{type}</MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                    </Box>
+                    <Divider textAlign={"left"} sx={dividerStyles}>Syllables and Type</Divider>
+                    <Stack direction={"row"} spacing={1}>
+                        <CustomSyllableInput
+                            type={"number"}
+                            value={syllableCount}
+                            onChange={handleSyllableChange}
+                            inputProps={{min: 0}}
+                        />
+                        <Box>
+                            <FormControl sx={{minWidth: 100}}>
+                                {/*<InputLabel id={"stutter-type-select-label"}>Type</InputLabel>*/}
+                                <Select
+                                    labelId={"stutter-type-select-label"}
+                                    id={"select-stutter"}
+                                    value={stutterType}
+                                    onChange={handleStutterTypeChange}
+                                    // label={"type"}
+                                >
+                                    <MenuItem value={'None'}>
+                                        <em>None</em>
+                                    </MenuItem>
+                                    {typeList.map((type, ind) => (
+                                        <MenuItem key={ind} value={type}>{type}</MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Box>
+                    </Stack>
                     <Divider textAlign={"left"} sx={dividerStyles}>Physical Concomitants</Divider>
                     <Box>
                         <FormControl sx={{minWidth: 100}}>
@@ -214,7 +219,10 @@ const AudioPlayerPopover = ({anchorEl, setAnchorEl, popoverOpen, setPopoverOpen,
                             </Select>
                         </FormControl>
                     </Box>
-                    <Button variant={"contained"} sx={{width: '40px', mb: 1, mt: 1}}
+                    <Button
+                        variant={"contained"}
+                        disabled={doneDisabled}
+                        sx={{width: '40px', mb: 1, mt: 1}}
                             onClick={handleDonePopoverClose}>Done</Button>
                 </Stack>
             </Box>

@@ -6,7 +6,6 @@ import React, {
     useMemo, useContext,
 } from "react";
 import {WaveSurfer, WaveForm, Marker, Region} from 'wavesurfer-react';
-import "./styles.css";
 import RegionsPlugin from "wavesurfer.js/dist/plugin/wavesurfer.regions.min";
 import TimelinePlugin from "wavesurfer.js/dist/plugin/wavesurfer.timeline.min";
 import MarkersPlugin from "wavesurfer.js/src/plugin/markers";

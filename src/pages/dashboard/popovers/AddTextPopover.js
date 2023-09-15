@@ -73,7 +73,13 @@ const AddTextPopover = ({leftId, rightId, setAnchorEl, anchorEl,}) => {
                     <Divider sx={dividerStyles}>Text</Divider>
                     <CustomWordInput
                         value={addedText}
-                        onChange={(event) => setAddedText(event.target.value)}
+                        onChange={(event) => {
+                            event.stopPropagation();
+                            setAddedText(event.target.value)
+                        }}
+                        onKeyPress={(event) => {
+                            event.stopPropagation();
+                        }}
                     />
                     <Divider sx={dividerStyles}>Syllables</Divider>
                     <CustomSyllableInput
