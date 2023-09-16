@@ -10,3 +10,9 @@ export const repSyllable = "Rep. Syllable";
 export const prolongation = "Prolongation";
 export const block = "Block";
 export const interjection = "Interjection";
+export const UPD_WS_STATUS = Object.freeze({
+    IDLE: "idle",
+    SAVING: "saving",
+    SUCCESS: "success",
+    ERROR: "error",
+});

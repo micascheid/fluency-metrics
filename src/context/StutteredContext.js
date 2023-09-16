@@ -11,7 +11,7 @@ import {
 import {db} from "../FirebaseConfig";
 import {UserContext} from "./UserContext";
 import axios from "axios";
-import {BASE_URL} from "../constants";
+import {BASE_URL, UPD_WS_STATUS} from "../constants";
 
 export const StutteredContext = createContext();
 
@@ -73,8 +73,8 @@ export const StutteredProvider = (props) => {
     const [isLoadingWorkspace, setIsLoadingWorkspace] = useState(false);
     const [percentSS, setPercentSS] = useState(0);
     const [customNotes, setCustomNotes] = useState(initialState.customNotes);
+    const [wsSaveStatus, setWsSaveStatus] = useState(UPD_WS_STATUS.IDLE);
     const {user, setWorkspacesIndex} = useContext(UserContext);
-    console.log("SC CUSTOM NOTES:", customNotes);
 
     //FUNCTIONS
     const resetTransAndSE = async () => {
@@ -142,9 +142,17 @@ export const StutteredProvider = (props) => {
             customNotes: customNotes,
         }
         try {
+            setWorkspaceName(UPD_WS_STATUS.SAVING);
             await updateDoc(workspaceColDocRef, workspaceObject);
             await updateDoc(workspaceIndexDocRef, {name: name});
+            setWsSaveStatus(UPD_WS_STATUS.SUCCESS);
+            const timer = setTimeout(() => {
+                setWsSaveStatus(UPD_WS_STATUS.IDLE);
+            }, 3000);
+
+            return () => clearTimeout(timer);
         } catch (e) {
+            setWsSaveStatus(UPD_WS_STATUS.ERROR);
             console.log("trouble updating doc:", e);
         }
 
@@ -369,9 +377,7 @@ export const StutteredProvider = (props) => {
                 }
             }
 
-            update().then(r => {
-                // console.log("successful update to db");
-            });
+            update();
         }
 
     }, [customNotes]);
@@ -481,6 +487,7 @@ export const StutteredProvider = (props) => {
             percentSS,
             setCustomNotes,
             customNotes,
+            wsSaveStatus
         }
         return (
             <StutteredContext.Provider value={contextValues}>

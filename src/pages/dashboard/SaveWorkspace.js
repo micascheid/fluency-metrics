@@ -6,6 +6,7 @@ import {Checkbox, FormControlLabel} from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
 import {useTheme} from '@mui/material/styles';
 import {UserContext} from "../../context/UserContext";
+import useStatusMessage from "./custom-hooks/useStatusMessage";
 
 const SaveWorkspace = ({sx}) => {
     const {
@@ -21,6 +22,7 @@ const SaveWorkspace = ({sx}) => {
     const theme = useTheme();
     const [isNameError, setIsNameError] = useState(false);
     const [nameError, setNameError] = useState("");
+    const statusMessage = useStatusMessage();
 
     const handleOnClick = () => {
         if (localName.trim() === "") {
@@ -33,7 +35,6 @@ const SaveWorkspace = ({sx}) => {
 
     const handleOnChange = (event) => {
         const value = (event.target.value);
-        console.log("VALUE:", workspacesIndex);
         const doesExist = Object.values(workspacesIndex).some(workspace => workspace.name === value);
         if (doesExist){
             setNameError("Name already in use");
@@ -56,9 +57,6 @@ const SaveWorkspace = ({sx}) => {
     return (
         <Box sx={sx}>
             <Stack direction={"row"} sx={{alignItems: 'center'}} spacing={1}>
-                <Button variant={"contained"} onClick={handleOnClick} disabled={workspaceName === '' || !!nameError}>
-                    Save Work
-                </Button>
                 <Typography variant={"h4"} fontWeight={"lighter"}>Current Analysis: </Typography>
                 <TextField
                     required
@@ -75,8 +73,14 @@ const SaveWorkspace = ({sx}) => {
                               onClick={() => setEditWorkspaceName(!editWorkspaceName)}
                     />
                 </ButtonBase>
+                <Button variant={"contained"} onClick={handleOnClick} disabled={workspaceName === '' || !!nameError}>
+                    Save Work
+                </Button>
+                <Typography
+                    variant={"body"}
+                    sx={{color: theme.palette.success.main}}
+                >{statusMessage}</Typography>
             </Stack>
-
         </Box>
     );
 };

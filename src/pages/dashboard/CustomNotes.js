@@ -1,16 +1,23 @@
 import react, {useCallback, useContext, useEffect, useState} from 'react';
 import MainCard from "../../components/MainCard";
-import {Button, Stack, TextField} from "@mui/material";
+import {Button, Stack, TextField, Typography} from "@mui/material";
 import {StutteredContext} from "../../context/StutteredContext";
+import {UPD_WS_STATUS} from "../../constants";
+import {useTheme} from "@mui/material/styles";
+import useStatusMessage from "./custom-hooks/useStatusMessage";
 
 const CustomNotes = () => {
     const {
         workspaceName,
         setCustomNotes,
         customNotes,
+        wsSaveStatus,
     } = useContext(StutteredContext);
     const [localNotes, setLocalNotes] = useState(customNotes);
     const saveNotesDisabled = !workspaceName;
+    const theme = useTheme();
+    const statusMessage = useStatusMessage();
+
 
     const handleSaveNotes = () => {
         setCustomNotes(localNotes);
@@ -43,12 +50,19 @@ const CustomNotes = () => {
                 value={localNotes}
                 // label={"Notes"}
               >Enter Your Custom Notes Here</TextField>
-              <Button
-                  variant={"contained"}
-                  sx={{maxWidth: 105}}
-                  onClick={handleSaveNotes}
-                  disabled={saveNotesDisabled}
-              >Save Notes</Button>
+              <Stack direction={"row"} sx={{alignItems: 'center'}} spacing={1}>
+                  <Button
+                      variant={"contained"}
+                      sx={{maxWidth: 105}}
+                      onClick={handleSaveNotes}
+                      disabled={saveNotesDisabled}
+                  >Save Notes</Button>
+                  <Typography
+                      variant={"body"}
+                      sx={{color: theme.palette.success.main}}
+                  >{statusMessage}</Typography>
+              </Stack>
+
           </Stack>
       </MainCard>
     );
