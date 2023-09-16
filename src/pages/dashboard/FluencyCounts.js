@@ -8,15 +8,15 @@ const dividerStyles = {
     "&::before, &::after": {
         borderColor: "#000",
     },
-    pt: 3,
+    pt: 1,
 }
 const FluencyCounts = () => {
     const { totalSyllableCount, stutteredEventsCount, percentSS, averageDuration, psList, longest3Durations } = useContext(StutteredContext);
 
 
     return (
-        <MainCard>
-            <Typography variant={"h4"}>Fluency Metrics</Typography>
+        <MainCard title={"Fluency Counts"}>
+            {/*<Typography variant={"h4"}>Fluency Counts</Typography>*/}
             <Stack direction={"column"}>
                 <Divider textAlign={"left"} sx={dividerStyles}><Typography variant={"h5"}>Frequency</Typography></Divider>
                 <Typography>Total Syllables: {totalSyllableCount}</Typography>
@@ -34,8 +34,6 @@ const FluencyCounts = () => {
                         }
                     )}
                 </Stack>
-                <Divider textAlign={"left"} sx={dividerStyles}><Typography variant={"h5"}>Physical Concomitants</Typography></Divider>
-                <Typography>{psList}</Typography>
             </Stack>
         </MainCard>
 

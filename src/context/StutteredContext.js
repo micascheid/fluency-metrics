@@ -3,13 +3,10 @@ import {
     addDoc,
     collection,
     doc,
-    getDoc,
     getDocs,
-    query,
     serverTimestamp,
     setDoc,
     updateDoc,
-    where
 } from "firebase/firestore";
 import {db} from "../FirebaseConfig";
 import {UserContext} from "./UserContext";
@@ -58,6 +55,7 @@ export const StutteredProvider = (props) => {
         playBackSpeed: 1,
         workspaceId: workspaceId,
         globalYesNo: false,
+        customNotes: '',
     }
 
     const [stutteredEventsCount, setStutteredEventsCount] = useState(initialState.stutteredEventsCount);
@@ -74,7 +72,9 @@ export const StutteredProvider = (props) => {
     const [playBackSpeed, setPlayBackSpeed] = useState(initialState.playBackSpeed);
     const [isLoadingWorkspace, setIsLoadingWorkspace] = useState(false);
     const [percentSS, setPercentSS] = useState(0);
+    const [customNotes, setCustomNotes] = useState(initialState.customNotes);
     const {user, setWorkspacesIndex} = useContext(UserContext);
+    console.log("SC CUSTOM NOTES:", customNotes);
 
     //FUNCTIONS
     const resetTransAndSE = async () => {
@@ -88,6 +88,7 @@ export const StutteredProvider = (props) => {
         setLoadingTranscription(initialState.loadingTranscription);
         setkiStutteredRegions(initialState.kiStutteredRegions);
         setLongest3Durations(initialState.longest3Durations);
+        setCustomNotes(initialState.customNotes);
     }
 
     const stateSetters = {
@@ -108,6 +109,7 @@ export const StutteredProvider = (props) => {
         longest3Durations: setLongest3Durations,
         audioPlayerControl: setAudioPlayerControl,
         playBackSpeed: setPlayBackSpeed,
+        customNotes: setCustomNotes,
     }
 
     const updateStateFromObject = (dbWorkspaceObj) => {
@@ -136,7 +138,8 @@ export const StutteredProvider = (props) => {
             kiStutteredRegions: kiStutteredRegions,
             fileChosen: fileChosen,
             longest3Durations: longest3Durations,
-            playBackSpeed: playBackSpeed
+            playBackSpeed: playBackSpeed,
+            customNotes: customNotes,
         }
         try {
             await updateDoc(workspaceColDocRef, workspaceObject);
@@ -172,7 +175,8 @@ export const StutteredProvider = (props) => {
             kiStutteredRegions: kiStutteredRegions,
             fileChosen: fileChosen,
             longest3Durations: longest3Durations,
-            playBackSpeed: playBackSpeed
+            playBackSpeed: playBackSpeed,
+            customNotes: '',
         }
         //add workspace first then if successful add workspace_index doc
         try {
@@ -335,7 +339,6 @@ export const StutteredProvider = (props) => {
         if (Object.keys(kiStutteredRegions).length >= 0 && transcriptionObj) {
             transcriptError();
             const percent = (stutteredEventsCount/totalSyllableCount)*100
-            // setPercentSS(parseFloat(Number(percent).toFixed(2)));
         }
 
     }, [totalSyllableCount, stutteredEventsCount, kiStutteredRegions]);
@@ -357,6 +360,23 @@ export const StutteredProvider = (props) => {
     }
 
     useEffect(() => {
+        if (workspaceName){
+            const update = async () => {
+                try {
+                    await updateWorkspace(workspaceName);
+                } catch (error) {
+                    console.log("Unable to save notes to db");
+                }
+            }
+
+            update().then(r => {
+                // console.log("successful update to db");
+            });
+        }
+
+    }, [customNotes]);
+
+    useEffect(() => {
         (async () => {
             if (isCreateNewWorkspace) {
                 try {
@@ -369,6 +389,7 @@ export const StutteredProvider = (props) => {
                     setLoadingTranscription(initialState.loadingTranscription);
                     setkiStutteredRegions(initialState.kiStutteredRegions);
                     setLongest3Durations(initialState.longest3Durations);
+                    setCustomNotes(initialState.customNotes);
 
                     const transcriptObj = await get_transcription();
                     await createNewWorkspace(workspaceName, transcriptObj);
@@ -380,8 +401,6 @@ export const StutteredProvider = (props) => {
 
             }
         })();
-
-
     }, [isCreateNewWorkspace]);
 
     useEffect(() => {
@@ -460,6 +479,8 @@ export const StutteredProvider = (props) => {
             setIsLoadingWorkspace,
             workspaceId,
             percentSS,
+            setCustomNotes,
+            customNotes,
         }
         return (
             <StutteredContext.Provider value={contextValues}>

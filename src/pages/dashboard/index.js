@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {Grid} from "@mui/material";
+import {Grid, Stack} from "@mui/material";
 import AudioPlayer from "./AudioPlayer";
 import FluencyCounts from "./FluencyCounts";
 import KeyboardLegend from "./KeyboardLegend";
@@ -11,6 +11,7 @@ import {UserContext} from "../../context/UserContext";
 import LoadingOverlay from "./LoadingOverlay";
 import {StutteredProvider} from "../../context/StutteredContext";
 import HelpMode from "./help-components/HelpMode";
+import CustomNotes from "./CustomNotes";
 
 
 const DefaultDashboard = () => {
@@ -83,11 +84,15 @@ const DefaultDashboard = () => {
                         <Grid item xs={12} sm={12} md={12} lg={12}>
                             <Transcription/>
                         </Grid>
-                        <Grid item xs={12} sm={12} md={8} lg={8}>
+                        <Grid item xs={12} sm={12} md={7} lg={7}>
                             <StutteredEvents/>
                         </Grid>
-                        <Grid item xs={12} sm={12} md={4} lg={4}>
-                            <FluencyCounts/>
+
+                        <Grid item xs={12} sm={12} md={5} lg={5}>
+                            <Stack spacing={2}>
+                                <FluencyCounts/>
+                                <CustomNotes />
+                            </Stack>
                         </Grid>
                     </StutteredProvider>
 

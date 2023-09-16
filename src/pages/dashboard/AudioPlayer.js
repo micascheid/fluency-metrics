@@ -25,7 +25,6 @@ const AudioPlayer = () => {
         setCurrentWordIndex,
         currentWordIndex,
         audioFile,
-        audioFileName,
         kiStutteredRegions,
         setkiStutteredRegions,
         setAudioPlayerControl,
@@ -334,10 +333,6 @@ const AudioPlayer = () => {
                 }
             });
         }
-
-        // if (wavesurferRef.current) {
-        //     wavesurferRef.current.setPlaybackRate(1);
-        // }
 
         window.addEventListener('keypress', handleKeyPress);
         return () => {

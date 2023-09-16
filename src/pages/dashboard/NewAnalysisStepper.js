@@ -112,7 +112,7 @@ const NewAnalysisStepper = (props) => {
                         onChange={handleMode}
                     >
                         <MenuItem value={"auto"}>Automated-Transcriptions</MenuItem>
-                        {/*<MenuItem value={"manual"} disabled>Manual (Coming Soon)</MenuItem>*/}
+                        <MenuItem value={"manual"} disabled>Manual (Coming Soon)</MenuItem>
                     </Select>
                 </FormControl>
                 <Box>
