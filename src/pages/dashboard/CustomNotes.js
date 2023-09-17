@@ -35,7 +35,7 @@ const CustomNotes = () => {
     }, [customNotes]);
 
     return (
-      <MainCard title={"Custom Notes"}>
+      <MainCard title={"Additional Notes"}>
           <Stack spacing={1}>
               <TextField
                 multiline
@@ -49,7 +49,7 @@ const CustomNotes = () => {
                 disabled={saveNotesDisabled}
                 value={localNotes}
                 // label={"Notes"}
-              >Enter Your Custom Notes Here</TextField>
+              >Enter Your Notes Here</TextField>
               <Stack direction={"row"} sx={{alignItems: 'center'}} spacing={1}>
                   <Button
                       variant={"contained"}

@@ -11,8 +11,16 @@ const dividerStyles = {
     pt: 1,
 }
 const FluencyCounts = () => {
-    const { totalSyllableCount, stutteredEventsCount, percentSS, averageDuration, psList, longest3Durations } = useContext(StutteredContext);
+    const {
+        totalSyllableCount,
+        stutteredEventsCount,
+        averageDuration,
+        longest3Durations
+    } = useContext(StutteredContext);
 
+    const percentSS = totalSyllableCount === 0 ?
+        0:
+        Number((stutteredEventsCount/totalSyllableCount)*100).toFixed(2);
 
     return (
         <MainCard title={"Fluency Counts"}>
@@ -21,7 +29,7 @@ const FluencyCounts = () => {
                 <Divider textAlign={"left"} sx={dividerStyles}><Typography variant={"h5"}>Frequency</Typography></Divider>
                 <Typography>Total Syllables: {totalSyllableCount}</Typography>
                 <Typography>Stuttered Events: {stutteredEventsCount}</Typography>
-                <Typography>%SS: {Number((stutteredEventsCount/totalSyllableCount)*100).toFixed(2)}</Typography>
+                <Typography>%SS: {percentSS}</Typography>
                 <Divider textAlign={"left"} sx={dividerStyles}><Typography variant={"h5"}>Duration</Typography></Divider>
                 <Typography>Average: {averageDuration}</Typography>
                 <Stack direction={"row"}>
