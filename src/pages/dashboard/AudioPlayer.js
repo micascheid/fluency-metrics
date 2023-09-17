@@ -32,6 +32,7 @@ const AudioPlayer = () => {
         playBackSpeed,
         stutteredEvents,
         workspaceName,
+        setAudioFileDuration,
     } = useContext(StutteredContext);
 
     // console.log("AUDIO FILE NAME", audioFile);
@@ -103,6 +104,8 @@ const AudioPlayer = () => {
 
                 wavesurferRef.current.on("ready", () => {
                     console.log("WaveSurfer is ready");
+                    setAudioFileDuration(Math.round(wavesurferRef.current.getDuration()));
+
                 });
 
                 wavesurferRef.current.on("region-removed", (region) => {
@@ -148,6 +151,7 @@ const AudioPlayer = () => {
                 wavesurferRef.current.loadBlob(new Blob([reader.result]));
             }
             reader.readAsArrayBuffer(file)
+
         }
     };
 

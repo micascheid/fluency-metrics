@@ -27,6 +27,8 @@ export const StutteredProvider = (props) => {
         setMode,
         audioFileName,
         setAudioFileName,
+        audioFileDuration,
+        setAudioFileDuration,
         audioFile,
         setAudioFile,
         isCreateNewWorkspace,
@@ -148,7 +150,7 @@ export const StutteredProvider = (props) => {
             setWsSaveStatus(UPD_WS_STATUS.SUCCESS);
             const timer = setTimeout(() => {
                 setWsSaveStatus(UPD_WS_STATUS.IDLE);
-            }, 3000);
+            }, 60000);
 
             return () => clearTimeout(timer);
         } catch (e) {
@@ -318,7 +320,7 @@ export const StutteredProvider = (props) => {
         const formData = new FormData();
         formData.append('file', audioFile);
         const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-        await delay(1500);
+        await delay(3000);
         try {
             const response = await axios.post(`${BASE_URL}/get_transcription2`, formData, {
                 headers: {
@@ -487,7 +489,9 @@ export const StutteredProvider = (props) => {
             percentSS,
             setCustomNotes,
             customNotes,
-            wsSaveStatus
+            wsSaveStatus,
+            setAudioFileDuration,
+            audioFileDuration,
         }
         return (
             <StutteredContext.Provider value={contextValues}>

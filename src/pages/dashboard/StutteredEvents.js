@@ -19,7 +19,7 @@ const StutteredEvents = () => {
     }, [stutteredEvents]);
 
     return (
-      <MainCard sx={{minHeight: '400px'}}>
+      <MainCard sx={{minHeight: '475px', maxHeight: '475px'}}>
           <Typography variant={"h4"} sx={{pb: 3}}>Disfluency Events</Typography>
           {Object.keys(stutteredEvents).length > 0 ? (
               <DataGrid

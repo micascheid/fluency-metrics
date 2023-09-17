@@ -1,14 +1,17 @@
-import {react, useState, useEffect, useRef} from 'react';
+import {react, useState, useEffect, useRef, useContext} from 'react';
 import MainCard from "../../components/MainCard";
 import {Box} from "@mui/material";
 import WaveSurfer from 'wavesurfer';
 import { Wavesurfer } from 'wavesurfer-react';
 import RegionsPlugin from "wavesurfer.js/dist/plugin/wavesurfer.regions.min";
+import {StutteredContext} from "../../context/StutteredContext";
 
 const Waveform = () => {
+    const {setAudioFileDuration} = useContext(StutteredContext);
     const waveformRef = useRef(null);
     const timelineRef = useRef(null);
     const wavesurferRef = useRef(null);
+
 
     useEffect(() => {
 
@@ -18,6 +21,7 @@ const Waveform = () => {
             const pixelsPerSecond = 1000 / 30;
             const zoomLevel = pixelsPerSecond / (duration / 30);
             wavesurferRef.current.zoom(zoomLevel);
+            setAudioFileDuration(duration);
         });
 
         return () => {

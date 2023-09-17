@@ -20,17 +20,17 @@ const NewAnalysisStepper = (props) => {
         setAudioFile,
         setFileChosen,
         setIsCreateNewWorkspace,
+        setAudioFileDuration,
+        audioFileDuration,
     } = props;
     const {
         workspacesIndex,
-        setWorkspacesIndex,
     } = useContext(UserContext);
     const [localWorkspaceName, setLocalWorkspaceName] = useState('');
     const [nameError, setNameError] = useState('');
     const [showAreYouSure, setShowAreYouSure] = useState(false);
     const [yesNo, setYesNo] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
-
     const handleMode = (event) => {
         setMode(event.target.value);
     };
@@ -54,6 +54,13 @@ const NewAnalysisStepper = (props) => {
             setFileChosen(false);
             return;
         }
+        const audio = new Audio();
+        const objURL = URL.createObjectURL(file);
+        audio.onloadedmetadata = () => {
+            setAudioFileDuration(audio.duration);
+            URL.revokeObjectURL(objURL);
+        }
+        audio.src = objURL;
         setAudioFile(file);
         setAudioFileName(file.name);
         setFileChosen(true);
@@ -128,6 +135,7 @@ const NewAnalysisStepper = (props) => {
                         />
                     </Button>
                     <Typography variant={"body1"}>{audioFileName}</Typography>
+                    <Typography></Typography>
                 </Box>
 
                 <Stack direction={"row"} alignItems={"center"} spacing={1}>

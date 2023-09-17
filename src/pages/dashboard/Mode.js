@@ -30,7 +30,6 @@ const Mode = (props) => {
 
 
     useEffect(() => {
-        console.log("MODE CREATE NEW WORKSPACE:", isCreateNewWorkspace);
     },[isCreateNewWorkspace])
 
     const CustomTabPanel = (props) => {

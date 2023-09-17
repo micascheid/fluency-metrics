@@ -23,6 +23,7 @@ const DefaultDashboard = () => {
     const [audioFile, setAudioFile] = useState(null)
     const [fileChosen, setFileChosen] = useState('');
     const [audioFileName, setAudioFileName] = useState('');
+    const [audioFileDuration, setAudioFileDuration] = useState(0);
     const [workspaceName, setWorkspaceName] = useState('');
     const [isGetTranscription, setIsGetTranscription] = useState(false);
     const [isCreateNewWorkspace, setIsCreateNewWorkspace] = useState(false);
@@ -51,6 +52,8 @@ const DefaultDashboard = () => {
         isUpdateWorkspace: isUpdateWorkspace,
         setLoadWorkspaceByObj: setLoadWorkspaceByObj,
         loadWorkspaceByObj: loadWorkspaceByObj,
+        setAudioFileDuration: setAudioFileDuration,
+        audioFileDuration: audioFileDuration,
     }
 
     useEffect(() => {
@@ -84,11 +87,11 @@ const DefaultDashboard = () => {
                         <Grid item xs={12} sm={12} md={12} lg={12}>
                             <Transcription/>
                         </Grid>
-                        <Grid item xs={12} sm={12} md={7} lg={7}>
+                        <Grid item xs={12} sm={12} md={6} lg={6}>
                             <StutteredEvents/>
                         </Grid>
 
-                        <Grid item xs={12} sm={12} md={5} lg={5}>
+                        <Grid item xs={12} sm={12} md={6} lg={6}>
                             <Stack spacing={2}>
                                 <FluencyCounts/>
                                 <CustomNotes />
