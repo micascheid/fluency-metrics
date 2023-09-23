@@ -1,11 +1,11 @@
 import {
-    Box,
+    Box, Collapse,
     Divider,
-    Grid,
+    Grid, IconButton, Stack, styled,
     Tab,
     Tabs,
 } from "@mui/material";
-import React, {useContext, useEffect, useState} from "react";
+import React, {Fragment, useContext, useEffect, useState} from "react";
 import MainCard from "../../components/MainCard";
 import axios from "axios";
 import AreYouSure from "./modals/AreYouSure";
@@ -15,10 +15,24 @@ import ResumeAnalysisStepper from "./ResumeAnalysisStepper";
 import InstructionsAutoMode from "./InstructionsAutoMode";
 import Help from "./Help";
 import HelpMode from "./help-components/HelpMode";
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
+
+const ExpandMore = styled((props) => {
+    const {expand, ...other} = props;
+    return <IconButton {...other} />;
+})(({theme, expand}) => ({
+    transform: !expand ? 'rotate(-90deg)' : 'rotate(0deg)',
+    marginLeft: 'auto',
+    transition: theme.transitions.create('transform', {
+        duration: theme.transitions.duration.shortest,
+    }),
+}));
 
 const Mode = (props) => {
     const {
+        expanded,
+        setExpanded,
         help,
         setAudioFileName,
         setAudioFile,
@@ -30,10 +44,10 @@ const Mode = (props) => {
 
 
     useEffect(() => {
-    },[isCreateNewWorkspace])
+    }, [isCreateNewWorkspace])
 
     const CustomTabPanel = (props) => {
-        const { children, value, index, ...other } = props;
+        const {children, value, index, ...other} = props;
 
         return (
             <div
@@ -44,7 +58,7 @@ const Mode = (props) => {
                 {...other}
             >
                 {value === index && (
-                    <Box sx={{ pt: 0 }}>
+                    <Box sx={{pt: 0}}>
                         {children}
                     </Box>
                 )}
@@ -70,49 +84,72 @@ const Mode = (props) => {
     };
 
     const handleTabChange = (event, newValue) => {
-      setTabValue(newValue);
+        setTabValue(newValue);
     };
 
     return (
-        <MainCard sx={{minHeight: "335px", maxHeight: "400pxs"}} title={
-            <Help title={"Start/Resume Analysis"}>
-                <HelpMode />
-            </Help>
-        }>
-            {showAreYouSure && <AreYouSure setAreYouSure={setShowAreYouSure}/>}
-            <Grid container spacing={2}>
-                <Grid item xs={5} sm={5} md={5} lg={5}>
-                    <Box width={"100%"}>
-                        <Box sx={{mb: 2}} >
-                            <Tabs value={tabValue} onChange={handleTabChange} variant={'fullWidth'} sx={{boxShadow: '0px 2px 4px rgba(0,0,0,0.2)'}}>
-                                <Tab  label={"New Analysis"}/>
-                                <Tab label={"Resume Analysis"}/>
-                            </Tabs>
-                        </Box>
-                        <Box>
-                            <CustomTabPanel value={tabValue} index={0}>
-                                <NewAnalysisStepper {...props}/>
-                            </CustomTabPanel>
-                            <CustomTabPanel value={tabValue} index={1}>
-                                <ResumeAnalysisStepper {...props}/>
-                            </CustomTabPanel>
-                        </Box>
+        <Fragment>
+
+            {/*<Collapse in={expanded} timeout="auto" unmountOnExit>*/}
+            <MainCard title={
+                <Stack direction={"row"} sx={{alignItems: 'center'}}>
+                    <ExpandMore
+                        expand={expanded}
+                        onClick={() => {
+                            setExpanded(!expanded)
+                        }}
+                        aria-expanded={expanded}
+                        aria-label="show more"
+                    >
+                        <ExpandMoreIcon/>
+                    </ExpandMore>
+                    <Box flexGrow={1}>
+                        <Help title={"Start/Resume Analysis"}>
+                            <HelpMode/>
+                        </Help>
                     </Box>
-                </Grid>
-                <Grid item xs={7} sm={7} md={7} lg={7}>
-                    <Grid container style={{height: '100%'}} spacing={2}>
-                        <Grid item xs={1} sm={1} md={1} lg={1}>
-                            <Divider orientation={"vertical"} style={{borderColor: "darkgray"}}/>
-                        </Grid>
-                        <Grid item xs={11} sm={11} md={11} lg={11}>
-                            <Box style={{ overflowY: 'scroll', maxHeight: '335px' }}>
-                                <InstructionsAutoMode />
+                </Stack>
+            }>
+                <Collapse in={expanded} timeout="auto" unmountOnExit>
+                    {showAreYouSure && <AreYouSure setAreYouSure={setShowAreYouSure}/>}
+                    {/*<Collapse in={expanded} timeout="auto" unmountOnExit>*/}
+                    <Grid container spacing={2}>
+                        <Grid item xs={5} sm={5} md={5} lg={5}>
+                            <Box width={"100%"}>
+                                <Box sx={{mb: 2}}>
+                                    <Tabs value={tabValue} onChange={handleTabChange} variant={'fullWidth'}
+                                          sx={{boxShadow: '0px 2px 4px rgba(0,0,0,0.2)'}}>
+                                        <Tab label={"New Analysis"}/>
+                                        <Tab label={"Resume Analysis"}/>
+                                    </Tabs>
+                                </Box>
+                                <Box>
+                                    <CustomTabPanel value={tabValue} index={0}>
+                                        <NewAnalysisStepper {...props} setExpanded={setExpanded} expanded={expanded}/>
+                                    </CustomTabPanel>
+                                    <CustomTabPanel value={tabValue} index={1}>
+                                        <ResumeAnalysisStepper {...props}/>
+                                    </CustomTabPanel>
+                                </Box>
                             </Box>
                         </Grid>
+                        <Grid item xs={7} sm={7} md={7} lg={7}>
+                            <Grid container style={{height: '100%'}} spacing={2}>
+                                <Grid item xs={1} sm={1} md={1} lg={1}>
+                                    <Divider orientation={"vertical"} style={{borderColor: "darkgray"}}/>
+                                </Grid>
+                                <Grid item xs={11} sm={11} md={11} lg={11}>
+                                    <Box style={{overflowY: 'scroll', maxHeight: '335px'}}>
+                                        <InstructionsAutoMode/>
+                                    </Box>
+                                </Grid>
+                            </Grid>
+                        </Grid>
                     </Grid>
-                </Grid>
-            </Grid>
-        </MainCard>
+                </Collapse>
+            </MainCard>
+        </Fragment>
+
 
     );
 };

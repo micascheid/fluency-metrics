@@ -22,6 +22,8 @@ export const StutteredProvider = (props) => {
     const {
         children,
         mode,
+        speechSampleContext,
+        setSpeechSampleContext,
         workspaceName,
         setWorkspaceName,
         setMode,
@@ -36,6 +38,8 @@ export const StutteredProvider = (props) => {
         loadWorkspaceByObj,
         workspaceId,
         setWorkspaceId,
+        expanded,
+        setExpanded,
     } = props;
 
     const initialState = {
@@ -58,6 +62,7 @@ export const StutteredProvider = (props) => {
         workspaceId: workspaceId,
         globalYesNo: false,
         customNotes: '',
+        speechSampleContext: ''
     }
 
     const [stutteredEventsCount, setStutteredEventsCount] = useState(initialState.stutteredEventsCount);
@@ -94,25 +99,27 @@ export const StutteredProvider = (props) => {
     }
 
     const stateSetters = {
-        workspaceName: setWorkspaceName,
-        stutteredEventsCount: setStutteredEventsCount,
+        audioFile: setAudioFile,
+        audioFileName: setAudioFileName,
+        audioPlayerControl: setAudioPlayerControl,
+        averageDuration: setAverageDuration,
+        customNotes: setCustomNotes,
+        currentWordIndex: setCurrentWordIndex,
+        fileChosen: setFileChosen,
+        kiStutteredRegions: setkiStutteredRegions,
+        loadingTranscription: setLoadingTranscription,
+        longest3Durations: setLongest3Durations,
+        mode: setMode,
         percentSS: setPercentSS,
+        playBackSpeed: setPlayBackSpeed,
+        speechSampleContext: setSpeechSampleContext,
         stutteredEvents: setStutteredEvents,
+        stutteredEventsCount: setStutteredEventsCount,
         totalSyllableCount: setTotalSyllableCount,
         transcriptionObj: setTranscriptionObj,
-        currentWordIndex: setCurrentWordIndex,
-        averageDuration: setAverageDuration,
-        loadingTranscription: setLoadingTranscription,
-        mode: setMode,
-        audioFileName: setAudioFileName,
-        audioFile: setAudioFile,
-        kiStutteredRegions: setkiStutteredRegions,
-        fileChosen: setFileChosen,
-        longest3Durations: setLongest3Durations,
-        audioPlayerControl: setAudioPlayerControl,
-        playBackSpeed: setPlayBackSpeed,
-        customNotes: setCustomNotes,
-    }
+        workspaceName: setWorkspaceName,
+    };
+
 
     const updateStateFromObject = (dbWorkspaceObj) => {
         for (let key in dbWorkspaceObj) {
@@ -136,6 +143,7 @@ export const StutteredProvider = (props) => {
             averageDuration: averageDuration,
             loadingTranscription: loadingTranscription,
             mode: mode,
+            speechSampleContext: speechSampleContext,
             audioFileName: audioFileName,
             kiStutteredRegions: kiStutteredRegions,
             fileChosen: fileChosen,
@@ -150,7 +158,7 @@ export const StutteredProvider = (props) => {
             setWsSaveStatus(UPD_WS_STATUS.SUCCESS);
             const timer = setTimeout(() => {
                 setWsSaveStatus(UPD_WS_STATUS.IDLE);
-            }, 60000);
+            }, 3000);
 
             return () => clearTimeout(timer);
         } catch (e) {
@@ -169,7 +177,8 @@ export const StutteredProvider = (props) => {
         const data = {
             name: name,
             creation_time: firestoreTime,
-            audio_file_name: audioFileName
+            audio_file_name: audioFileName,
+            speechSampleContext: speechSampleContext,
         };
         const workspaceObject = {
             workspaceName: name,
@@ -181,6 +190,7 @@ export const StutteredProvider = (props) => {
             averageDuration: averageDuration,
             loadingTranscription: loadingTranscription,
             mode: mode,
+            speechSampleContext: speechSampleContext,
             audioFileName: audioFileName,
             kiStutteredRegions: kiStutteredRegions,
             fileChosen: fileChosen,
@@ -195,6 +205,7 @@ export const StutteredProvider = (props) => {
             await setDoc(docRef, data);
             setWorkspaceId(docData.id);
             setWorkspaceName(name);
+            setExpanded(false);
         } catch (error) {
             console.log("Trouble with workspaces or workspaces index:", error)
         }
@@ -403,6 +414,7 @@ export const StutteredProvider = (props) => {
                     await createNewWorkspace(workspaceName, transcriptObj);
                     await updateWorkspacesIndex();
                     setIsCreateNewWorkspace(false);
+
                 } catch (error) {
                     console.log("TROUBLE CREATING WORKSPACE", error);
                 }
@@ -492,6 +504,7 @@ export const StutteredProvider = (props) => {
             wsSaveStatus,
             setAudioFileDuration,
             audioFileDuration,
+            speechSampleContext
         }
         return (
             <StutteredContext.Provider value={contextValues}>

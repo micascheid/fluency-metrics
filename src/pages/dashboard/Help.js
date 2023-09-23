@@ -1,8 +1,10 @@
 import react, {Fragment, useContext, useState} from 'react';
 import {HelpOutline} from "@mui/icons-material";
-import {Modal, Stack, Typography} from "@mui/material";
+import {IconButton, Modal, Stack, styled, Typography} from "@mui/material";
 import MainCard from "../../components/MainCard";
 import {useTheme} from "@mui/material/styles";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import React from "react";
 
 const style = {
     position: 'absolute',
@@ -12,11 +14,26 @@ const style = {
     width: 800,
 }
 
+const ExpandMore = styled((props) => {
+    const { expand, ...other } = props;
+    return <IconButton {...other} />;
+})(({ theme, expand }) => ({
+    transform: !expand ? 'rotate(-90deg)' : 'rotate(0deg)',
+    marginLeft: 'auto',
+    transition: theme.transitions.create('transform', {
+        duration: theme.transitions.duration.shortest,
+    }),
+}));
 
 
 const Help = ({children, title}) => {
     const [isShowHelp, setIsShowHelp] = useState(false);
     const theme = useTheme();
+    const [expanded, setExpanded] = React.useState(true);
+
+    const handleExpandClick = () => {
+        setExpanded(!expanded);
+    };
     const handleClose = () => {
         setIsShowHelp(false);
     };
@@ -24,7 +41,8 @@ const Help = ({children, title}) => {
 
     return (
         <Fragment>
-            <Stack spacing={1} direction={"row"}>
+
+            <Stack spacing={1} direction={"row"} sx={{alignItems: 'center'}}>
                 <HelpOutline
                     sx={{
                         ':hover': {

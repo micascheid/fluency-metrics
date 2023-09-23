@@ -16,3 +16,10 @@ export const UPD_WS_STATUS = Object.freeze({
     SUCCESS: "success",
     ERROR: "error",
 });
+
+export const SPEECH_SAMPLE_OPTIONS = {
+    ReadingPassage: 'Reading Passage',
+    DescribingTask: 'Describing Task',
+    Conversation: 'Conversation',
+    Other: 'Other...'
+}

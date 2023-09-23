@@ -42,7 +42,7 @@ const CustomNotes = () => {
                 minRows={5}
                 maxRows={15}
                 fullWidth
-                placeholder={"Custom Notes Here"}
+                placeholder={"Notes Here"}
                 onKeyPress={(event) => {event.stopPropagation();}}
                 onChange={handleChange}
                 onBlur={handleSaveNotes}

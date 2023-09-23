@@ -7,30 +7,34 @@ import saveWorkSpace from "./SaveWorkspace";
 import AreYouSure from "./modals/AreYouSure";
 import {UserContext} from "../../context/UserContext";
 import PHIEntryChecker from "./modals/PHIEntryChecker";
+import {SPEECH_SAMPLE_OPTIONS} from "../../constants";
 
 
-const NewAnalysisStepper = (props) => {
+const NewAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
     const {
         workspaceName,
         setWorkspaceName,
         mode,
         setMode,
+        speechSampleContext,
+        setSpeechSampleContext,
         audioFileName,
         setAudioFileName,
         setAudioFile,
         setFileChosen,
         setIsCreateNewWorkspace,
         setAudioFileDuration,
-        audioFileDuration,
-    } = props;
+    } = otherProps;
     const {
         workspacesIndex,
     } = useContext(UserContext);
-    const [localWorkspaceName, setLocalWorkspaceName] = useState('');
+    const [localWorkspaceName, setLocalWorkspaceName] = useState('')
+    const [localSpeechContext, setLocalSpeechContext] = useState('');
     const [nameError, setNameError] = useState('');
     const [showAreYouSure, setShowAreYouSure] = useState(false);
     const [yesNo, setYesNo] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
+
     const handleMode = (event) => {
         setMode(event.target.value);
     };
@@ -93,16 +97,23 @@ const NewAnalysisStepper = (props) => {
 
     };
 
+    const handleSpeechSampleChange = (event) => {
+        setLocalSpeechContext(event.target.value);
+    };
+
+
     useEffect(() => {
         (async () => {
             if (yesNo) {
                 console.log("local workspace name", localWorkspaceName);
                 setWorkspaceName(localWorkspaceName);
+                setSpeechSampleContext(localSpeechContext);
                 setIsCreateNewWorkspace(true);
             }
         })();
 
     }, [yesNo])
+
 
 
     return (
@@ -137,7 +148,25 @@ const NewAnalysisStepper = (props) => {
                     <Typography variant={"body1"}>{audioFileName}</Typography>
                     <Typography></Typography>
                 </Box>
-
+                <FormControl
+                    disabled={audioFileName === ''}
+                >
+                    <InputLabel
+                    >Sample Context</InputLabel>
+                    <Select
+                        value={localSpeechContext}
+                        onChange={handleSpeechSampleChange}
+                    >
+                        {Object.keys(SPEECH_SAMPLE_OPTIONS).map((key) => (
+                            <MenuItem
+                                key={key}
+                                value={key}
+                            >
+                                {SPEECH_SAMPLE_OPTIONS[key]}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
                 <Stack direction={"row"} alignItems={"center"} spacing={1}>
                     <TextField
                         sx={{minWidth: "350px"}}
@@ -147,12 +176,13 @@ const NewAnalysisStepper = (props) => {
                         error={!!nameError}
                         helperText={nameError || ' '}
                         onKeyPress={handleKeyPress}
-                        disabled={audioFileName === ''}
+                        disabled={!localSpeechContext}
                     />
                 </Stack>
+
                 <Button
-                    variant={"contained"}
-                    disabled={!!nameError || localWorkspaceName === ''}
+                    variant={"outlined"}
+                    disabled={(!!nameError || localWorkspaceName === '') && localSpeechContext !== ''}
                     onClick={handleCreateWorkspace}
                 >Create Workspace</Button>
             </Stack>

@@ -46,7 +46,7 @@ const Transcription = () => {
                 // <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', pt: 2}}>
                     <Stack alignItems={'center'}>
                         <CircularProgress/>
-                        <Typography variant={"h4"} fontWeight={"light"}>Your transcription will be ready in</Typography>
+                        <Typography variant={"h4"} fontWeight={"light"}>Hang tight! Transcription processing time is:</Typography>
                         <Typography variant={"h4"}>{transcriptionEstimate}</Typography>
                     </Stack>
             ) : (

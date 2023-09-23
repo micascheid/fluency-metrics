@@ -7,12 +7,16 @@ import EditIcon from '@mui/icons-material/Edit';
 import {useTheme} from '@mui/material/styles';
 import {UserContext} from "../../context/UserContext";
 import useStatusMessage from "./custom-hooks/useStatusMessage";
+import {SPEECH_SAMPLE_OPTIONS} from "../../constants";
+import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 
 const SaveWorkspace = ({sx}) => {
     const {
         workspaceName,
         setWorkspaceName,
         updateWorkspace,
+        audioFileName,
+        speechSampleContext,
     } = useContext(StutteredContext);
     const {
         workspacesIndex,
@@ -57,7 +61,7 @@ const SaveWorkspace = ({sx}) => {
     return (
         <Box sx={sx}>
             <Stack direction={"row"} sx={{alignItems: 'center'}} spacing={1}>
-                <Typography variant={"h4"} fontWeight={"lighter"}>Current Analysis: </Typography>
+                <Typography variant={"h5"}>Current Workspace: </Typography>
                 <TextField
                     required
                     error={isNameError}
@@ -73,14 +77,21 @@ const SaveWorkspace = ({sx}) => {
                               onClick={() => setEditWorkspaceName(!editWorkspaceName)}
                     />
                 </ButtonBase>
-                <Button variant={"contained"} onClick={handleOnClick} disabled={workspaceName === '' || !!nameError}>
-                    Save Work
-                </Button>
-                <Typography
-                    variant={"body"}
-                    sx={{color: theme.palette.success.main}}
-                >{statusMessage}</Typography>
+                <Typography variant={"h5"} fontWeight={""}>File:</Typography>
+                <Typography variant={"body"} >{audioFileName}</Typography>
+
+
+
+                <Typography variant={"h5"} >Sample Context: </Typography>
+                <Typography variant={"body"}>{SPEECH_SAMPLE_OPTIONS[speechSampleContext]}</Typography>
             </Stack>
+            <Button variant={"contained"} onClick={handleOnClick} disabled={workspaceName === '' || !!nameError}>
+                Save Work
+            </Button>
+            <Typography
+                variant={"body"}
+                sx={{color: theme.palette.success.main}}
+            >{statusMessage}</Typography>
         </Box>
     );
 };

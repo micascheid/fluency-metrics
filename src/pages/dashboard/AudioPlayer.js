@@ -419,7 +419,7 @@ const AudioPlayer = () => {
                     </React.Fragment>
                 ) : (
                     <Box sx={{height: 128, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                        <Typography variant={"h2"} fontWeight={"medium"}>Start or load a new Analysis to get started!</Typography>
+                        <Typography variant={"h2"} fontWeight={"light"}>Start or load a new Analysis to get started!</Typography>
                     </Box>
                 )}
 

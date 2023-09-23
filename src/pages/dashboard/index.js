@@ -12,6 +12,7 @@ import LoadingOverlay from "./LoadingOverlay";
 import {StutteredProvider} from "../../context/StutteredContext";
 import HelpMode from "./help-components/HelpMode";
 import CustomNotes from "./CustomNotes";
+import CreateSummary from "./CreateSummary";
 
 
 const DefaultDashboard = () => {
@@ -20,6 +21,7 @@ const DefaultDashboard = () => {
     } = useContext(UserContext);
 
     const [mode, setMode] = useState('');
+    const [speechSampleContext, setSpeechSampleContext] = useState('');
     const [audioFile, setAudioFile] = useState(null)
     const [fileChosen, setFileChosen] = useState('');
     const [audioFileName, setAudioFileName] = useState('');
@@ -30,10 +32,16 @@ const DefaultDashboard = () => {
     const [isUpdateWorkspace, setIsUpdateWorkspace] = useState(false);
     const [loadWorkspaceByObj, setLoadWorkspaceByObj] = useState(null);
     const [workspaceId, setWorkspaceId] = useState('None');
+    const [expanded, setExpanded] = useState(true);
+
 
     const propValues = {
+        expanded: expanded,
+        setExpanded: setExpanded,
         mode: mode,
         setMode: setMode,
+        speechSampleContext,
+        setSpeechSampleContext,
         fileChosen: fileChosen,
         setFileChosen: setFileChosen,
         audioFileName: audioFileName,
@@ -97,8 +105,10 @@ const DefaultDashboard = () => {
                                 <CustomNotes />
                             </Stack>
                         </Grid>
+                        <Grid item xs={12} sm={12} md={12} lg={12}>
+                            <CreateSummary />
+                        </Grid>
                     </StutteredProvider>
-
                 </Grid>
             )}
         </React.Fragment>
