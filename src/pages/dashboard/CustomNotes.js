@@ -30,7 +30,6 @@ const CustomNotes = () => {
     };
 
     useEffect(() => {
-        console.log("CUSTOM NOTES Local:", customNotes);
         setLocalNotes(customNotes);
     }, [customNotes]);
 

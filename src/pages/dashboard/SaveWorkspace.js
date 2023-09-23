@@ -1,4 +1,4 @@
-import react, {useContext, useEffect, useState} from 'react';
+import react, {useContext, useEffect, useRef, useState} from 'react';
 import {Box, Button, ButtonBase, Stack, TextField, Typography} from "@mui/material";
 import {StutteredContext} from "../../context/StutteredContext";
 import MainCard from "../../components/MainCard";
@@ -9,6 +9,9 @@ import {UserContext} from "../../context/UserContext";
 import useStatusMessage from "./custom-hooks/useStatusMessage";
 import {SPEECH_SAMPLE_OPTIONS} from "../../constants";
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
+import PrintIcon from "@mui/icons-material/Print";
+import ReactToPrint, {useReactToPrint} from "react-to-print";
+import PrintOut from "../PrintOut";
 
 const SaveWorkspace = ({sx}) => {
     const {
@@ -26,7 +29,10 @@ const SaveWorkspace = ({sx}) => {
     const theme = useTheme();
     const [isNameError, setIsNameError] = useState(false);
     const [nameError, setNameError] = useState("");
+    const [isPrinting, setIsPrinting] = useState(false);
+
     const statusMessage = useStatusMessage();
+    const printComponentRef = useRef();
 
     const handleOnClick = () => {
         if (localName.trim() === "") {
@@ -36,6 +42,23 @@ const SaveWorkspace = ({sx}) => {
         setWorkspaceName(localName);
         updateWorkspace(localName);
     };
+
+    const handlePrint = useReactToPrint({
+        content: () => printComponentRef.current,
+        onAfterPrint: () => setIsPrinting(false),
+    });
+
+    const handlePrintOutClick = () => {
+        setIsPrinting(true);
+    }
+
+    useEffect(() => {
+        if (isPrinting && printComponentRef.current) {
+            handlePrint();
+        }
+    }, [isPrinting]);
+
+
 
     const handleOnChange = (event) => {
         const value = (event.target.value);
@@ -58,6 +81,7 @@ const SaveWorkspace = ({sx}) => {
         setLocalName(workspaceName);
     }, [workspaceName])
 
+
     return (
         <Box sx={sx}>
             <Stack direction={"row"} sx={{alignItems: 'center'}} spacing={1}>
@@ -77,13 +101,16 @@ const SaveWorkspace = ({sx}) => {
                               onClick={() => setEditWorkspaceName(!editWorkspaceName)}
                     />
                 </ButtonBase>
-                <Typography variant={"h5"} fontWeight={""}>File:</Typography>
-                <Typography variant={"body"} >{audioFileName}</Typography>
+                <PrintIcon onClick={handlePrintOutClick} />
+                {isPrinting && <PrintOut ref={printComponentRef} />}
+
+                {/*<Typography variant={"h5"} fontWeight={""}>File:</Typography>*/}
+                {/*<Typography variant={"body"} >{audioFileName}</Typography>*/}
 
 
 
-                <Typography variant={"h5"} >Sample Context: </Typography>
-                <Typography variant={"body"}>{SPEECH_SAMPLE_OPTIONS[speechSampleContext]}</Typography>
+                {/*<Typography variant={"h5"} >Sample Context: </Typography>*/}
+                {/*<Typography variant={"body"}>{SPEECH_SAMPLE_OPTIONS[speechSampleContext]}</Typography>*/}
             </Stack>
             <Button variant={"contained"} onClick={handleOnClick} disabled={workspaceName === '' || !!nameError}>
                 Save Work

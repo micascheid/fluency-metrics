@@ -105,9 +105,6 @@ const DefaultDashboard = () => {
                                 <CustomNotes />
                             </Stack>
                         </Grid>
-                        <Grid item xs={12} sm={12} md={12} lg={12}>
-                            <CreateSummary />
-                        </Grid>
                     </StutteredProvider>
                 </Grid>
             )}

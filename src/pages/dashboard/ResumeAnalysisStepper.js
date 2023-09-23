@@ -20,7 +20,6 @@ import LoadPreviousAudioFile from "./LoadPreviousAudioFile";
 import CorrectAudioFileChecker from "./modals/CorrectAudioFileChecker";
 
 const ResumeAnalysisStepper = (props) => {
-    console.log("RESUME ANALYSIS STEPPER");
     const {
         user,
         workspacesIndex,

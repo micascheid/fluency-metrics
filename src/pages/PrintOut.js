@@ -1,16 +1,22 @@
-import react from 'react';
-import {Box, Typography} from "@mui/material";
+import {forwardRef, useEffect} from 'react';
+import {Box, Typography, styled} from "@mui/material";
 
 
-const PrintOut = () => {
+const StyledBox = styled(Box)({
+    display: 'none',
+    '@media print': {
+        display: 'block'
+    }
 
+});
 
-
+const PrintOut = forwardRef((props, ref) => {
+    console.log("RENDER PRINT OUT");
     return (
-        <Box>
+        <StyledBox ref={ref} >
             <Typography>Re-organized components go here</Typography>
-        </Box>
+        </StyledBox>
     );
-};
+});
 
 export default PrintOut;
