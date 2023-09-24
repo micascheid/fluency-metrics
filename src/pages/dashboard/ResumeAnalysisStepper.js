@@ -17,33 +17,22 @@ import {db} from "../../FirebaseConfig";
 import {StutteredContext} from "../../context/StutteredContext";
 import Loader from "../../components/Loader";
 import LoadPreviousAudioFile from "./LoadPreviousAudioFile";
+import CorrectAudioFileChecker from "./modals/CorrectAudioFileChecker";
 
-const ResumeAnalysisStepper = (props) => {
-    console.log("RESUME ANALYSIS STEPPER");
+const ResumeAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
     const {
         user,
         workspacesIndex,
-        setWorkspacesIndex,
     } = useContext(UserContext);
     const {
-        workspaceName,
-        setWorkspaceName,
-        mode,
-        setMode,
         audioFileName,
         setAudioFileName,
-        audioFile,
         setAudioFile,
-        fileChosen,
         setFileChosen,
         workspaceId,
         setWorkspaceId,
-        isCreateNewWorkspace,
-        setIsGetTranscription,
-        setIsCreateNewWorkspace,
-        setIsUpdateWorkspace,
         setLoadWorkspaceByObj,
-    } = props;
+    } = otherProps;
 
     const workspacesColRef = collection(db, 'users', user.uid, 'workspaces');
     const workspacesIndexRef = collection(db, 'users', user.uid, 'workspaces_index');
@@ -52,7 +41,7 @@ const ResumeAnalysisStepper = (props) => {
     const [isLoadingModal, setIsLoadingModal] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [workspaceObj, setWorkspaceObj] = useState({});
-    // console.log("workspaceID", workspaceId);
+    const [isAudioCheckerModal, setIsAudioCheckerModal] = useState(false);
 
     const handleResumeSelection = (event) => {
         // console.log("selectedResume:", event.target.value);
@@ -80,8 +69,6 @@ const ResumeAnalysisStepper = (props) => {
     };
 
     const handleLoadWorkSpace = () => {
-        //load in workspace dock from db
-
         setIsLoadingModal(true);
     };
 
@@ -106,6 +93,25 @@ const ResumeAnalysisStepper = (props) => {
 
     }
 
+    const handleAudioCheckerModal = () => {
+        setIsAudioCheckerModal(true);
+    };
+
+    const handleAudioCheckNo = () => {
+        setIsAudioCheckerModal(false);
+    };
+
+    const handleAudioCheckYes = async () => {
+        setIsAudioCheckerModal(false);
+        try {
+            handleLoadWorkSpace();
+            await handleLoadObj();
+            setExpanded(false);
+        } catch (error) {
+            console.log("Unable to load workspace:", error);
+        }
+    };
+
     const handleLoadObj = async () => {
         const workspaceRef = doc(db, 'users', user.uid, 'workspaces', localWorkspaceId);
         try {
@@ -123,6 +129,7 @@ const ResumeAnalysisStepper = (props) => {
 
     return (
         <Stack spacing={2}>
+            <CorrectAudioFileChecker audioFileName={audioFileName} isModalOpen={isAudioCheckerModal} onYes={handleAudioCheckYes} onNo={handleAudioCheckNo} />
             <FormControl>
                 <InputLabel>None</InputLabel>
                 <Select
@@ -168,7 +175,7 @@ const ResumeAnalysisStepper = (props) => {
                 <Typography variant={"body1"}>{audioFileName}</Typography>
             </Box>
 
-            <Button variant={"contained"} disabled={!audioFileName || selectedResume === 'None'} onClick={handleLoadObj}>
+            <Button variant={"contained"} disabled={!audioFileName || selectedResume === 'None'} onClick={handleAudioCheckerModal}>
                 Load Workspace
             </Button>
         </Stack>

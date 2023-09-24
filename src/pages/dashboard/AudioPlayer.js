@@ -5,8 +5,7 @@ import React, {
     useState,
     useMemo, useContext,
 } from "react";
-import {WaveSurfer, WaveForm, Marker, Region} from "wavesurfer-react";
-import "./styles.css";
+import {WaveSurfer, WaveForm, Marker, Region} from 'wavesurfer-react';
 import RegionsPlugin from "wavesurfer.js/dist/plugin/wavesurfer.regions.min";
 import TimelinePlugin from "wavesurfer.js/dist/plugin/wavesurfer.timeline.min";
 import MarkersPlugin from "wavesurfer.js/src/plugin/markers";
@@ -18,6 +17,8 @@ import Speed from '@mui/icons-material/Speed';
 import {StutteredContext} from "../../context/StutteredContext";
 import AudioPlayerPopover from "./popovers/AudioPlayerPopover";
 import SaveWorkspace from "./SaveWorkspace";
+import ReactToPrint from "react-to-print";
+import PrintIcon from '@mui/icons-material/Print';
 
 const AudioPlayer = () => {
     // VARIABLES
@@ -26,7 +27,6 @@ const AudioPlayer = () => {
         setCurrentWordIndex,
         currentWordIndex,
         audioFile,
-        audioFileName,
         kiStutteredRegions,
         setkiStutteredRegions,
         setAudioPlayerControl,
@@ -34,6 +34,7 @@ const AudioPlayer = () => {
         playBackSpeed,
         stutteredEvents,
         workspaceName,
+        setAudioFileDuration,
     } = useContext(StutteredContext);
 
     // console.log("AUDIO FILE NAME", audioFile);
@@ -48,12 +49,16 @@ const AudioPlayer = () => {
     const [currentRegion, setCurrentRegion] = useState(null);
     const [stutteredWords, setStutteredWords] = useState({});
     const [popoverKey, setPopoverKey] = useState(null);
+    const [isFlashing, setIsFlashing] = useState(false);
     const isDisabled = transcriptionObj === null;
+
 
     const waveformProps = {
         id: "waveform",
         cursorColor: "#000",
         cursorWidth: 2,
+        scrollParent: true,
+        fillParent: true,
     }
 
     //FUNCTIONS
@@ -67,7 +72,7 @@ const AudioPlayer = () => {
                 plugin: TimelinePlugin,
                 options: {
                     container: "#timeline",
-                    timeInterval: .5
+                    timeInterval: .5,
                 }
             },
             {
@@ -101,6 +106,8 @@ const AudioPlayer = () => {
 
                 wavesurferRef.current.on("ready", () => {
                     console.log("WaveSurfer is ready");
+                    setAudioFileDuration(Math.round(wavesurferRef.current.getDuration()));
+
                 });
 
                 wavesurferRef.current.on("region-removed", (region) => {
@@ -146,6 +153,7 @@ const AudioPlayer = () => {
                 wavesurferRef.current.loadBlob(new Blob([reader.result]));
             }
             reader.readAsArrayBuffer(file)
+
         }
     };
 
@@ -154,11 +162,11 @@ const AudioPlayer = () => {
     };
 
     const playbackSpeedHandler = useCallback((event, value) => {
-        console.log("Playback Speed", value);
-        console.log(wavesurferRef.current.getCurrentTime());
-        wavesurferRef.current.setPlaybackRate(value);
         setPlayBackSpeed(value);
-    }, [playBackSpeed]);
+        if (wavesurferRef.current) {
+            wavesurferRef.current.setPlaybackRate(value);
+        }
+    },[playBackSpeed]);
 
     const playPause = () => {
         if (wavesurferRef.current !== null) {
@@ -166,31 +174,48 @@ const AudioPlayer = () => {
         }
     }
 
+    const isAudioCursorInsideAnyRegion = (cursorTime) => {
+        return Object.values(kiStutteredRegions).some((region) => {
+            return cursorTime >= region.start && cursorTime <= region.end;
+        })
+    }
+
     const handleKeyPress = (event) => {
         if (wavesurferRef.current && !isDisabled) {
+            console.log("WAVESURFER: ", wavesurferRef.current);
+            const audioTime = wavesurferRef.current.getCurrentTime();
             if (event.key === 's') {
-                const time = wavesurferRef.current.getCurrentTime();
-                if (!isCreatingRegion) {
-                    const newRegionTemp = {start: time};
-                    setIsCreatingRegion(true);
-                    setCreatingRegion(newRegionTemp);
-                } else {
-                    const duration = time - creatingRegion.start;
-                    const region = {
-                        start: creatingRegion.start,
-                        end: time,
-                        duration: duration,
-                        color: "rgba(0, 0, 0, .2)"
-                    };
-                    const id = Object.keys(kiStutteredRegions).length;
-                    setkiStutteredRegions(prevRegions => ({
-                        ...prevRegions,
-                        [id]: region
-                    }));
+                if (!isAudioCursorInsideAnyRegion(audioTime)) {
+                    if (!isCreatingRegion) {
+                        const newRegionTemp = {start: audioTime};
+                        setIsCreatingRegion(true);
+                        setCreatingRegion(newRegionTemp);
+                    } else {
+                        const duration = audioTime - creatingRegion.start;
+                        const region = {
+                            start: creatingRegion.start,
+                            end: audioTime,
+                            duration: duration,
+                            color: "rgba(255, 0, 0, .2)",
+                        };
+                        const id = Object.keys(kiStutteredRegions).length;
+                        setkiStutteredRegions(prevRegions => ({
+                            ...prevRegions,
+                            [id]: region
+                        }));
 
-                    setCreatingRegion(null);
-                    setIsCreatingRegion(false);
+                        setCreatingRegion(null);
+                        setIsCreatingRegion(false);
+                    }
+                } else {
+                    setIsFlashing(true);
                 }
+            }
+
+            if (event.key === 'r') {
+                console.log("r");
+                wavesurferRef.current.setBackgroundColor('rgba(255,0,0,.5)');
+                setIsFlashing(true);
             }
 
             if (event.key === " ") {
@@ -252,9 +277,39 @@ const AudioPlayer = () => {
     }, [audioFile]);
 
     useEffect(() => {
+        if (isFlashing && wavesurferRef.current) {
+            wavesurferRef.current.setBackgroundColor('rgba(255,0,0,.2)')
+            const timer = setTimeout(() => {
+                wavesurferRef.current.setBackgroundColor(null);
+                setIsFlashing(false);
+            }, 200);
+
+            return () => clearTimeout(timer);
+        }
+    }, [isFlashing])
+
+    useEffect(() => {
 
         if (transcriptionObj) {
             wavesurferRef.current.on('audioprocess', function (time) {
+                if (isCreatingRegion && isAudioCursorInsideAnyRegion(time)) {
+                    const duration = time - creatingRegion.start;
+                    const region = {
+                        start: creatingRegion.start,
+                        end: time,
+                        duration: duration,
+                        color: "rgba(0, 0, 0, .2)",
+                    };
+                    const id = Object.keys(kiStutteredRegions).length;
+                    setkiStutteredRegions(prevRegions => ({
+                        ...prevRegions,
+                        [id]: region
+                    }));
+
+                    setCreatingRegion(null);
+                    setIsCreatingRegion(false);
+                }
+
                 let newWordIndex = null;
                 Object.keys(transcriptionObj).forEach((key) => {
                     if (time >= transcriptionObj[key].start && time <= transcriptionObj[key].end) {
@@ -285,10 +340,6 @@ const AudioPlayer = () => {
             });
         }
 
-        if (wavesurferRef.current) {
-            wavesurferRef.current.setPlaybackRate(1);
-        }
-
         window.addEventListener('keypress', handleKeyPress);
         return () => {
             window.removeEventListener('keypress', handleKeyPress);
@@ -300,6 +351,26 @@ const AudioPlayer = () => {
             }
         }
     }, [wavesurferRef, transcriptionObj, handleKeyPress, playBackSpeed, kiStutteredRegions]);
+
+    useEffect(() => {
+        if (wavesurferRef.current) {
+            const timelineElem = document.getElementById('timeline');
+
+            const handleTimelineClick = (event) => {
+                const clickPosition = event.offsetX / timelineElem.offsetWidth;
+                // const clickTime = clickPosition * wavesurferRef.current.getDuration();
+                wavesurferRef.current.seekTo(clickPosition);
+            };
+
+            timelineElem.addEventListener('click', handleTimelineClick);
+
+            return () => {
+                timelineElem.removeEventListener('click', handleTimelineClick);
+            };
+        }
+    }, [wavesurferRef]);
+
+
 
 
     return (
@@ -350,7 +421,7 @@ const AudioPlayer = () => {
                     </React.Fragment>
                 ) : (
                     <Box sx={{height: 128, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                        <Typography variant={"h2"} fontWeight={"medium"}>Start or load a new Analysis to get started!</Typography>
+                        <Typography variant={"h2"} fontWeight={"light"}>Start or load a new Analysis to get started!</Typography>
                     </Box>
                 )}
 

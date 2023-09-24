@@ -3,18 +3,15 @@ import {
     addDoc,
     collection,
     doc,
-    getDoc,
     getDocs,
-    query,
     serverTimestamp,
     setDoc,
     updateDoc,
-    where
 } from "firebase/firestore";
 import {db} from "../FirebaseConfig";
 import {UserContext} from "./UserContext";
 import axios from "axios";
-import {BASE_URL} from "../constants";
+import {BASE_URL, UPD_WS_STATUS} from "../constants";
 
 export const StutteredContext = createContext();
 
@@ -22,25 +19,31 @@ export const StutteredContext = createContext();
 
 export const StutteredProvider = (props) => {
     // VARIABLES
-
     const {
         children,
         mode,
+        speechSampleContext,
+        setSpeechSampleContext,
         workspaceName,
         setWorkspaceName,
         setMode,
         audioFileName,
         setAudioFileName,
+        audioFileDuration,
+        setAudioFileDuration,
         audioFile,
         setAudioFile,
         isCreateNewWorkspace,
         setIsCreateNewWorkspace,
-        isGetTranscription,
         loadWorkspaceByObj,
         workspaceId,
+        setWorkspaceId,
+        expanded,
+        setExpanded,
     } = props;
 
     const initialState = {
+        percentSS: 0,
         stutteredEventsCount: 0,
         stutteredEvents: {},
         totalSyllableCount: 0,
@@ -56,10 +59,12 @@ export const StutteredProvider = (props) => {
         longest3Durations: [0, 0, 0],
         audioPlayerControl: null,
         playBackSpeed: 1,
-        workspaceId: null,
+        workspaceId: workspaceId,
         globalYesNo: false,
+        customNotes: '',
+        speechSampleContext: ''
     }
-    // const [workspaceName, setWorkspaceName] = useState('');
+
     const [stutteredEventsCount, setStutteredEventsCount] = useState(initialState.stutteredEventsCount);
     const [stutteredEvents, setStutteredEvents] = useState({});
     const [totalSyllableCount, setTotalSyllableCount] = useState(initialState.totalSyllableCount);
@@ -73,11 +78,15 @@ export const StutteredProvider = (props) => {
     const [audioPlayerControl, setAudioPlayerControl] = useState(initialState.audioPlayerControl);
     const [playBackSpeed, setPlayBackSpeed] = useState(initialState.playBackSpeed);
     const [isLoadingWorkspace, setIsLoadingWorkspace] = useState(false);
+    const [percentSS, setPercentSS] = useState(0);
+    const [customNotes, setCustomNotes] = useState(initialState.customNotes);
+    const [wsSaveStatus, setWsSaveStatus] = useState(UPD_WS_STATUS.IDLE);
     const {user, setWorkspacesIndex} = useContext(UserContext);
 
     //FUNCTIONS
     const resetTransAndSE = async () => {
         setStutteredEventsCount(initialState.stutteredEventsCount);
+        setPercentSS(initialState.percentSS);
         setStutteredEvents(initialState.stutteredEvents);
         setTotalSyllableCount(initialState.totalSyllableCount);
         setTranscriptionObj(initialState.transcriptionObj);
@@ -86,26 +95,31 @@ export const StutteredProvider = (props) => {
         setLoadingTranscription(initialState.loadingTranscription);
         setkiStutteredRegions(initialState.kiStutteredRegions);
         setLongest3Durations(initialState.longest3Durations);
+        setCustomNotes(initialState.customNotes);
     }
 
     const stateSetters = {
-        workspaceName: setWorkspaceName,
-        stutteredEventsCount: setStutteredEventsCount,
+        audioFile: setAudioFile,
+        audioFileName: setAudioFileName,
+        audioPlayerControl: setAudioPlayerControl,
+        averageDuration: setAverageDuration,
+        customNotes: setCustomNotes,
+        currentWordIndex: setCurrentWordIndex,
+        fileChosen: setFileChosen,
+        kiStutteredRegions: setkiStutteredRegions,
+        loadingTranscription: setLoadingTranscription,
+        longest3Durations: setLongest3Durations,
+        mode: setMode,
+        percentSS: setPercentSS,
+        playBackSpeed: setPlayBackSpeed,
+        speechSampleContext: setSpeechSampleContext,
         stutteredEvents: setStutteredEvents,
+        stutteredEventsCount: setStutteredEventsCount,
         totalSyllableCount: setTotalSyllableCount,
         transcriptionObj: setTranscriptionObj,
-        currentWordIndex: setCurrentWordIndex,
-        averageDuration: setAverageDuration,
-        loadingTranscription: setLoadingTranscription,
-        mode: setMode,
-        audioFileName: setAudioFileName,
-        audioFile: setAudioFile,
-        kiStutteredRegions: setkiStutteredRegions,
-        fileChosen: setFileChosen,
-        longest3Durations: setLongest3Durations,
-        audioPlayerControl: setAudioPlayerControl,
-        playBackSpeed: setPlayBackSpeed,
-    }
+        workspaceName: setWorkspaceName,
+    };
+
 
     const updateStateFromObject = (dbWorkspaceObj) => {
         for (let key in dbWorkspaceObj) {
@@ -116,12 +130,12 @@ export const StutteredProvider = (props) => {
     };
 
     const updateWorkspace = async (name) => {
-        console.log("updating workspace: ", name);
         const workspaceColDocRef = doc(db, 'users', user.uid, 'workspaces', workspaceId);
         const workspaceIndexDocRef = doc(db, 'users', user.uid, 'workspaces_index', workspaceId);
         const workspaceObject = {
             workspaceName: name,
             stutteredEventsCount: stutteredEventsCount,
+            percentSS: percentSS,
             stutteredEvents: stutteredEvents,
             totalSyllableCount: totalSyllableCount,
             transcriptionObj: transcriptionObj,
@@ -129,23 +143,29 @@ export const StutteredProvider = (props) => {
             averageDuration: averageDuration,
             loadingTranscription: loadingTranscription,
             mode: mode,
+            speechSampleContext: speechSampleContext,
             audioFileName: audioFileName,
             kiStutteredRegions: kiStutteredRegions,
             fileChosen: fileChosen,
             longest3Durations: longest3Durations,
-            playBackSpeed: playBackSpeed
+            playBackSpeed: playBackSpeed,
+            customNotes: customNotes,
         }
         try {
+            setWorkspaceName(name);
             await updateDoc(workspaceColDocRef, workspaceObject);
             await updateDoc(workspaceIndexDocRef, {name: name});
+            setWsSaveStatus(UPD_WS_STATUS.SUCCESS);
+            const timer = setTimeout(() => {
+                setWsSaveStatus(UPD_WS_STATUS.IDLE);
+            }, 3000);
+
+            return () => clearTimeout(timer);
         } catch (e) {
+            setWsSaveStatus(UPD_WS_STATUS.ERROR);
             console.log("trouble updating doc:", e);
         }
 
-        //update workspace data
-
-
-        //update workspace_index
     };
 
     const createNewWorkspace = async (name, transcriptionObj) => {
@@ -157,7 +177,8 @@ export const StutteredProvider = (props) => {
         const data = {
             name: name,
             creation_time: firestoreTime,
-            audio_file_name: audioFileName
+            audio_file_name: audioFileName,
+            speechSampleContext: speechSampleContext,
         };
         const workspaceObject = {
             workspaceName: name,
@@ -169,20 +190,22 @@ export const StutteredProvider = (props) => {
             averageDuration: averageDuration,
             loadingTranscription: loadingTranscription,
             mode: mode,
+            speechSampleContext: speechSampleContext,
             audioFileName: audioFileName,
             kiStutteredRegions: kiStutteredRegions,
             fileChosen: fileChosen,
             longest3Durations: longest3Durations,
-            playBackSpeed: playBackSpeed
+            playBackSpeed: playBackSpeed,
+            customNotes: '',
         }
         //add workspace first then if successful add workspace_index doc
         try {
             const docData = await addDoc(workspacesColRef, workspaceObject)
             const docRef = doc(workspacesIndexColRef, docData.id);
             await setDoc(docRef, data);
-            // setWorkspaceId(docData.id);
-            console.log("NAME:", name);
+            setWorkspaceId(docData.id);
             setWorkspaceName(name);
+            setExpanded(false);
         } catch (error) {
             console.log("Trouble with workspaces or workspaces index:", error)
         }
@@ -190,7 +213,13 @@ export const StutteredProvider = (props) => {
     };
 
     const handleStutteredChange = (change) => {
-        setStutteredEventsCount(prevCount => prevCount + change);
+        setStutteredEventsCount(prevCount => {
+            const newCount = prevCount + change;
+            const syllables = countTotalSyllables();
+            const percent = (newCount/syllables)*100
+            setPercentSS(parseFloat(Number(percent).toFixed(2)));
+        });
+
     };
 
     const addStutteredEvent = (word_obj, type, syllable_count, ps, newWord, wordIndex) => {
@@ -198,7 +227,7 @@ export const StutteredProvider = (props) => {
         const eventItem = {type: type, duration: duration, ps: ps, text: newWord, uid: wordIndex};
         if (!stutteredEvents.some((obj) => obj.uid === wordIndex)) {
             setStutteredEvents(prevEvents => [...prevEvents, {...eventItem, id: prevEvents.length + 1}])
-            setStutteredEventsCount(prevCount => prevCount + 1);
+            handleStutteredChange(1)
         }
     };
 
@@ -215,7 +244,7 @@ export const StutteredProvider = (props) => {
         };
         if (!stutteredEvents[region.id]) {
             setStutteredEvents(prevEvents => ({...prevEvents, [region.id]: eventItem}));
-            setStutteredEventsCount(prevCount => prevCount + 1);
+            handleStutteredChange(1)
         }
         let changeRegion = kiStutteredRegions[region.id];
         changeRegion.color = "rgba(255, 153, 10, .5)";
@@ -246,15 +275,10 @@ export const StutteredProvider = (props) => {
         });
     };
 
-    const randomFunction = () => {
-        console.log("RANDOM FUNCTION");
-    };
-
     const removeStutteredEvent = (wordIndex) => {
-        console.log(stutteredEvents);
         setStutteredEvents(prevList => prevList.filter(word_obj => word_obj.id !== wordIndex));
         if (stutteredEvents) {
-            setStutteredEventsCount(prevCount => prevCount - 1)
+            handleStutteredChange(-1);
         }
     };
 
@@ -264,7 +288,7 @@ export const StutteredProvider = (props) => {
             delete newEvents[region.id];
             return newEvents;
         });
-        setStutteredEventsCount(preCount => preCount - 1);
+        handleStutteredChange(-1);
     }
 
     const setAdjustedSyllableCount = (index, syllableCount) => {
@@ -280,6 +304,7 @@ export const StutteredProvider = (props) => {
             sum += transcriptionObj[key].syllable_count;
         }
         setTotalSyllableCount(sum);
+        return sum;
     };
 
     const configureDurations = () => {
@@ -289,7 +314,6 @@ export const StutteredProvider = (props) => {
         durations.sort((a, b) => b - a);
         let topThree = durations.slice(0, 3);
         const average = Number((topThree.reduce((a, b) => a + b, 0) / topThree.length).toFixed(2));
-        console.log("AVERAGE", average);
         setLongest3Durations(topThree);
         setAverageDuration(average)
     };
@@ -307,7 +331,7 @@ export const StutteredProvider = (props) => {
         const formData = new FormData();
         formData.append('file', audioFile);
         const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-        await delay(1500);
+        await delay(3000);
         try {
             const response = await axios.post(`${BASE_URL}/get_transcription2`, formData, {
                 headers: {
@@ -335,6 +359,7 @@ export const StutteredProvider = (props) => {
 
         if (Object.keys(kiStutteredRegions).length >= 0 && transcriptionObj) {
             transcriptError();
+            const percent = (stutteredEventsCount/totalSyllableCount)*100
         }
 
     }, [totalSyllableCount, stutteredEventsCount, kiStutteredRegions]);
@@ -344,18 +369,7 @@ export const StutteredProvider = (props) => {
         setStutteredEventsCount(Object.keys(stutteredEvents).length);
     }, [stutteredEvents]);
 
-    //This use Effect handles the updating of a workspace when user manually saves
-    // useEffect(() => {
-    //     (async () => {
-    //         try {
-    //             await updateWorkspace(workspaceName);
-    //         } catch (error) {
-    //             console.log("TROUBLE UPDATING WORKSPACE:", error);
-    //         }
-    //     })();
-    // }, [workspaceName]);
     const updateWorkspacesIndex = async () => {
-        console.log()
         const workspacesIndexTemp = {};
         const workspacesIndexRef = collection(db, 'users', user.uid, 'workspaces_index');
         const workspacesIndexDocs = await getDocs(workspacesIndexRef);
@@ -365,6 +379,21 @@ export const StutteredProvider = (props) => {
 
         setWorkspacesIndex(workspacesIndexTemp);
     }
+
+    useEffect(() => {
+        if (workspaceName){
+            const update = async () => {
+                try {
+                    await updateWorkspace(workspaceName);
+                } catch (error) {
+                    console.log("Unable to save notes to db");
+                }
+            }
+
+            update();
+        }
+
+    }, [customNotes]);
 
     useEffect(() => {
         (async () => {
@@ -379,19 +408,19 @@ export const StutteredProvider = (props) => {
                     setLoadingTranscription(initialState.loadingTranscription);
                     setkiStutteredRegions(initialState.kiStutteredRegions);
                     setLongest3Durations(initialState.longest3Durations);
+                    setCustomNotes(initialState.customNotes);
 
                     const transcriptObj = await get_transcription();
                     await createNewWorkspace(workspaceName, transcriptObj);
                     await updateWorkspacesIndex();
                     setIsCreateNewWorkspace(false);
+
                 } catch (error) {
                     console.log("TROUBLE CREATING WORKSPACE", error);
                 }
 
             }
         })();
-
-
     }, [isCreateNewWorkspace]);
 
     useEffect(() => {
@@ -439,7 +468,6 @@ export const StutteredProvider = (props) => {
             longest3Durations,
             mode,
             playBackSpeed,
-            randomFunction,
             removeStutteredEvent,
             removeStutteredEventsWaveForm,
             resetTransAndSE,
@@ -470,6 +498,13 @@ export const StutteredProvider = (props) => {
             isLoadingWorkspace,
             setIsLoadingWorkspace,
             workspaceId,
+            percentSS,
+            setCustomNotes,
+            customNotes,
+            wsSaveStatus,
+            setAudioFileDuration,
+            audioFileDuration,
+            speechSampleContext
         }
         return (
             <StutteredContext.Provider value={contextValues}>

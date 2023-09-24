@@ -4,15 +4,17 @@ import { forwardRef } from 'react';
 // material-ui
 import { useTheme } from '@mui/material/styles';
 import { Card, CardContent, CardHeader, Divider, Typography } from '@mui/material';
-
 // project import
 import Highlighter from './third-party/Highlighter';
 
 // header style
+
+
 const headerSX = {
-    p: 2.5,
-    '& .MuiCardHeader-action': { m: '0px auto', alignSelf: 'center' }
+    // p: 2.5,
+    '& .MuiCardsHeader-action': { m: '0px auto', alignSelf: 'center' }
 };
+
 
 // ==============================|| CUSTOM - MAIN CARD ||============================== //
 
@@ -27,6 +29,7 @@ const MainCard = forwardRef(
             darkTitle,
             divider = true,
             elevation,
+            help,
             secondary,
             shadow,
             sx = {},
@@ -38,7 +41,9 @@ const MainCard = forwardRef(
     ) => {
         const theme = useTheme();
         boxShadow = theme.palette.mode === 'dark' ? boxShadow || true : boxShadow;
-
+        const dividerStyles = {
+            borderColor: theme.palette.secondary.main,
+        }
         return (
             <Card
                 elevation={elevation || 0}
@@ -46,8 +51,8 @@ const MainCard = forwardRef(
                 {...others}
                 sx={{
                     ...sx,
-                    border: border ? '1px solid' : 'none',
-                    borderRadius: 2,
+                    // border: border ? '1px solid' : 'none',
+                    // borderRadius: 2,
                     borderColor: theme.palette.mode === 'dark' ? theme.palette.divider : theme.palette.grey.A800,
                     boxShadow: boxShadow && (!border || theme.palette.mode === 'dark') ? shadow || theme.customShadows.z1 : 'inherit',
                     ':hover': {
@@ -63,14 +68,14 @@ const MainCard = forwardRef(
             >
                 {/* card header and action */}
                 {!darkTitle && title && (
-                    <CardHeader sx={headerSX} titleTypographyProps={{ variant: 'subtitle1' }} title={title} action={secondary} />
+                    <CardHeader sx={headerSX} titleTypographyProps={{ variant: 'h5' }} title={title} action={help || secondary} />
                 )}
                 {darkTitle && title && (
-                    <CardHeader sx={headerSX} title={<Typography variant="h3">{title}</Typography>} action={secondary} />
+                    <CardHeader sx={headerSX} title={<Typography variant="h3">{title}</Typography>} action={help || secondary} />
                 )}
 
                 {/* content & header divider */}
-                {title && divider && <Divider />}
+                {title && divider && <Divider sx={dividerStyles}/>}
 
                 {/* card content */}
                 {content && <CardContent sx={contentSX}>{children}</CardContent>}
@@ -100,7 +105,10 @@ MainCard.propTypes = {
     secondary: PropTypes.node,
     shadow: PropTypes.string,
     sx: PropTypes.object,
-    title: PropTypes.string,
+    title: PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.node,
+    ]),
     codeHighlight: PropTypes.bool,
     content: PropTypes.bool,
     children: PropTypes.node

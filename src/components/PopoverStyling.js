@@ -7,6 +7,7 @@ const CustomWordInput = styled(TextField)(({theme}) => ({
     '& input': {
         textAlign: 'center',
     },
+
 }));
 
 const CustomSyllableInput = styled(TextField)(({theme}) => ({
@@ -21,7 +22,7 @@ const dividerStyles = {
     "&::before, &::after": {
         borderColor: "lightgray",
     },
-    pt: 2,
+    pt: 1,
     pb: 1,
 }
 

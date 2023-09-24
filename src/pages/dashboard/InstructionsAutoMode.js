@@ -104,8 +104,6 @@ const InstructionsAutoMode = () => {
                         </Typography>
                     </Stack>
                 </ListItem>
-
-
             </List>
         </Box>
     )

@@ -3,6 +3,14 @@ import {Box, Button, Modal, Stack, Typography} from "@mui/material";
 import MainCard from "../../../components/MainCard";
 import {StutteredContext} from "../../../context/StutteredContext";
 
+const style = {
+    position: 'absolute',
+    top:'50%',
+    left: '50%',
+    transform: 'translate(-50%,-50%)',
+    width: 400,
+}
+
 const AreYouSure = ({setAreYouSure, setYesNo}) => {
 
     const [isOpen, setIsOpen] = useState(false);
@@ -10,16 +18,9 @@ const AreYouSure = ({setAreYouSure, setYesNo}) => {
     const handleClose = () => {
         setAreYouSure(false);
     };
-    const style = {
-        position: 'absolute',
-        top:'50%',
-        left: '50%',
-        transform: 'translate(-50%,-50%)',
-        width: 400,
-    }
+
 
     const handleYesClick = async () => {
-        // await resetTransAndSE();
         setYesNo(true);
         handleClose();
     };

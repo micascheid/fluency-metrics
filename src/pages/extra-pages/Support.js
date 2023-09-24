@@ -16,6 +16,14 @@ const Support = () => (
                 micalinscheid@fluencymetrics.com
             </Typography>
         </Stack>
+        <Stack direction={"row"} spacing={2}>
+            <Typography variant="h6">
+                Phone:
+            </Typography>
+            <Typography variant="h6">
+                1-907-942-2446
+            </Typography>
+        </Stack>
         <Divider sx={{width: '100%'}}/>
     </MainCard>
 );
