@@ -1,19 +1,38 @@
 import React, {forwardRef, useContext, useEffect} from 'react';
-import {Box, Typography, styled, Divider, Stack, Grid} from "@mui/material";
+import {
+    Box,
+    Typography,
+    styled,
+    Divider,
+    Stack,
+    Grid,
+    Table,
+    TableHead,
+    TableCell,
+    TableBody,
+    TableRow,
+} from "@mui/material";
 import {StutteredContext} from "../context/StutteredContext";
 import {SPEECH_SAMPLE_OPTIONS} from "../constants";
-import {TypeSpecimenOutlined} from "@mui/icons-material";
-import {DataGrid} from "@mui/x-data-grid";
-import MainCard from "../components/MainCard";
+import logodrawer from '../assets/images/logodrawer.png';
 
 
 const StyledBox = styled(Box)({
-    display: 'none',
+    visibility: 'hidden',
+    width: 0,
+    height: 0,
+    overflow: 'hidden',
     '@media print': {
-        display: 'block'
+        visibility: 'visible',
+        width: 'auto',
+        height: 'auto',
+        margin: '50px'
     }
-
 });
+
+const LocalTableCell = styled(TableCell)({
+    padding: '2px 4px'
+})
 
 const dividerStyles = {
     height: '60px',
@@ -30,7 +49,7 @@ const PrintOut = forwardRef((props, ref) => {
         stutteredEvents,
         customNotes,
         percentSS,
-
+        transcriptionObj
     } = useContext(StutteredContext);
     const getStutterEventTypeTotal = (type) => {
         let total = 0;
@@ -46,25 +65,25 @@ const PrintOut = forwardRef((props, ref) => {
     const prolongation = getStutterEventTypeTotal("Prolongation");
     const block = getStutterEventTypeTotal("Block");
     const interjection = getStutterEventTypeTotal("Interjection");
-
+    console.log("HELLO", Object.values(stutteredEvents))
 
     const renderHighLevelMetrics = () => (
         <Box>
             <Stack direction={"row"} alignItems="stretch" spacing={3}>
                 <Box>
-                    <Typography variant={"subtitle2"}>Frequency</Typography>
+                    <Typography variant={"subtitle1"}>Frequency Stats</Typography>
                     <Typography>Total Syllables: {totalSyllableCount}</Typography>
                     <Typography>Stuttered Events: {stutteredEventsCount}</Typography>
                     <Typography>%SS: {percentSS}</Typography>
                 </Box>
                 <Box>
-                    <Typography variant={"subtitle2"}>Duration</Typography>
+                    <Typography variant={"subtitle1"}>Duration Stats</Typography>
                     <Typography>Average: {averageDuration}</Typography>
                     <Stack direction={"row"}>
                         <Typography>Longest Three: </Typography>
                         {Object.values(longest3Durations).map((duration, index) => {
                             if (duration !== 0) {
-                                return <Typography style={{paddingLeft: "8px", textDecoration: "underline"}}
+                                return <Typography style={{paddingLeft: "2px", textDecoration: "underline"}}
                                                    key={index}>{duration}</Typography>
                             }
                             return null;
@@ -90,57 +109,98 @@ const PrintOut = forwardRef((props, ref) => {
     )
 
     const renderStutteredEvents = () => {
-        const columns = [
-            {field: 'id', headerName: "Event #", flex: 1, valueGetter: (param) => (Number(param.id) + 1).toString()},
-            {field: 'type', headerName: "Type", flex: 1},
-            {field: 'syllable_count', headerName: "Syllables", flex: 1},
-            {field: 'duration', headerName: "Duration", flex: 1, type: 'number', align: 'left', headerAlign: 'left'},
-            {field: 'ps', headerName: "Phys Conc", flex: 1, type: 'number', align: 'left', headerAlign: 'left'},
-            {field: 'text', headerName: "Text", flex: 1},
-        ]
         return (
-            <Box sx={{minHeight: '1px'}}>
-                {Object.keys(stutteredEvents).length > 0 ? (
-                    <DataGrid
-                        rows={Object.values(stutteredEvents)}
-                        columns={columns}
-                        sx={{borderColor: '#000'}}
-                    />
-                ) : (
-                    <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                        <Typography variant={"h4"}>Disfluency events will show up here</Typography>
-                    </Box>
-                )
-                }
-
+            <Box>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <LocalTableCell>Event #</LocalTableCell>
+                            <LocalTableCell>Type</LocalTableCell>
+                            <LocalTableCell>Syllables</LocalTableCell>
+                            <LocalTableCell>Duration</LocalTableCell>
+                            <LocalTableCell>Phys Conc</LocalTableCell>
+                            <LocalTableCell>Text</LocalTableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {Object.values(stutteredEvents).map((event, index) => (
+                            <TableRow
+                                key={index}
+                            >
+                                <LocalTableCell>{Number(event.id) + 1}</LocalTableCell>
+                                <LocalTableCell>{event.type}</LocalTableCell>
+                                <LocalTableCell>{event.syllable_count}</LocalTableCell>
+                                <LocalTableCell>{event.duration.toFixed(2)}</LocalTableCell>
+                                <LocalTableCell>{event.ps}</LocalTableCell>
+                                <LocalTableCell>{event.text}</LocalTableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
             </Box>
         );
     };
 
+    const renderTranscription = () => {
+        const transcription = Object.values(transcriptionObj)
+            .map((value) => value.punctuated_word)
+            .join(' ');
+        return (
+            <Box>
+                <Typography variant={"body1"}>{transcription}</Typography>
+            </Box>
+        );
+    };
+
+
     return (
+
         <StyledBox ref={ref}>
-            {/*Title Area*/}
-            <Typography variant={"h4"} fontWeight={"medium"}>Workspace Name: {workspaceName}</Typography>
-            <Typography variant={"h4"} fontWeight={"medium"}>Speech Sample
-                Context: {SPEECH_SAMPLE_OPTIONS[speechSampleContext]}</Typography>
-            <Box marginBottom={2}/>
-            {/*High Level Fluency summary*/}
-            <Grid container spacing={2}>
+            <Grid container alignItems="center" spacing={2}>
+                {/* Logo and Main Title Area */}
+                <Grid item xs={12}>
+                    <Grid container alignItems="center" spacing={2}>
+                        <Grid item>
+                            <img src={logodrawer} alt="Your Logo"
+                                 style={{width: 50, height: 50}}/> {/* Adjust size as needed */}
+                        </Grid>
+                        <Grid item>
+                            <Typography variant="h3">Fluency Metrics Summary</Typography>
+                        </Grid>
+                    </Grid>
+                </Grid>
+                {/*Title Area*/}
+                <Grid item xs={12}>
+                    <Typography variant={"h5"} fontWeight={"medium"}>Workspace Name: {workspaceName}</Typography>
+                    <Typography variant={"h5"} fontWeight={"medium"}>Speech Sample
+                        Context: {SPEECH_SAMPLE_OPTIONS[speechSampleContext]}</Typography>
+                    <Box marginBottom={2}/>
+                </Grid>
+
+                {/*High Level Fluency summary*/}
+                {/*<Grid container spacing={2}>*/}
                 <Grid item xs={5}>
-                    <Typography variant={"subtitle1"} fontWeight={"medium"}>High Level Summary:</Typography>
-                    {renderHighLevelMetrics()}
+                    <Box sx={{justifyContent: 'center'}}>
+                        <Typography variant={"subtitle1"} fontWeight={"medium"}>High Level Summary:</Typography>
+                        {renderHighLevelMetrics()}
+                    </Box>
                 </Grid>
                 <Grid item xs={7}>
-                    <Typography variant={"subtitle1"} fontWeight={"medium"}>Custom Notes:</Typography>
+                    <Typography variant={"subtitle1"} fontWeight={"medium"}>Additional Notes:</Typography>
                     {renderCustomNotes()}
                 </Grid>
                 <Grid item xs={12}>
-                    <Typography variant={"subtitle1"} fontWeight={"medium"}>Stuttered Events:</Typography>
+                    <Typography variant={"h5"} fontWeight={"medium"}>Transcription:</Typography>
+                    {renderTranscription()}
+                </Grid>
+                <Grid item xs={12}>
+                    {/*<Typography variant={"subtitle1"} fontWeight={"medium"}>Stuttered Events:</Typography>*/}
                     {renderStutteredEvents()}
                 </Grid>
             </Grid>
 
         </StyledBox>
+
     );
 });
 

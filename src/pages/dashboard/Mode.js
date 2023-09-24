@@ -128,7 +128,7 @@ const Mode = (props) => {
                                         <NewAnalysisStepper {...props} setExpanded={setExpanded} expanded={expanded}/>
                                     </CustomTabPanel>
                                     <CustomTabPanel value={tabValue} index={1}>
-                                        <ResumeAnalysisStepper {...props}/>
+                                        <ResumeAnalysisStepper {...props} setExpanded={setExpanded}/>
                                     </CustomTabPanel>
                                 </Box>
                             </Box>

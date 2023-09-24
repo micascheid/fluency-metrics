@@ -19,7 +19,7 @@ import Loader from "../../components/Loader";
 import LoadPreviousAudioFile from "./LoadPreviousAudioFile";
 import CorrectAudioFileChecker from "./modals/CorrectAudioFileChecker";
 
-const ResumeAnalysisStepper = (props) => {
+const ResumeAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
     const {
         user,
         workspacesIndex,
@@ -32,7 +32,7 @@ const ResumeAnalysisStepper = (props) => {
         workspaceId,
         setWorkspaceId,
         setLoadWorkspaceByObj,
-    } = props;
+    } = otherProps;
 
     const workspacesColRef = collection(db, 'users', user.uid, 'workspaces');
     const workspacesIndexRef = collection(db, 'users', user.uid, 'workspaces_index');
@@ -106,6 +106,7 @@ const ResumeAnalysisStepper = (props) => {
         try {
             handleLoadWorkSpace();
             await handleLoadObj();
+            setExpanded(false);
         } catch (error) {
             console.log("Unable to load workspace:", error);
         }

@@ -101,8 +101,10 @@ const SaveWorkspace = ({sx}) => {
                               onClick={() => setEditWorkspaceName(!editWorkspaceName)}
                     />
                 </ButtonBase>
-                <ButtonBase disabled={editWorkspaceName === ''} disableRipple>
-                    <PrintIcon onClick={handlePrintOutClick} />
+                <ButtonBase disabled={workspaceName === ''}>
+                    <PrintIcon
+                        sx={workspaceName ? {color: theme.palette.primary.main} : {color: theme.palette.secondary.main}}
+                        onClick={handlePrintOutClick} />
                 </ButtonBase>
 
                 {isPrinting && <PrintOut ref={printComponentRef} />}

@@ -16,7 +16,6 @@ const NewAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
         setWorkspaceName,
         mode,
         setMode,
-        speechSampleContext,
         setSpeechSampleContext,
         audioFileName,
         setAudioFileName,
