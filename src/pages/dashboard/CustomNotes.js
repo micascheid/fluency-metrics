@@ -11,7 +11,6 @@ const CustomNotes = () => {
         workspaceName,
         setCustomNotes,
         customNotes,
-        wsSaveStatus,
     } = useContext(StutteredContext);
     const [localNotes, setLocalNotes] = useState(customNotes);
     const saveNotesDisabled = !workspaceName;

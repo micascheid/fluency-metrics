@@ -152,7 +152,7 @@ export const StutteredProvider = (props) => {
             customNotes: customNotes,
         }
         try {
-            setWorkspaceName(UPD_WS_STATUS.SAVING);
+            setWorkspaceName(name);
             await updateDoc(workspaceColDocRef, workspaceObject);
             await updateDoc(workspaceIndexDocRef, {name: name});
             setWsSaveStatus(UPD_WS_STATUS.SUCCESS);

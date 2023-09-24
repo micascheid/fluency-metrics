@@ -101,16 +101,12 @@ const SaveWorkspace = ({sx}) => {
                               onClick={() => setEditWorkspaceName(!editWorkspaceName)}
                     />
                 </ButtonBase>
-                <PrintIcon onClick={handlePrintOutClick} />
+                <ButtonBase disabled={editWorkspaceName === ''} disableRipple>
+                    <PrintIcon onClick={handlePrintOutClick} />
+                </ButtonBase>
+
                 {isPrinting && <PrintOut ref={printComponentRef} />}
 
-                {/*<Typography variant={"h5"} fontWeight={""}>File:</Typography>*/}
-                {/*<Typography variant={"body"} >{audioFileName}</Typography>*/}
-
-
-
-                {/*<Typography variant={"h5"} >Sample Context: </Typography>*/}
-                {/*<Typography variant={"body"}>{SPEECH_SAMPLE_OPTIONS[speechSampleContext]}</Typography>*/}
             </Stack>
             <Button variant={"contained"} onClick={handleOnClick} disabled={workspaceName === '' || !!nameError}>
                 Save Work
