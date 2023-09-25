@@ -41,7 +41,6 @@ const Help = ({children, title}) => {
 
     return (
         <Fragment>
-
             <Stack spacing={1} direction={"row"} sx={{alignItems: 'center'}}>
                 <HelpOutline
                     sx={{

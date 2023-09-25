@@ -32,8 +32,8 @@ const ExpandMore = styled((props) => {
 const Mode = (props) => {
     const {
         expanded,
-        setExpanded,
         help,
+        setExpanded,
         setAudioFileName,
         setAudioFile,
         setFileChosen,
@@ -105,14 +105,14 @@ const Mode = (props) => {
                     </ExpandMore>
                     <Box flexGrow={1}>
                         <Help title={"Start/Resume Analysis"}>
-                            <HelpMode/>
+                            {help}
                         </Help>
                     </Box>
                 </Stack>
-            }>
+            }
+            >
                 <Collapse in={expanded} timeout="auto" unmountOnExit>
                     {showAreYouSure && <AreYouSure setAreYouSure={setShowAreYouSure}/>}
-                    {/*<Collapse in={expanded} timeout="auto" unmountOnExit>*/}
                     <Grid container spacing={2}>
                         <Grid item xs={5} sm={5} md={5} lg={5}>
                             <Box width={"100%"}>

@@ -11,15 +11,24 @@ import {UserContext} from "../../context/UserContext";
 import LoadingOverlay from "./LoadingOverlay";
 import {StutteredProvider} from "../../context/StutteredContext";
 import HelpMode from "./help-components/HelpMode";
-import CustomNotes from "./CustomNotes";
+import AdditionalNotes from "./AdditionalNotes";
 import CreateSummary from "./CreateSummary";
+import HelpAudioPlayer from "./help-components/HelpAudioPlayer";
+import HelpTranscription from "./help-components/HelpTranscription";
+import HelpDisfluencyEvents from "./help-components/HelpDisfluencyEvents";
+import HelpFluencyCounts from "./help-components/HelpFluencyCounts";
+import HelpAdditionalNotes from "./help-components/HelpAdditionalNotes";
+import HelpWorkspace from "./help-components/HelpWorkspace";
+import Workspace from "./Workspace";
+import HighLevelSummary from "./HighLevelSummary";
+import {useTheme} from "@mui/material/styles";
 
 
 const DefaultDashboard = () => {
     const {
         isLoading,
     } = useContext(UserContext);
-
+    const theme = useTheme();
     const [mode, setMode] = useState('');
     const [speechSampleContext, setSpeechSampleContext] = useState('');
     const [audioFile, setAudioFile] = useState(null)
@@ -65,7 +74,7 @@ const DefaultDashboard = () => {
     }
 
     useEffect(() => {
-        const beforeUnloadListenter =(event) => {
+        const beforeUnloadListenter = (event) => {
             event.preventDefault();
             event.returnValue = 'Refreshing will result in loss of unsaved work';
         };
@@ -89,22 +98,37 @@ const DefaultDashboard = () => {
                         <Mode {...propValues} help={<HelpMode/>}/>
                     </Grid>
                     <StutteredProvider {...propValues}>
-                        <Grid item xs={12} sm={12} md={12} lg={12}>
-                            <AudioPlayer/>
-                        </Grid>
-                        <Grid item xs={12} sm={12} md={12} lg={12}>
-                            <Transcription/>
-                        </Grid>
-                        <Grid item xs={12} sm={12} md={6} lg={6}>
-                            <StutteredEvents/>
+                        <Grid item xs={12}>
+                            <Workspace help={<HelpWorkspace/>}>
+                                <Grid item container xs={12} spacing={2}>
+                                    <Grid item xs={12}>
+                                        <AudioPlayer help={<HelpAudioPlayer/>} cardColor={theme.palette.grey[300]}/>
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        <Transcription help={<HelpTranscription/>} cardColor={theme.palette.grey[300]}/>
+                                    </Grid>
+                                </Grid>
+                            </Workspace>
                         </Grid>
 
-                        <Grid item xs={12} sm={12} md={6} lg={6}>
-                            <Stack spacing={2}>
-                                <FluencyCounts/>
-                                <CustomNotes />
-                            </Stack>
+                        <Grid item xs={12}>
+                            <HighLevelSummary>
+                                <Grid item container xs={12} spacing={2}>
+                                    <Grid item xs={12} sm={12} md={6} lg={6}>
+                                        <StutteredEvents help={<HelpDisfluencyEvents/>}/>
+                                    </Grid>
+
+                                    <Grid item xs={12} sm={12} md={6} lg={6}>
+                                        <Stack spacing={2}>
+                                            <FluencyCounts help={<HelpFluencyCounts/>}/>
+                                            <AdditionalNotes help={<HelpAdditionalNotes/>}/>
+                                        </Stack>
+                                    </Grid>
+                                </Grid>
+                            </HighLevelSummary>
                         </Grid>
+
+
                     </StutteredProvider>
                 </Grid>
             )}

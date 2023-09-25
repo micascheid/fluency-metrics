@@ -19,8 +19,10 @@ import AudioPlayerPopover from "./popovers/AudioPlayerPopover";
 import SaveWorkspace from "./SaveWorkspace";
 import ReactToPrint from "react-to-print";
 import PrintIcon from '@mui/icons-material/Print';
+import Help from "./Help";
+import {useTheme} from "@mui/material/styles";
 
-const AudioPlayer = () => {
+const AudioPlayer = (props) => {
     // VARIABLES
     const {
         transcriptionObj,
@@ -37,6 +39,8 @@ const AudioPlayer = () => {
         setAudioFileDuration,
     } = useContext(StutteredContext);
 
+    const {help, cardColor} = props;
+    const theme = useTheme();
     // console.log("AUDIO FILE NAME", audioFile);
     const [timelineVis, setTimelineVis] = useState(true);
     const [zoomLevel, setZoomLevel] = useState(1);
@@ -166,7 +170,7 @@ const AudioPlayer = () => {
         if (wavesurferRef.current) {
             wavesurferRef.current.setPlaybackRate(value);
         }
-    },[playBackSpeed]);
+    }, [playBackSpeed]);
 
     const playPause = () => {
         if (wavesurferRef.current !== null) {
@@ -371,10 +375,16 @@ const AudioPlayer = () => {
     }, [wavesurferRef]);
 
 
-
-
     return (
-        <MainCard>
+        <MainCard title={
+            <Box flexGrow={1}>
+                <Help title={"Audio Player"}>
+                    {help}
+                </Help>
+            </Box>
+        }
+            // sx={{backgroundColor: theme.palette.grey[300]}}
+        >
             <Stack>
                 {audioFile ? (
                     <React.Fragment>
@@ -421,7 +431,8 @@ const AudioPlayer = () => {
                     </React.Fragment>
                 ) : (
                     <Box sx={{height: 128, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                        <Typography variant={"h2"} fontWeight={"light"}>Start or load a new Analysis to get started!</Typography>
+                        <Typography variant={"h2"} fontWeight={"light"}>Start or load a new Analysis to get
+                            started!</Typography>
                     </Box>
                 )}
 
@@ -447,17 +458,11 @@ const AudioPlayer = () => {
                             sx={{width: 90, mr: 10}}
                         />
                     </Box>
-                    <Button variant={"contained"} onClick={(event) => {
+                    <Button variant={"outlined"} onClick={(event) => {
                         play();
                         event.currentTarget.blur();
                     }}
                             disabled={isDisabled}>Play / Pause</Button>
-                    <Button variant={"contained"} onClick={(event) => {
-                        toggleTimeline();
-                        event.currentTarget.blur();
-                    }} disabled={isDisabled}>
-                        Toggle
-                        timeline</Button>
                     <ZoomOut/>
                     <Box sx={{width: 100}}>
                         <Slider

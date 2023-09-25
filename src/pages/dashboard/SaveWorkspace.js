@@ -11,7 +11,7 @@ import {SPEECH_SAMPLE_OPTIONS} from "../../constants";
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import PrintIcon from "@mui/icons-material/Print";
 import ReactToPrint, {useReactToPrint} from "react-to-print";
-import PrintOut from "../PrintOut";
+import PrintOut from "./PrintOut";
 
 const SaveWorkspace = ({sx}) => {
     const {
@@ -78,14 +78,37 @@ const SaveWorkspace = ({sx}) => {
     };
 
     useEffect(() => {
+        const handleKeyDown = (e) => {
+            // Check if either 'Ctrl' or 'Cmd' is pressed along with 'P'
+            if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+                e.preventDefault();  // Prevent the default print dialog
+                handlePrintOutClick();
+            }
+        };
+
+        // Add the event listener to the window object
+        // document.addEventListener('keydown', handleKeyDown, true);
+        window.addEventListener('keydown', handleKeyDown, true);
+
+        // Clean up the event listener when the component is unmounted
+        return () => {
+            // document.removeEventListener('keydown', handleKeyDown, true);
+            window.removeEventListener('keydown', handleKeyDown, true);
+        };
+    }, []);
+
+
+    useEffect(() => {
         setLocalName(workspaceName);
     }, [workspaceName])
+
+
 
 
     return (
         <Box sx={sx}>
             <Stack direction={"row"} sx={{alignItems: 'center'}} spacing={1}>
-                <Typography variant={"h5"}>Current Workspace: </Typography>
+                <Typography variant={"h5"} fontWeight={"medium"}>Current Workspace: </Typography>
                 <TextField
                     required
                     error={isNameError}
@@ -110,7 +133,7 @@ const SaveWorkspace = ({sx}) => {
                 {isPrinting && <PrintOut ref={printComponentRef} />}
 
             </Stack>
-            <Button variant={"contained"} onClick={handleOnClick} disabled={workspaceName === '' || !!nameError}>
+            <Button variant={"outlined"} onClick={handleOnClick} disabled={workspaceName === '' || !!nameError}>
                 Save Work
             </Button>
             <Typography

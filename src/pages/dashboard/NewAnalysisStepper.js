@@ -180,7 +180,7 @@ const NewAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
                 </Stack>
 
                 <Button
-                    variant={"outlined"}
+                    variant={"contained"}
                     disabled={(!!nameError || localWorkspaceName === '') && localSpeechContext !== ''}
                     onClick={handleCreateWorkspace}
                 >Create Workspace</Button>

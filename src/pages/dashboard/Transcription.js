@@ -6,9 +6,10 @@ import WordComponent from "./WordComponent";
 import TranscriptionAuto from "./TranscriptionAuto";
 import TranscriptionManual from "./TranscriptionManual";
 import {AUTO, MANUAL} from "../../constants";
+import Help from "./Help";
 
 
-const Transcription = () => {
+const Transcription = (props) => {
     // variables
     const {
         mode,
@@ -17,6 +18,7 @@ const Transcription = () => {
         countTotalSyllables,
         audioFileDuration,
     } = useContext(StutteredContext);
+    const {help, cardColor} = props;
 
     const transcriptionTimeEstimate = () => {
         const finalDur = Math.round(audioFileDuration / 60) * 6;
@@ -41,9 +43,16 @@ const Transcription = () => {
     const transcriptionEstimate = transcriptionTimeEstimate();
 
     return (
-        <MainCard>
+        <MainCard title={
+            <Box flexGrow={1}>
+                <Help title={"Transcription"}>
+                    {help}
+                </Help>
+            </Box>
+        }
+        // sx={{backgroundColor: cardColor}}
+        >
             {loadingTranscription ? (
-                // <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', pt: 2}}>
                     <Stack alignItems={'center'}>
                         <CircularProgress/>
                         <Typography variant={"h4"} fontWeight={"light"}>Hang tight! Transcription processing time is:</Typography>

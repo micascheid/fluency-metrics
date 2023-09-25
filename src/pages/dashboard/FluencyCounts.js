@@ -2,6 +2,7 @@ import React, {useContext} from 'react';
 import MainCard from "../../components/MainCard";
 import {Box, Divider, List, Stack, Typography} from "@mui/material";
 import {StutteredContext} from "../../context/StutteredContext";
+import Help from "./Help";
 
 
 
@@ -9,20 +10,26 @@ const dividerStyles = {
     height: '60px',
     borderColor: '#000',
 }
-const FluencyCounts = () => {
+const FluencyCounts = (props) => {
     const {
         totalSyllableCount,
         stutteredEventsCount,
         averageDuration,
         longest3Durations
     } = useContext(StutteredContext);
-
+    const {help} = props;
     const percentSS = totalSyllableCount === 0 ?
         0:
         Number((stutteredEventsCount/totalSyllableCount)*100).toFixed(2);
 
     return (
-        <MainCard title={"Fluency Counts"}>
+        <MainCard title={
+            <Box flexGrow={1}>
+                <Help title={"Fluency Counts"}>
+                    {help}
+                </Help>
+            </Box>
+        }>
             <Stack direction={"row"} alignItems="stretch" spacing={3}>
                 <Box display={"flex"} flexDirection={"column"} flexGrow={1}>
                     <Typography variant={"h5"}>Frequency</Typography>
