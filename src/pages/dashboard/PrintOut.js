@@ -1,4 +1,4 @@
-import React, { forwardRef, useContext } from 'react';
+import React, {forwardRef, useContext} from 'react';
 import {
     Box,
     Typography,
@@ -10,8 +10,8 @@ import {
     TableBody,
     TableRow, Stack,
 } from "@mui/material";
-import { StutteredContext } from "../../context/StutteredContext";
-import { SPEECH_SAMPLE_OPTIONS } from "../../constants";
+import {StutteredContext} from "../../context/StutteredContext";
+import {SPEECH_SAMPLE_OPTIONS} from "../../constants";
 import logodrawer from '../../assets/images/logodrawer.png';
 import {useTheme} from "@mui/material/styles";
 
@@ -60,6 +60,7 @@ const PrintOut = forwardRef((props, ref) => {
         transcriptionObj,
     } = useContext(StutteredContext);
     const theme = useTheme();
+
     const getStutterEventTypeTotal = (type) => {
         let total = 0;
         Object.values(stutteredEvents).forEach((val) => {
@@ -91,7 +92,8 @@ const PrintOut = forwardRef((props, ref) => {
                             <SubtitleTypography variant={"subtitle1"}>Duration Stats</SubtitleTypography>
                             <Typography>Average: {averageDuration}</Typography>
                             <Typography>
-                                Longest Three: {Object.values(longest3Durations).filter(duration => duration !== 0).join(', ')}
+                                Longest
+                                Three: {Object.values(longest3Durations).filter(duration => duration !== 0).join(', ')}
                             </Typography>
                         </Grid>
                     </Grid>
@@ -148,7 +150,7 @@ const PrintOut = forwardRef((props, ref) => {
             <Box>
                 {Object.values(transcriptionObj).map((value, index) => {
                     return value.stuttered ? (
-                        <span key={index} style={{ backgroundColor: theme.palette.grey.A200, padding: '2px' }}>
+                        <span key={index} style={{backgroundColor: theme.palette.grey.A200, padding: '2px'}}>
                         {value.punctuated_word}
                     </span>
                     ) : (
@@ -165,28 +167,44 @@ const PrintOut = forwardRef((props, ref) => {
                 <Grid item xs={12}>
                     <Grid container alignItems="center" spacing={2}>
                         <Grid item xs={1}>
-                            <img src={logodrawer} alt="Your Logo" style={{ width: 50, height: 50 }} />
+                            <img src={logodrawer} alt="Your Logo" style={{width: 50, height: 50}}/>
                         </Grid>
-                        <Grid item xs={11} style={{ textAlign: 'center' }}>
+                        <Grid item xs={11} style={{textAlign: 'center'}}>
                             <TitleTypography variant="h3">Fluency Metrics Summary</TitleTypography>
                         </Grid>
                     </Grid>
                 </Grid>
                 <Grid item xs={12}>
                     <Typography variant={"h5"} fontWeight={"medium"}>Workspace Name: {workspaceName}</Typography>
-                    <Typography variant={"h5"} fontWeight={"medium"}>Speech Sample Context: {SPEECH_SAMPLE_OPTIONS[speechSampleContext]}</Typography>
+                    <Typography variant={"h5"} fontWeight={"medium"}>Speech Sample
+                        Context: {SPEECH_SAMPLE_OPTIONS[speechSampleContext]}</Typography>
                 </Grid>
                 <Grid item xs={5}>
-                    <SubtitleTypography variant={"subtitle1"}>High Level Summary:</SubtitleTypography>
-                    {renderHighLevelMetrics()}
+                    <Box sx={{borderColor: '#000', borderStyle: 'solid', borderWidth: 1}}>
+                        <Box sx={{padding: 1}}>
+                            <SubtitleTypography variant={"subtitle1"}>High Level Summary:</SubtitleTypography>
+                            {renderHighLevelMetrics()}
+                        </Box>
+
+                    </Box>
+
                 </Grid>
                 <Grid item xs={7}>
-                    <SubtitleTypography variant={"subtitle1"}>Additional Notes:</SubtitleTypography>
-                    {renderCustomNotes()}
+                    <Box sx={{borderColor: '#000', borderStyle: 'solid', borderWidth: 1}}>
+                        <Box sx={{padding: 1}}>
+                            <SubtitleTypography variant={"subtitle1"}>Additional Notes:</SubtitleTypography>
+                            {renderCustomNotes()}
+                        </Box>
+                    </Box>
+
                 </Grid>
                 <Grid item xs={12}>
-                    <SubtitleTypography variant={"h5"}>Transcription:</SubtitleTypography>
-                    {renderTranscription()}
+                    <Box sx={{borderColor: '#000', borderStyle: 'solid', borderWidth: 1}}>
+                        <Box sx={{padding: 1}}>
+                            <SubtitleTypography variant={"h5"}>Transcription:</SubtitleTypography>
+                            {renderTranscription()}
+                        </Box>
+                    </Box>
                 </Grid>
                 <Grid item xs={12}>
                     <SubtitleTypography variant={"subtitle1"}>Stuttered Events:</SubtitleTypography>

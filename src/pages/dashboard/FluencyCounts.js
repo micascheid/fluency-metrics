@@ -15,12 +15,29 @@ const FluencyCounts = (props) => {
         totalSyllableCount,
         stutteredEventsCount,
         averageDuration,
-        longest3Durations
+        longest3Durations,
+        stutteredEvents,
     } = useContext(StutteredContext);
     const {help} = props;
     const percentSS = totalSyllableCount === 0 ?
         0:
         Number((stutteredEventsCount/totalSyllableCount)*100).toFixed(2);
+
+    const getStutterEventTypeTotal = (type) => {
+        let total = 0;
+        Object.values(stutteredEvents).forEach((val) => {
+            if (val.type === type) {
+                total += 1;
+            }
+        });
+        return total;
+    }
+
+    const repWholeWord = getStutterEventTypeTotal("Rep. Whole Word");
+    const repSyllable = getStutterEventTypeTotal("Rep. Syllable");
+    const prolongation = getStutterEventTypeTotal("Prolongation");
+    const block = getStutterEventTypeTotal("Block");
+    const interjection = getStutterEventTypeTotal("Interjection");
 
     return (
         <MainCard title={
@@ -43,16 +60,26 @@ const FluencyCounts = (props) => {
                 <Box display={"flex"} flexDirection={"column"} flexGrow={1}>
                     <Typography variant={"h5"}>Duration</Typography>
                     <Typography>Average: {averageDuration}</Typography>
+
                     <Stack direction={"row"}>
                         <Typography>Longest Three: </Typography>
                         {Object.values(longest3Durations).map((duration, index) => {
                             if (duration !== 0) {
-                                return <Typography style={{paddingLeft: "8px", textDecoration: "underline"}} key={index}>{duration}</Typography>
+                                return <Typography style={{paddingLeft: "8px"}} key={index}>{duration}</Typography>
                             }
                             return null;
                         })}
                     </Stack>
                 </Box>
+                <Divider orientation={"vertical"} sx={dividerStyles}></Divider>
+                <Box display={"flex"} flexDirection={"column"} flexGrow={1}><Stack spacing={1}>
+                    <Typography variant={"h5"}>Type Totals</Typography>
+                    <Typography>Rep. Whole Word: {repWholeWord}</Typography>
+                    <Typography>Rep. Syllable: {repSyllable}</Typography>
+                    <Typography>Prolongation: {prolongation}</Typography>
+                    <Typography>Block: {block}</Typography>
+                    <Typography>Interjection: {interjection}</Typography>
+                </Stack></Box>
             </Stack>
 
         </MainCard>

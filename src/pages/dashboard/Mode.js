@@ -104,7 +104,7 @@ const Mode = (props) => {
                         <ExpandMoreIcon/>
                     </ExpandMore>
                     <Box flexGrow={1}>
-                        <Help title={"Start/Resume Analysis"}>
+                        <Help title={"Start/Resume Workspace"}>
                             {help}
                         </Help>
                     </Box>
@@ -119,8 +119,8 @@ const Mode = (props) => {
                                 <Box sx={{mb: 2}}>
                                     <Tabs value={tabValue} onChange={handleTabChange} variant={'fullWidth'}
                                           sx={{boxShadow: '0px 2px 4px rgba(0,0,0,0.2)'}}>
-                                        <Tab label={"New Analysis"}/>
-                                        <Tab label={"Resume Analysis"}/>
+                                        <Tab label={"New Workspace"}/>
+                                        <Tab label={"Resume Workspace"}/>
                                     </Tabs>
                                 </Box>
                                 <Box>

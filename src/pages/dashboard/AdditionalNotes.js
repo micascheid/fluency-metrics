@@ -47,7 +47,7 @@ const AdditionalNotes = (props) => {
               <TextField
                 multiline
                 minRows={5}
-                maxRows={15}
+                maxRows={10}
                 fullWidth
                 placeholder={"Notes Here"}
                 onKeyPress={(event) => {event.stopPropagation();}}
