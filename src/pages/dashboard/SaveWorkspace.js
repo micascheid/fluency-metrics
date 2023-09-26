@@ -82,9 +82,16 @@ const SaveWorkspace = ({sx}) => {
                         onChange={handleOnChange}
                         label={"Workspace Name"}
                     />
-                    <ButtonBase disabled={editWorkspaceName === ''} disableRipple>
-                        <EditIcon sx={editWorkspaceName ? {color: theme.palette.primary.main} : {color: theme.palette.secondary.main}}
-                                  onClick={() => setEditWorkspaceName(!editWorkspaceName)}
+                    <ButtonBase disabled={editWorkspaceName === ''}>
+                        <EditIcon
+                            sx={{
+                                borderRadius: '5px',
+                                color: editWorkspaceName ? theme.palette.primary.main : theme.palette.secondary.main,
+                                '&:hover': {
+                                    color: theme.palette.primary.main
+                                }
+                            }}
+                            onClick={() => setEditWorkspaceName(!editWorkspaceName)}
                         />
                     </ButtonBase>
                 </Stack>

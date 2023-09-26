@@ -32,12 +32,10 @@ const dividerStyles = {
 
 const WordSpan = styled('span')(({ isClicked, theme }) => ({
     cursor: 'pointer',
-    // transition: 'background-color 0.3s',
     backgroundColor: isClicked ? 'yellow' : 'inherit',
     '&:hover': {
         backgroundColor: 'yellow !important'
     },
-    // ...theme.typography.body1 // assuming you want the same typography for the span
 }));
 
 const WordComponent = ({word, word_obj, onUpdateWord, index, style}) => {
@@ -205,14 +203,6 @@ const WordComponent = ({word, word_obj, onUpdateWord, index, style}) => {
                             </IconButton>
                         </Box>
 
-                        {/*<Divider textAlign={"left"} sx={dividerStyles}>Stuttered Event</Divider>*/}
-                        {/*<Box sx={{ display: 'flex', alignItems: "center", justifyContent: "left"}}>*/}
-                        {/*    <Checkbox*/}
-                        {/*        checked={isStuttered}*/}
-                        {/*        onChange={()=>setIsStuttered(prevState => !prevState)}*/}
-                        {/*        onClick={(e) => e.stopPropagation()}*/}
-                        {/*    />*/}
-                        {/*</Box>*/}
                         <Divider textAlign={"left"} sx={dividerStyles}>Text</Divider>
                         <CustomWordInput
                             value={newWord}
@@ -229,36 +219,6 @@ const WordComponent = ({word, word_obj, onUpdateWord, index, style}) => {
                             inputProps={{min: 0}}
                             sx={{mb: 1}}
                         />
-                        {/*<Divider textAlign={"left"} sx={dividerStyles}>Type</Divider>*/}
-                        {/*<Stack direction={"row"}>*/}
-                        {/*    {Object.keys(typeMap).map((key, ind) => (*/}
-                        {/*        <FormControlLabel*/}
-                        {/*            key={ind}*/}
-                        {/*            control={*/}
-                        {/*                <Checkbox*/}
-                        {/*                    checked={key === type}*/}
-                        {/*                    onChange={() => setType(key)}*/}
-                        {/*                    disabled={!isStuttered}*/}
-                        {/*                />}*/}
-                        {/*            label={typeMap[key]}*/}
-                        {/*        />*/}
-                        {/*    ))}*/}
-                        {/*</Stack>*/}
-                        {/*<Divider textAlign={"left"} sx={dividerStyles}>Physical Concomitants</Divider>*/}
-                        {/*<Stack direction={"row"}>*/}
-                        {/*    {Object.keys(psList).map((ind) => (*/}
-                        {/*        <FormControlLabel*/}
-                        {/*            key={ind}*/}
-                        {/*            control={*/}
-                        {/*                <Checkbox*/}
-                        {/*                    checked={ind === ps}*/}
-                        {/*                    onChange={() => setps(ind)}*/}
-                        {/*                    disabled={!isStuttered}*/}
-                        {/*                />}*/}
-                        {/*            label={ind}*/}
-                        {/*        />*/}
-                        {/*    ))}*/}
-                        {/*</Stack>*/}
                         <Button variant={"contained"} sx={{width: '40px', mb: 1}}
                                 onClick={handleDonePopoverClose}>Done</Button>
                     </Stack>

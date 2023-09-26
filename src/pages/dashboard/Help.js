@@ -1,6 +1,6 @@
 import react, {Fragment, useContext, useState} from 'react';
 import {HelpOutline} from "@mui/icons-material";
-import {IconButton, Modal, Stack, styled, Typography} from "@mui/material";
+import {IconButton, Modal, Stack, styled, Tooltip, Typography} from "@mui/material";
 import MainCard from "../../components/MainCard";
 import {useTheme} from "@mui/material/styles";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -42,17 +42,23 @@ const Help = ({children, title}) => {
     return (
         <Fragment>
             <Stack spacing={1} direction={"row"} sx={{alignItems: 'center'}}>
-                <HelpOutline
-                    sx={{
-                        ':hover': {
-                            color: theme.palette.primary.main
-                        }
-                    }}
-                    onClick={() => {
-                    setIsShowHelp((prevState) => {
-                        console.log("set help");
-                    return !prevState
-                })}}/>
+                <Tooltip title="Click for help">
+                    <IconButton va>
+                        <HelpOutline
+                            sx={{
+                                color: theme.palette.primary.main,
+                            }}
+                            fontSize={"medium"}
+                            onClick={() => {
+                                setIsShowHelp(prevState => {
+                                    console.log("set help");
+                                    return !prevState;
+                                })
+                            }}
+                        />
+                    </IconButton>
+
+                </Tooltip>
                 <Typography variant={"h5"} fontWeight={"medium"}>{title}</Typography>
             </Stack>
             {isShowHelp &&

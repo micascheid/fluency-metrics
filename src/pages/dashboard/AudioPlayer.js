@@ -21,6 +21,17 @@ import ReactToPrint from "react-to-print";
 import PrintIcon from '@mui/icons-material/Print';
 import Help from "./Help";
 import {useTheme} from "@mui/material/styles";
+import {styled} from "@mui/material";
+
+
+const StyledRegion = styled('div')({
+    '& .wavesurfer-region': {
+        borderRadius: '15px',
+    },
+    '& .wavesurfer-handle': {
+        borderRadius: '25%',
+    },
+});
 
 const AudioPlayer = (props) => {
     // VARIABLES
@@ -389,6 +400,7 @@ const AudioPlayer = (props) => {
                 {audioFile ? (
                     <React.Fragment>
                         <SaveWorkspace sx={{mb: 3}} name={workspaceName}/>
+                        <StyledRegion>
                         <WaveSurfer plugins={plugins} onMount={handleWSMount}>
                             <WaveForm {...waveformProps}>
                                 {markers.map((marker) => (
@@ -428,6 +440,7 @@ const AudioPlayer = (props) => {
                             </WaveForm>
                             <div id="timeline"/>
                         </WaveSurfer>
+                        </StyledRegion>
                     </React.Fragment>
                 ) : (
                     <Box sx={{height: 128, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>

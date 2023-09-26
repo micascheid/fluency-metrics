@@ -32,7 +32,9 @@ const TranscriptionAuto = () => {
                         word_obj={transcriptionObj[key]}
                         index={key}
                         style={{textDecoration: currentWordIndex === parseInt(key) ? 'underline' : 'none',
-                                backgroundColor: transcriptionObj[key].stuttered ? "#ADD8E6" : 'transparent'}}
+                                backgroundColor: transcriptionObj[key].stuttered ? "#ADD8E6" : 'transparent',
+                                borderRadius: '5px',
+                        }}
                     >
                     </WordComponent>
                     {index !== keys.length - 1 && (
