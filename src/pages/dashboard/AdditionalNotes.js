@@ -59,7 +59,7 @@ const AdditionalNotes = (props) => {
               >Enter Your Notes Here</TextField>
               <Stack direction={"row"} sx={{alignItems: 'center'}} spacing={1}>
                   <Button
-                      variant={"contained"}
+                      variant={"outlined"}
                       sx={{maxWidth: 105}}
                       onClick={handleSaveNotes}
                       disabled={saveNotesDisabled}
