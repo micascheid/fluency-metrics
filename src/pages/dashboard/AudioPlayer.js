@@ -17,8 +17,6 @@ import Speed from '@mui/icons-material/Speed';
 import {StutteredContext} from "../../context/StutteredContext";
 import AudioPlayerPopover from "./popovers/AudioPlayerPopover";
 import SaveWorkspace from "./SaveWorkspace";
-import ReactToPrint from "react-to-print";
-import PrintIcon from '@mui/icons-material/Print';
 import Help from "./Help";
 import {useTheme} from "@mui/material/styles";
 import {styled} from "@mui/material";

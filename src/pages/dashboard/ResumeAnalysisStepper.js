@@ -158,14 +158,14 @@ const ResumeAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
             <Box>
                 <Button
                     sx={{maxWidth: 135}}
-                    variant={"contained"}
+                    variant={"outlined"}
                     disabled={selectedResume === 'None'}
                     onClick={(event) => {
                         event.currentTarget.blur();
                     }}
                     component={"label"}
                 >
-                    Link AudioFile...
+                    Link Audio File...
                     <input
                         type={"file"}
                         hidden

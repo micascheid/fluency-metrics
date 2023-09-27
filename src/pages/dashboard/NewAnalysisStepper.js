@@ -134,7 +134,7 @@ const NewAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
                 </FormControl>
                 <Box>
                     <Button disabled={mode === ''}
-                            variant={"contained"} fullWidth component={"label"} onClick={(event) => {
+                            variant={"outlined"} fullWidth component={"label"} onClick={(event) => {
                         event.currentTarget.blur();
                     }}>
                         Choose File
@@ -181,7 +181,7 @@ const NewAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
 
                 <Button
                     variant={"contained"}
-                    disabled={(!!nameError || localWorkspaceName === '') && localSpeechContext !== ''}
+                    disabled={(!!nameError || localWorkspaceName === '')}
                     onClick={handleCreateWorkspace}
                 >Create Workspace</Button>
             </Stack>

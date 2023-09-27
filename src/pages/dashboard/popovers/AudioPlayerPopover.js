@@ -224,7 +224,7 @@ const AudioPlayerPopover = ({anchorEl, setAnchorEl, popoverOpen, setPopoverOpen,
                         variant={"contained"}
                         disabled={doneDisabled}
                         sx={{width: '40px', mb: 1, mt: 1}}
-                            onClick={handleDonePopoverClose}>Done</Button>
+                            onClick={handleDonePopoverClose}>Confirm</Button>
                 </Stack>
             </Box>
         </Popover>

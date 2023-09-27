@@ -158,7 +158,7 @@ export const StutteredProvider = (props) => {
             setWsSaveStatus(UPD_WS_STATUS.SUCCESS);
             const timer = setTimeout(() => {
                 setWsSaveStatus(UPD_WS_STATUS.IDLE);
-            }, 3000);
+            }, 1000);
 
             return () => clearTimeout(timer);
         } catch (e) {

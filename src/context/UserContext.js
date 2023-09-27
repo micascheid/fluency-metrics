@@ -70,7 +70,7 @@ export const UserProvider = ({children}) => {
                 workspacesIndexDocs.docs.forEach((doc) => {
                     workspacesIndexTemp[doc.id] = doc.data();
                 });
-                await delay(2000);
+                // await delay(1000);
                 setWorkspacesIndex(workspacesIndexTemp);
                 setIsLoading(false);
                 if (await shouldBlock(currentUser.uid)) {

@@ -38,7 +38,7 @@ const WordSpan = styled('span')(({ isClicked, theme }) => ({
     },
 }));
 
-const WordComponent = ({word, word_obj, onUpdateWord, index, style}) => {
+const WordComponent = ({word, word_obj, index, style}) => {
     // VARIABLES
     const [anchorEl, setAnchorEl] = useState(null);
     const [newWord, setNewWord] = useState(word);
@@ -72,7 +72,7 @@ const WordComponent = ({word, word_obj, onUpdateWord, index, style}) => {
         // if (syllableCount === 0) {
         //     setSyllableCount(word_obj.syllable_count);
         // }
-        handleStutteredEvent();
+        // handleStutteredEvent();
         handleBlur();
         setAnchorEl(null);
         setIsClicked(false);

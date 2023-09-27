@@ -93,13 +93,12 @@ const HighLevelSummary = (props) => {
                 </Stack>
                 <Button
                     variant={"contained"}
-                    // color="primary"
                     startIcon={<PrintIcon />}
                     onClick={handlePrintOutClick}
                     disabled={workspaceName === ''}
                     sx={{fontWeight: 'bold'}}
                 >
-                    Summary and Trascription
+                    Summary and Transcription
                 </Button>
             </Stack>
         } sx={{backgroundColor: theme.palette.success.lighter}}
