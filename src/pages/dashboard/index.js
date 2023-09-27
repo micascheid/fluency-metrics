@@ -2,17 +2,14 @@ import React, {useContext, useEffect, useState} from 'react';
 import {Backdrop, Grid, Stack} from "@mui/material";
 import AudioPlayer from "./AudioPlayer";
 import FluencyCounts from "./FluencyCounts";
-import KeyboardLegend from "./KeyboardLegend";
 import StutteredEvents from "./StutteredEvents";
 import Mode from "./Mode";
 import Transcription from "./Transcription";
-import SaveWorkspace from "./SaveWorkspace";
 import {UserContext} from "../../context/UserContext";
 import LoadingOverlay from "./LoadingOverlay";
 import {StutteredProvider} from "../../context/StutteredContext";
 import HelpMode from "./help-components/HelpMode";
 import AdditionalNotes from "./AdditionalNotes";
-import CreateSummary from "./CreateSummary";
 import HelpAudioPlayer from "./help-components/HelpAudioPlayer";
 import HelpTranscription from "./help-components/HelpTranscription";
 import HelpDisfluencyEvents from "./help-components/HelpDisfluencyEvents";
@@ -22,8 +19,6 @@ import HelpWorkspace from "./help-components/HelpWorkspace";
 import Workspace from "./Workspace";
 import HighLevelSummary from "./HighLevelSummary";
 import {useTheme} from "@mui/material/styles";
-import {doc, getDoc} from "firebase/firestore";
-import {db} from "../../FirebaseConfig";
 import DashboardBlocked from "./modals/DashboardBlocked";
 
 

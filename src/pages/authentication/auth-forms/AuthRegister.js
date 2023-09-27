@@ -70,7 +70,7 @@ const AuthRegister = () => {
         const userRef = doc(db, 'users', `${userId}`)
         const userSnap = await getDoc(userRef);
 
-        if (!userSnap.exists()){
+        if (!userSnap.exists()) {
             await setDoc(userRef, {subscription: userData});
         } else {
             console.log("user already exists")
@@ -101,7 +101,7 @@ const AuthRegister = () => {
     return (
         <>
             {isShowOrgInfoModal &&
-                <OrganizationCodeInfo setIsShow={setIsShowOrgInfoModal} />
+                <OrganizationCodeInfo setIsShow={setIsShowOrgInfoModal}/>
             }
             <Formik
                 initialValues={{
@@ -200,33 +200,34 @@ const AuthRegister = () => {
                                 </Stack>
                             </Grid>
                             <Grid item xs={12}>
-                            <Stack spacing={1}>
-                                <Stack direction={"row"} sx={{alignItems: 'center'}} spacing={1}>
-                                    <Tooltip title={"Don't pay?"}>
-                                        <IconButton onClick={handleOrgInfo}>
-                                            <InfoIcon sx={{color: theme.palette.primary.main}}/>
-                                        </IconButton>
-                                    </Tooltip>
-                                    <InputLabel htmlFor="organizationCode-signup">Organization Code (Optional)</InputLabel>
+                                <Stack spacing={1}>
+                                    <Stack direction={"row"} sx={{alignItems: 'center'}} spacing={1}>
+                                        <Tooltip title={"Don't pay?"}>
+                                            <IconButton onClick={handleOrgInfo}>
+                                                <InfoIcon sx={{color: theme.palette.primary.main}}/>
+                                            </IconButton>
+                                        </Tooltip>
+                                        <InputLabel htmlFor="organizationCode-signup">Organization Code
+                                            (Optional)</InputLabel>
+                                    </Stack>
+                                    <OutlinedInput
+                                        fullWidth
+                                        error={Boolean(touched.organizationCode && errors.organizationCode)}
+                                        id="organizationCode-signup"
+                                        type="text"
+                                        value={values.organizationCode}
+                                        name="organizationCode"
+                                        onBlur={handleBlur}
+                                        onChange={handleChange}
+                                        placeholder="Enter your organization code"
+                                    />
+                                    {touched.organizationCode && errors.organizationCode && (
+                                        <FormHelperText error id="helper-text-organizationCode-signup">
+                                            {errors.organizationCode}
+                                        </FormHelperText>
+                                    )}
                                 </Stack>
-                                <OutlinedInput
-                                    fullWidth
-                                    error={Boolean(touched.organizationCode && errors.organizationCode)}
-                                    id="organizationCode-signup"
-                                    type="text"
-                                    value={values.organizationCode}
-                                    name="organizationCode"
-                                    onBlur={handleBlur}
-                                    onChange={handleChange}
-                                    placeholder="Enter your organization code"
-                                />
-                                {touched.organizationCode && errors.organizationCode && (
-                                    <FormHelperText error id="helper-text-organizationCode-signup">
-                                        {errors.organizationCode}
-                                    </FormHelperText>
-                                )}
-                            </Stack>
-                        </Grid>
+                            </Grid>
                             <Grid item xs={12}>
                                 <Stack spacing={1}>
                                     <InputLabel htmlFor="password-signup">Password</InputLabel>
