@@ -43,18 +43,19 @@ const Help = ({children, title}) => {
         <Fragment>
             <Stack spacing={1} direction={"row"} sx={{alignItems: 'center'}}>
                 <Tooltip title="Click for help">
-                    <IconButton va>
+                    <IconButton
+                        onClick={() => {
+                            setIsShowHelp(prevState => {
+                            console.log("set help");
+                            return !prevState;
+                        })
+                    }}>
                         <HelpOutline
                             sx={{
                                 color: theme.palette.primary.main,
                             }}
                             fontSize={"medium"}
-                            onClick={() => {
-                                setIsShowHelp(prevState => {
-                                    console.log("set help");
-                                    return !prevState;
-                                })
-                            }}
+
                         />
                     </IconButton>
 

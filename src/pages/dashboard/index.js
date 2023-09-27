@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {Grid, Stack} from "@mui/material";
+import {Backdrop, Grid, Stack} from "@mui/material";
 import AudioPlayer from "./AudioPlayer";
 import FluencyCounts from "./FluencyCounts";
 import KeyboardLegend from "./KeyboardLegend";
@@ -22,11 +22,15 @@ import HelpWorkspace from "./help-components/HelpWorkspace";
 import Workspace from "./Workspace";
 import HighLevelSummary from "./HighLevelSummary";
 import {useTheme} from "@mui/material/styles";
+import {doc, getDoc} from "firebase/firestore";
+import {db} from "../../FirebaseConfig";
+import DashboardBlocked from "./modals/DashboardBlocked";
 
 
 const DefaultDashboard = () => {
     const {
         isLoading,
+        isBlocked,
     } = useContext(UserContext);
     const theme = useTheme();
     const [mode, setMode] = useState('');
@@ -86,51 +90,55 @@ const DefaultDashboard = () => {
         }
     }, []);
 
-    //call data in here to get
 
     return (
         <React.Fragment>
             {isLoading ? (
                 <LoadingOverlay isOpen={isLoading}/>
             ) : (
-                <Grid container spacing={2}>
-                    <Grid item xs={12} sm={12} md={12} lg={12}>
-                        <Mode {...propValues} help={<HelpMode/>}/>
+                <React.Fragment>
+                    {isBlocked &&
+                        <DashboardBlocked isBlocked={isBlocked}/>
+                    }
+                    <Grid container spacing={2}>
+                        <Grid item xs={12} sm={12} md={12} lg={12}>
+                            <Mode {...propValues} help={<HelpMode/>}/>
+                        </Grid>
+                        <StutteredProvider {...propValues}>
+                            <Grid item xs={12}>
+                                <Workspace help={<HelpWorkspace/>}>
+                                    <Grid item container xs={12} spacing={2}>
+                                        <Grid item xs={12}>
+                                            <AudioPlayer help={<HelpAudioPlayer/>} cardColor={theme.palette.grey[300]}/>
+                                        </Grid>
+                                        <Grid item xs={12}>
+                                            <Transcription help={<HelpTranscription/>}
+                                                           cardColor={theme.palette.grey[300]}/>
+                                        </Grid>
+                                    </Grid>
+                                </Workspace>
+                            </Grid>
+
+                            <Grid item xs={12}>
+                                <HighLevelSummary>
+                                    <Grid item container xs={12} spacing={2}>
+                                        <Grid item xs={12} sm={12} md={6} lg={6}>
+                                            <StutteredEvents help={<HelpDisfluencyEvents/>}/>
+                                        </Grid>
+
+                                        <Grid item xs={12} sm={12} md={6} lg={6}>
+                                            <Stack spacing={2}>
+                                                <FluencyCounts help={<HelpFluencyCounts/>}/>
+                                                <AdditionalNotes help={<HelpAdditionalNotes/>}/>
+                                            </Stack>
+                                        </Grid>
+                                    </Grid>
+                                </HighLevelSummary>
+                            </Grid>
+                        </StutteredProvider>
                     </Grid>
-                    <StutteredProvider {...propValues}>
-                        <Grid item xs={12}>
-                            <Workspace help={<HelpWorkspace/>}>
-                                <Grid item container xs={12} spacing={2}>
-                                    <Grid item xs={12}>
-                                        <AudioPlayer help={<HelpAudioPlayer/>} cardColor={theme.palette.grey[300]}/>
-                                    </Grid>
-                                    <Grid item xs={12}>
-                                        <Transcription help={<HelpTranscription/>} cardColor={theme.palette.grey[300]}/>
-                                    </Grid>
-                                </Grid>
-                            </Workspace>
-                        </Grid>
+                </React.Fragment>
 
-                        <Grid item xs={12}>
-                            <HighLevelSummary>
-                                <Grid item container xs={12} spacing={2}>
-                                    <Grid item xs={12} sm={12} md={6} lg={6}>
-                                        <StutteredEvents help={<HelpDisfluencyEvents/>}/>
-                                    </Grid>
-
-                                    <Grid item xs={12} sm={12} md={6} lg={6}>
-                                        <Stack spacing={2}>
-                                            <FluencyCounts help={<HelpFluencyCounts/>}/>
-                                            <AdditionalNotes help={<HelpAdditionalNotes/>}/>
-                                        </Stack>
-                                    </Grid>
-                                </Grid>
-                            </HighLevelSummary>
-                        </Grid>
-
-
-                    </StutteredProvider>
-                </Grid>
             )}
         </React.Fragment>
 

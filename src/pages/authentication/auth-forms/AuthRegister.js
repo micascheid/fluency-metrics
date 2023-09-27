@@ -15,8 +15,9 @@ import {
     InputLabel,
     OutlinedInput,
     Stack,
-    Typography
+    Typography, Tooltip
 } from '@mui/material';
+import InfoIcon from '@mui/icons-material/Info';
 
 // third party
 import * as Yup from 'yup';
@@ -32,8 +33,10 @@ import {EyeOutlined, EyeInvisibleOutlined} from '@ant-design/icons';
 // firebase auth
 import {getAuth, createUserWithEmailAndPassword, updateProfile} from 'firebase/auth';
 import {initializeApp} from "firebase/app";
-import {doc, setDoc, getDoc} from "firebase/firestore";
+import {doc, setDoc, getDoc, serverTimestamp} from "firebase/firestore";
 import {db, auth} from "../../../FirebaseConfig";
+import {useTheme} from "@mui/material/styles";
+import OrganizationCodeInfo from "../../dashboard/modals/OrganizationCodeInfo";
 
 // ============================|| FIREBASE - REGISTER ||============================ //
 
@@ -42,17 +45,41 @@ const AuthRegister = () => {
     const [level, setLevel] = useState();
     const [showPassword, setShowPassword] = useState(false);
     const [isRegistering, setIsRegistering] = useState(false);
+    const [isShowOrgInfoModal, setIsShowOrgInfoModal] = useState(false);
+    const theme = useTheme();
+
+    //
+    // const firestoreTimestamp = serverTimestamp();
+    const trialPeriod = 30
+    const trialStartDate = new Date();
+    const trialEndDate = new Date(trialStartDate);
+    trialEndDate.setDate(trialStartDate.getDate() + trialPeriod);
+
+
+    const subscription_info = {
+        subscription_status: "trial",
+        trial_start_date: trialStartDate,
+        trial_end_date: trialEndDate,
+        subscription_end_time: "",
+        organization_id: "",
+        stripe_id: "",
+        subscription_type: 1,
+    }
 
     const addUserIfNotExists = async (userId, userData) => {
         const userRef = doc(db, 'users', `${userId}`)
         const userSnap = await getDoc(userRef);
 
         if (!userSnap.exists()){
-            await setDoc(userRef, userData);
+            await setDoc(userRef, {subscription: userData});
         } else {
             console.log("user already exists")
         }
     };
+
+    const handleOrgInfo = () => {
+        setIsShowOrgInfoModal(true);
+    }
 
     const handleClickShowPassword = () => {
         setShowPassword(!showPassword);
@@ -73,23 +100,32 @@ const AuthRegister = () => {
 
     return (
         <>
+            {isShowOrgInfoModal &&
+                <OrganizationCodeInfo setIsShow={setIsShowOrgInfoModal} />
+            }
             <Formik
                 initialValues={{
                     displayname: '',
                     email: '',
                     company: '',
                     password: '',
-                    submit: null
+                    submit: null,
+                    organizationCode: '',
                 }}
                 validationSchema={Yup.object().shape({
                     displayname: Yup.string().max(255).required('First Name is required'),
                     email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
-                    password: Yup.string().max(255).required('Password is required')
+                    password: Yup.string().max(255).required('Password is required'),
+                    organizationCode: Yup.string().max(50)
                 })}
                 onSubmit={async (values, {setErrors, setStatus, setSubmitting}) => {
                     setStatus({success: false});
                     setSubmitting(false);
 
+                    //check if they are associated with organization
+                    if (values.organizationCode) {
+                        //do some stuff here
+                    }
                     createUserWithEmailAndPassword(auth, values.email, values.password)
                         .then((userCredential) => {
                             const user = userCredential.user;
@@ -97,7 +133,8 @@ const AuthRegister = () => {
                                 displayName: values.displayname, photoURL: ''
                             }).then(() => {
                                 setIsRegistering(true);
-                                addUserIfNotExists(user.uid, {}).then(() => {
+
+                                addUserIfNotExists(user.uid, subscription_info).then(() => {
                                     navigate('/dashboard/default')
                                 });
                             })
@@ -152,7 +189,7 @@ const AuthRegister = () => {
                                         name="email"
                                         onBlur={handleBlur}
                                         onChange={handleChange}
-                                        placeholder="demo@company.com"
+                                        placeholder="coolemail@coolemail.com"
                                         inputProps={{}}
                                     />
                                     {touched.email && errors.email && (
@@ -162,6 +199,34 @@ const AuthRegister = () => {
                                     )}
                                 </Stack>
                             </Grid>
+                            <Grid item xs={12}>
+                            <Stack spacing={1}>
+                                <Stack direction={"row"} sx={{alignItems: 'center'}} spacing={1}>
+                                    <Tooltip title={"Don't pay?"}>
+                                        <IconButton onClick={handleOrgInfo}>
+                                            <InfoIcon sx={{color: theme.palette.primary.main}}/>
+                                        </IconButton>
+                                    </Tooltip>
+                                    <InputLabel htmlFor="organizationCode-signup">Organization Code (Optional)</InputLabel>
+                                </Stack>
+                                <OutlinedInput
+                                    fullWidth
+                                    error={Boolean(touched.organizationCode && errors.organizationCode)}
+                                    id="organizationCode-signup"
+                                    type="text"
+                                    value={values.organizationCode}
+                                    name="organizationCode"
+                                    onBlur={handleBlur}
+                                    onChange={handleChange}
+                                    placeholder="Enter your organization code"
+                                />
+                                {touched.organizationCode && errors.organizationCode && (
+                                    <FormHelperText error id="helper-text-organizationCode-signup">
+                                        {errors.organizationCode}
+                                    </FormHelperText>
+                                )}
+                            </Stack>
+                        </Grid>
                             <Grid item xs={12}>
                                 <Stack spacing={1}>
                                     <InputLabel htmlFor="password-signup">Password</InputLabel>
