@@ -26,7 +26,7 @@ export const UserProvider = ({children}) => {
     const trialValid = (firestoreTime) => {
         const firestoreDate = firestoreTime.toDate();
         const currentDate = new Date();
-        return firestoreDate < currentDate;
+        return firestoreDate > currentDate;
     }
 
     const shouldBlock = async (userId) => {
