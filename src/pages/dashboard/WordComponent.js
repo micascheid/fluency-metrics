@@ -64,8 +64,21 @@ const WordComponent = ({word, word_obj, index, style}) => {
 
     const handleDonePopoverClose = () => {
         //save local new word to transcription object here
+        saveNewTranscription();
         setAnchorEl(null);
         setIsClicked(false);
+    };
+
+    const saveNewTranscription = () => {
+        setTranscriptionObj((prevTranscriptionObj) => {
+            let newTranscriptionObj = {...prevTranscriptionObj};
+            let newWordObj = prevTranscriptionObj[index];
+            newWordObj.punctuated_word = newWord;
+            newWordObj.syllable_count = syllableCount;
+            newTranscriptionObj[index] = newWordObj
+            return newTranscriptionObj;
+        });
+
     };
 
     const handlePopoverClose = () => {
@@ -90,7 +103,7 @@ const WordComponent = ({word, word_obj, index, style}) => {
         if (!Number.isNaN(value)) {
             console.log("Setting syllableCount to ", value);
             setSyllableCount(value);
-            setAdjustedSyllableCount(index, value);
+            // setAdjustedSyllableCount(index, value);
         } else {
             console.log("Setting syllableCount to 0");
             setSyllableCount(0);
@@ -152,7 +165,7 @@ const WordComponent = ({word, word_obj, index, style}) => {
                     }
                 }}
             >
-                {newWord}
+                {word}
             </WordSpan>
             <Popover
                 open={Boolean(anchorEl)}
