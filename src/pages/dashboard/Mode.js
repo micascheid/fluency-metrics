@@ -16,6 +16,7 @@ import InstructionsAutoMode from "./InstructionsAutoMode";
 import Help from "./Help";
 import HelpMode from "./help-components/HelpMode";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ArrowDropDownCircleIcon from "@mui/icons-material/ArrowDropDownCircle";
 
 
 const ExpandMore = styled((props) => {
@@ -41,6 +42,7 @@ const Mode = (props) => {
     } = props;
     const [showAreYouSure, setShowAreYouSure] = useState(false);
     const [tabValue, setTabValue] = useState(0);
+    const [autoInstuctionsHasOverflow, setAutoInstuctHasOverflow] = useState();
 
 
     useEffect(() => {
@@ -87,6 +89,16 @@ const Mode = (props) => {
         setTabValue(newValue);
     };
 
+    const handleScroll = (event) => {
+        const element = event.target;
+        if (element.scrollHeight - element.scrollTop === element.clientHeight) {
+            // User has scrolled to the bottom
+            setAutoInstuctHasOverflow(false);
+        } else {
+            setAutoInstuctHasOverflow(true);
+        }
+    }
+
     return (
         <Fragment>
 
@@ -114,7 +126,7 @@ const Mode = (props) => {
                 <Collapse in={expanded} timeout="auto" unmountOnExit>
                     {showAreYouSure && <AreYouSure setAreYouSure={setShowAreYouSure}/>}
                     <Grid container spacing={2}>
-                        <Grid item xs={5} sm={5} md={5} lg={5}>
+                        <Grid item xs={5}>
                             <Box width={"100%"}>
                                 <Box sx={{mb: 2}}>
                                     <Tabs value={tabValue} onChange={handleTabChange} variant={'fullWidth'}
@@ -133,15 +145,32 @@ const Mode = (props) => {
                                 </Box>
                             </Box>
                         </Grid>
-                        <Grid item xs={7} sm={7} md={7} lg={7}>
+                        <Grid item xs={7}>
                             <Grid container style={{height: '100%'}} spacing={2}>
                                 <Grid item xs={1} sm={1} md={1} lg={1}>
                                     <Divider orientation={"vertical"} style={{borderColor: "darkgray"}}/>
                                 </Grid>
-                                <Grid item xs={11} sm={11} md={11} lg={11}>
-                                    <Box style={{overflowY: 'scroll', maxHeight: '335px'}}>
-                                        <InstructionsAutoMode/>
+                                <Grid item xs={11} sm={11} md={11} lg={11} style={{position: 'relative'}}>
+
+                                    <Box style={{overflowY: 'scroll', maxHeight: '335px'}}
+                                         onScroll={handleScroll}>
+                                        <InstructionsAutoMode setOverflow={setAutoInstuctHasOverflow}/>
                                     </Box>
+                                    {autoInstuctionsHasOverflow &&
+                                        <Box
+                                            sx={{
+                                                position: 'absolute',
+                                                bottom: 0,
+                                                left: '50%',
+                                                transform: 'translateX(-50%)',
+                                                display: 'flex',
+                                                justifyContent: 'center'
+                                            }}
+                                        >
+                                            <ArrowDropDownCircleIcon color={"primary"}/>
+                                        </Box>
+                                    }
+
                                 </Grid>
                             </Grid>
                         </Grid>
