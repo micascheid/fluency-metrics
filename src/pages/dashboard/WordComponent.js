@@ -50,16 +50,10 @@ const WordComponent = ({word, word_obj, index, style}) => {
     const psList = [0, 1, 2, 3, 4, 5];
     const [isClicked, setIsClicked] = useState(false);
     const {
-        addStutteredEvent,
         setTranscriptionObj,
         setAdjustedSyllableCount,
         mode,
     } = useContext(StutteredContext);
-
-
-    /* NOTES
-        type: Please see stuttered context for map
-     */
 
     // FUNCTIONS
     const handlePopoverOpen = (event) => {
@@ -69,23 +63,18 @@ const WordComponent = ({word, word_obj, index, style}) => {
     };
 
     const handleDonePopoverClose = () => {
-        // if (syllableCount === 0) {
-        //     setSyllableCount(word_obj.syllable_count);
-        // }
-        // handleStutteredEvent();
-        handleBlur();
+        //save local new word to transcription object here
         setAnchorEl(null);
         setIsClicked(false);
     };
 
     const handlePopoverClose = () => {
-        handleBlur();
         setAnchorEl(null);
         setIsClicked(false);
     };
 
     const closePopover = () => {
-        handleBlur();
+
         setAnchorEl(null);
         setIsClicked(false)
     };
@@ -108,14 +97,9 @@ const WordComponent = ({word, word_obj, index, style}) => {
         }
     };
 
-    const handleBlur = () => {
-        // onUpdateWord(index, newWord);
-    };
-
     const handleKeyDown = (event) => {
         if (event.key === "Enter") {
             event.preventDefault();
-            handleBlur();
         }
     };
 
@@ -123,11 +107,8 @@ const WordComponent = ({word, word_obj, index, style}) => {
         event.stopPropagation();
     };
 
-    const handleStutteredEvent = () => {
-        if (isStuttered) {
-            addStutteredEvent(word_obj, typeMap[type], ps, newWord, index);
-        }
-    };
+
+
 
     const handleWordDeletion = () => {
         setTranscriptionObj(prevTranscription => {

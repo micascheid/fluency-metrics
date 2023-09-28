@@ -147,10 +147,10 @@ const Mode = (props) => {
                         </Grid>
                         <Grid item xs={7}>
                             <Grid container style={{height: '100%'}} spacing={2}>
-                                <Grid item xs={1} sm={1} md={1} lg={1}>
+                                <Grid item xs={1}>
                                     <Divider orientation={"vertical"} style={{borderColor: "darkgray"}}/>
                                 </Grid>
-                                <Grid item xs={11} sm={11} md={11} lg={11} style={{position: 'relative'}}>
+                                <Grid item xs={11} style={{position: 'relative'}}>
 
                                     <Box style={{overflowY: 'scroll', maxHeight: '335px'}}
                                          onScroll={handleScroll}>
