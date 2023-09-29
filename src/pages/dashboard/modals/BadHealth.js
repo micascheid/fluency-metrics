@@ -1,15 +1,21 @@
 import react, {useContext, useState} from 'react';
 import {Backdrop, Box, Button, CircularProgress, Modal, Stack, Typography} from "@mui/material";
-import MainCard from "../../../components/MainCard";
-import {StutteredContext} from "../../../context/StutteredContext";
 import React from "react";
 
-const DashboardBlocked = ({isBlocked}) => {
+const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%,-50%)',
+    width: 400,
+}
+
+const BadHealth = ({reason, open}) => {
 
 
 
     return (
-        <Backdrop open={isBlocked} sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.appBar - 1 }}>
+        <Backdrop open={open} sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.appBar - 1 }}>
             <Box
                 display="flex"
                 flexDirection="column"
@@ -20,13 +26,12 @@ const DashboardBlocked = ({isBlocked}) => {
                     <Typography variant="h1" component="div" gutterBottom>
                         Oh no!
                     </Typography>
-                    <Typography>Looks like your not under an active subscription.</Typography>
-                    {/*TODO: takes user to plans*/}
-                    <Button variant={"contained"}>Resume Access</Button>
+                    <Typography variant={"h3"}>Looks like were having some issues on our end.</Typography>
+                    <Typography variant={"h4"}>Reason: {reason}</Typography>
                 </Stack>
             </Box>
         </Backdrop>
     );
 };
 
-export default DashboardBlocked;
+export default BadHealth;

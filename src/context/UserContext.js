@@ -11,6 +11,7 @@ export const UserProvider = ({children}) => {
     const [workspacesIndex, setWorkspacesIndex] = useState({});
     const [isLoading, setIsLoading] = useState(true);
     const [isBlocked, setIsBlocked] = useState(false);
+    const [badHealth, setBadHealth] = useState(false);
     const navigate = useNavigate();
     const login = (user) => {
         setUser(user);
@@ -58,6 +59,20 @@ export const UserProvider = ({children}) => {
         return block;
     }
 
+    const checkBackendHealth = async () => {
+        const healthCheckRef = doc(db, 'health', 'maintenance');
+        try {
+            const healthSnap = await getDoc(healthCheckRef);
+            const data = healthSnap.data();
+            if (data.reason !== ""){
+                setBadHealth(data.reason);
+            }
+        } catch (error) {
+            setBadHealth(error);
+            console.log("HEALTH CHECK ERROR:", error);
+        }
+    };
+
     const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
     useEffect(() => {
@@ -70,13 +85,14 @@ export const UserProvider = ({children}) => {
                 workspacesIndexDocs.docs.forEach((doc) => {
                     workspacesIndexTemp[doc.id] = doc.data();
                 });
-                await delay(1000);
+                await delay(2000);
                 setWorkspacesIndex(workspacesIndexTemp);
                 setIsLoading(false);
                 if (await shouldBlock(currentUser.uid)) {
                     console.log("Should be blocked");
                     setIsBlocked(true);
                 }
+                await checkBackendHealth();
             } else {
                 navigate('/login');
             }
@@ -96,6 +112,7 @@ export const UserProvider = ({children}) => {
         isLoading,
         setIsLoading,
         isBlocked,
+        badHealth,
     };
 
     return (

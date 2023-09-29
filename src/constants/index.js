@@ -1,3 +1,6 @@
+import {db} from "../FirebaseConfig";
+import {doc} from "firebase/firestore";
+
 export const AUTO = 'auto';
 export const MANUAL = 'manual';
 //local
@@ -23,3 +26,5 @@ export const SPEECH_SAMPLE_OPTIONS = {
     Conversation: 'Conversation',
     Other: 'Other...'
 }
+
+export const MAINTENANCE_CHECK = doc(db, 'health', 'maintenance');
