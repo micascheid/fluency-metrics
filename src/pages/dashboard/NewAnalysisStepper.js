@@ -1,9 +1,19 @@
 import react, {useContext, useEffect, useState} from 'react';
-import {Box, Button, FormControl, InputLabel, MenuItem, Select, Stack, TextField, Typography} from "@mui/material";
+import {
+    Box,
+    Button,
+    CircularProgress,
+    FormControl,
+    InputLabel,
+    MenuItem,
+    Select,
+    Stack,
+    TextField,
+    Typography
+} from "@mui/material";
 import {MANUAL} from "../../constants";
 import React from "react";
-import {StutteredContext} from "../../context/StutteredContext";
-import saveWorkSpace from "./SaveWorkspace";
+import LoadingButton from '@mui/lab/LoadingButton';
 import AreYouSure from "./modals/AreYouSure";
 import {UserContext} from "../../context/UserContext";
 import PHIEntryChecker from "./modals/PHIEntryChecker";
@@ -23,6 +33,8 @@ const NewAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
         setFileChosen,
         setIsCreateNewWorkspace,
         setAudioFileDuration,
+        audioFileDuration,
+        loadingTranscription,
     } = otherProps;
     const {
         workspacesIndex,
@@ -100,6 +112,20 @@ const NewAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
         setLocalSpeechContext(event.target.value);
     };
 
+    const transcriptionTimeEstimate = () => {
+        const finalDur = Math.round(audioFileDuration / 60) * 6;
+        const minutes = Math.floor(finalDur / 60);
+        const seconds = finalDur % 60;
+        let displayTime = '';
+        if (minutes > 0) {
+            displayTime += `${minutes} minute${minutes === 1 ? '' : 's'} and `
+        }
+        displayTime += `${seconds} second${seconds === 1 ? '' : 's'}`;
+        return displayTime;
+    };
+
+    const transcriptionEstimate = transcriptionTimeEstimate();
+
 
     useEffect(() => {
         (async () => {
@@ -116,11 +142,11 @@ const NewAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
 
 
     return (
-        <Box maxWidth={"150px"}>
+        <Box>
             {showAreYouSure && <AreYouSure setAreYouSure={setShowAreYouSure} setYesNo={setYesNo}/>}
             <PHIEntryChecker isModalOpen={isModalOpen} onYes={handlePhiYes} onNo={handlePhiNo} />
             <Stack spacing={2}>
-                <FormControl sx={{mt: 2}}>
+                <FormControl sx={{mt: 2, width: 150}}>
                     <InputLabel>Select Mode</InputLabel>
                     <Select
                         sx={{minWidth: 100}}
@@ -129,11 +155,11 @@ const NewAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
                         onChange={handleMode}
                     >
                         <MenuItem value={"auto"}>Automated-Transcriptions</MenuItem>
-                        <MenuItem value={"manual"} disabled>Manual (Coming Soon)</MenuItem>
+                        {/*<MenuItem value={"manual"} disabled>Manual (Coming Soon)</MenuItem>*/}
                     </Select>
                 </FormControl>
                 <Box>
-                    <Button disabled={mode === ''}
+                    <Button sx={{width: 150}} disabled={mode === ''}
                             variant={"outlined"} fullWidth component={"label"} onClick={(event) => {
                         event.currentTarget.blur();
                     }}>
@@ -148,6 +174,7 @@ const NewAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
                     <Typography></Typography>
                 </Box>
                 <FormControl
+                    sx={{width: 150}}
                     disabled={audioFileName === ''}
                 >
                     <InputLabel
@@ -178,12 +205,25 @@ const NewAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
                         disabled={!localSpeechContext}
                     />
                 </Stack>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                    <LoadingButton
+                        loading={loadingTranscription}
+                        variant={"contained"}
+                        disabled={(!!nameError || localWorkspaceName === '')}
+                        onClick={handleCreateWorkspace}
+                        sx={{ flexShrink: 0 }}  // Prevent the button from shrinking
+                    >
+                        Create Workspace
+                    </LoadingButton>
 
-                <Button
-                    variant={"contained"}
-                    disabled={(!!nameError || localWorkspaceName === '')}
-                    onClick={handleCreateWorkspace}
-                >Create Workspace</Button>
+                    {loadingTranscription &&
+                        <Stack direction={"row"} sx={{ flexGrow: 1, alignItems: 'center' }}>
+                            {/*<CircularProgress/>*/}
+                            <Typography variant={"h5"} fontWeight={"light"}>Hang tight! Processing time is:</Typography>
+                            <Typography variant={"h5"}>{transcriptionEstimate}</Typography>
+                        </Stack>
+                    }
+                </Box>
             </Stack>
         </Box>
     )

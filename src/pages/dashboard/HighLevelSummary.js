@@ -22,12 +22,12 @@ const ExpandMore = styled((props) => {
 
 
 const HighLevelSummary = (props) => {
-    const {children, help} = props;
+    const {children, expanded, help} = props;
     const {
         workspaceName,
     } = useContext(StutteredContext);
     const theme = useTheme();
-    const [isExpanded, setIsExpanded] = useState(true);
+    const [isExpanded, setIsExpanded] = useState(expanded);
     const [isPrinting, setIsPrinting] = useState(false);
     const printComponentRef = useRef();
     const handlePrint = useReactToPrint({
@@ -38,6 +38,10 @@ const HighLevelSummary = (props) => {
     const handlePrintOutClick = () => {
         setIsPrinting(true);
     }
+
+    useEffect(() => {
+        setIsExpanded(expanded);
+    }, [expanded]);
 
     useEffect(() => {
         if (isPrinting && printComponentRef.current) {

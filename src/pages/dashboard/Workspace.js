@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import MainCard from "../../components/MainCard";
 import Help from "./Help";
 import {Box, Collapse, IconButton, Stack, styled} from "@mui/material";
@@ -19,9 +19,17 @@ const ExpandMore = styled((props) => {
 
 
 const Workspace = (props) => {
-    const {children, help} = props;
+    const {
+        expanded,
+        children,
+        help
+    } = props;
     const theme = useTheme();
-    const [isExpanded, setIsExpanded] = useState(true);
+    const [isExpanded, setIsExpanded] = useState(expanded);
+
+    useEffect(() => {
+        setIsExpanded(expanded);
+    }, [expanded]);
     return (
         <MainCard title={
             <Stack direction={"row"} sx={{alignItems: 'center'}}>

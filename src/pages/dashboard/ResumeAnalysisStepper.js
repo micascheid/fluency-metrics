@@ -32,6 +32,7 @@ const ResumeAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
         workspaceId,
         setWorkspaceId,
         setLoadWorkspaceByObj,
+        setWorkspaceExpanded
     } = otherProps;
 
     const workspacesColRef = collection(db, 'users', user.uid, 'workspaces');
@@ -39,8 +40,6 @@ const ResumeAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
     const [selectedResume, setSelectedResume] = useState(workspaceId);
     const [localWorkspaceId, setLocalWorkspaceId] = useState(workspaceId);
     const [isLoadingModal, setIsLoadingModal] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
-    const [workspaceObj, setWorkspaceObj] = useState({});
     const [isAudioCheckerModal, setIsAudioCheckerModal] = useState(false);
 
     const handleResumeSelection = (event) => {
@@ -117,7 +116,9 @@ const ResumeAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
         try {
             const workspaceObj = await getDoc(workspaceRef);
             setLoadWorkspaceByObj(workspaceObj.data());
+            setWorkspaceExpanded(true);
         } catch (error) {
+            setWorkspaceExpanded(false);
             console.log("Trouble fetching workspace,", error);
         }
     };

@@ -41,6 +41,8 @@ const DefaultDashboard = () => {
     const [loadWorkspaceByObj, setLoadWorkspaceByObj] = useState(null);
     const [workspaceId, setWorkspaceId] = useState('None');
     const [expanded, setExpanded] = useState(true);
+    const [workspaceExpanded, setWorkspaceExpanded] = useState(false);
+    const [loadingTranscription, setLoadingTranscription] = useState(false);
 
 
     const propValues = {
@@ -70,6 +72,9 @@ const DefaultDashboard = () => {
         loadWorkspaceByObj: loadWorkspaceByObj,
         setAudioFileDuration: setAudioFileDuration,
         audioFileDuration: audioFileDuration,
+        loadingTranscription: loadingTranscription,
+        setLoadingTranscription: setLoadingTranscription,
+        setWorkspaceExpanded: setWorkspaceExpanded,
     }
 
     useEffect(() => {
@@ -101,7 +106,7 @@ const DefaultDashboard = () => {
                         </Grid>
                         <StutteredProvider {...propValues}>
                             <Grid item xs={12}>
-                                <Workspace help={<HelpWorkspace/>}>
+                                <Workspace expanded={workspaceExpanded} help={<HelpWorkspace/>}>
                                     <Grid item container xs={12} spacing={2}>
                                         <Grid item xs={12}>
                                             <AudioPlayer help={<HelpAudioPlayer/>} cardColor={theme.palette.grey[300]}/>
@@ -115,7 +120,7 @@ const DefaultDashboard = () => {
                             </Grid>
 
                             <Grid item xs={12}>
-                                <HighLevelSummary>
+                                <HighLevelSummary expanded={workspaceExpanded}>
                                     <Grid item container xs={12} spacing={2}>
                                         <Grid item xs={12} sm={12} md={6} lg={6}>
                                             <StutteredEvents help={<HelpDisfluencyEvents/>}/>

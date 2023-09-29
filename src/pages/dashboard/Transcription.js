@@ -18,7 +18,7 @@ const Transcription = (props) => {
         countTotalSyllables,
         audioFileDuration,
     } = useContext(StutteredContext);
-    const {help, cardColor} = props;
+    const {help} = props;
 
     const transcriptionTimeEstimate = () => {
         const finalDur = Math.round(audioFileDuration / 60) * 6;
@@ -50,7 +50,6 @@ const Transcription = (props) => {
                 </Help>
             </Box>
         }
-        // sx={{backgroundColor: cardColor}}
         >
             {loadingTranscription ? (
                     <Stack alignItems={'center'}>
