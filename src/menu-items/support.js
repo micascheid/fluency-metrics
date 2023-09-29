@@ -1,6 +1,7 @@
 // assets
 import { ChromeOutlined, QuestionOutlined } from '@ant-design/icons';
 import { SupportAgent } from '@mui/icons-material';
+import {Modal} from "@mui/material";
 // icons
 const icons = {
     ChromeOutlined,
