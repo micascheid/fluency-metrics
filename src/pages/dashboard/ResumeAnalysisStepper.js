@@ -130,7 +130,11 @@ const ResumeAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
 
     return (
         <Stack spacing={2}>
-            <CorrectAudioFileChecker audioFileName={audioFileName} isModalOpen={isAudioCheckerModal} onYes={handleAudioCheckYes} onNo={handleAudioCheckNo} />
+            <CorrectAudioFileChecker
+                audioFileName={audioFileName}
+                isModalOpen={isAudioCheckerModal}
+                onYes={handleAudioCheckYes}
+                onNo={handleAudioCheckNo} />
             <FormControl>
                 <InputLabel>None</InputLabel>
                 <Select
@@ -143,16 +147,19 @@ const ResumeAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
                         <em>None</em>
                     </MenuItem>
                     {workspacesIndex &&
-                        Object.entries(workspacesIndex).map(([id, data], index) => {
-                                const time = formatTimestamp(data.creation_time);
-                                return (
-                                    <MenuItem key={index} value={id}>
-                                        <Typography><strong>Name:</strong> {data.name}, <strong>Date
-                                            Created:</strong> {time} </Typography>
-                                    </MenuItem>
-                                )
-                            }
-                        )
+                        [...Object.entries(workspacesIndex)]
+                            .sort(([, a], [, b]) => {
+                                return b.creation_time.seconds - a.creation_time.seconds;
+                            })
+                            .map(([id, data], index) => {
+                                    const time = formatTimestamp(data.creation_time); // Convert Firestore Timestamp to JavaScript Date
+                                    return (
+                                        <MenuItem key={index} value={id}>
+                                            <Typography><strong>Name:</strong> {data.name}, <strong>Date Created:</strong> {time}</Typography>
+                                        </MenuItem>
+                                    );
+                                }
+                            )
                     }
                 </Select>
             </FormControl>

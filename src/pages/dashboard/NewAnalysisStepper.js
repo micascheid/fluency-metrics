@@ -18,7 +18,29 @@ import AreYouSure from "./modals/AreYouSure";
 import {UserContext} from "../../context/UserContext";
 import PHIEntryChecker from "./modals/PHIEntryChecker";
 import {SPEECH_SAMPLE_OPTIONS} from "../../constants";
+import {styled} from "@mui/material";
 
+
+const PulseLoadingButton = styled(LoadingButton)`
+  @keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 0.7;
+    }
+    50% {
+        transform: scale(1.05);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 0.7;
+    }
+}
+
+  &:not([disabled]) {
+    animation: pulse 1.5s infinite;
+  }
+`;
 
 const NewAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
     const {
@@ -206,15 +228,16 @@ const NewAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
                     />
                 </Stack>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-                    <LoadingButton
+
+                    <PulseLoadingButton
                         loading={loadingTranscription}
                         variant={"contained"}
                         disabled={(!!nameError || localWorkspaceName === '')}
                         onClick={handleCreateWorkspace}
-                        sx={{ flexShrink: 0 }}  // Prevent the button from shrinking
+                        sx={{ flexShrink: 0 }}
                     >
                         Create Workspace
-                    </LoadingButton>
+                    </PulseLoadingButton>
 
                     {loadingTranscription &&
                         <Stack direction={"row"} sx={{ flexGrow: 1, alignItems: 'center' }}>
