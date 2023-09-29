@@ -86,7 +86,7 @@ const InstructionsAutoMode = ({setOverflow}) => {
                 </ListItem>
                 <ListItem>
                     <CustomListItemText
-                        primary="2.) Next the workspace will open, now you may utilize the workspace tools to annotate stuttered regions."
+                        primary="2.) Next, the workspace will open, now you may utilize the workspace tools to annotate stuttered regions."
                     />
                 </ListItem>
                 <ListItem>

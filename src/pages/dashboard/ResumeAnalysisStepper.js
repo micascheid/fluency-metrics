@@ -18,11 +18,13 @@ import {StutteredContext} from "../../context/StutteredContext";
 import Loader from "../../components/Loader";
 import LoadPreviousAudioFile from "./LoadPreviousAudioFile";
 import CorrectAudioFileChecker from "./modals/CorrectAudioFileChecker";
+import PulsingLoadingButton from "../../components/PulsingLoadingButton";
 
 const ResumeAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
     const {
         user,
         workspacesIndex,
+        workspaceName
     } = useContext(UserContext);
     const {
         audioFileName,
@@ -35,15 +37,12 @@ const ResumeAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
         setWorkspaceExpanded
     } = otherProps;
 
-    const workspacesColRef = collection(db, 'users', user.uid, 'workspaces');
-    const workspacesIndexRef = collection(db, 'users', user.uid, 'workspaces_index');
     const [selectedResume, setSelectedResume] = useState(workspaceId);
     const [localWorkspaceId, setLocalWorkspaceId] = useState(workspaceId);
     const [isLoadingModal, setIsLoadingModal] = useState(false);
     const [isAudioCheckerModal, setIsAudioCheckerModal] = useState(false);
 
     const handleResumeSelection = (event) => {
-        // console.log("selectedResume:", event.target.value);
         const id = event.target.value;
         setSelectedResume(id);
         setLocalWorkspaceId(id);
@@ -117,15 +116,19 @@ const ResumeAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
             const workspaceObj = await getDoc(workspaceRef);
             setLoadWorkspaceByObj(workspaceObj.data());
             setWorkspaceExpanded(true);
+
         } catch (error) {
             setWorkspaceExpanded(false);
             console.log("Trouble fetching workspace,", error);
         }
     };
 
-    useEffect(() => {
-        setLocalWorkspaceId(workspaceId);
-    }, [localWorkspaceId]);
+    // useEffect(() => {
+    //     setLocalWorkspaceId(workspaceId);
+    // }, [localWorkspaceId]);
+
+
+
 
 
     return (
@@ -155,7 +158,7 @@ const ResumeAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
                                     const time = formatTimestamp(data.creation_time); // Convert Firestore Timestamp to JavaScript Date
                                     return (
                                         <MenuItem key={index} value={id}>
-                                            <Typography><strong>Name:</strong> {data.name}, <strong>Date Created:</strong> {time}</Typography>
+                                            <Typography><strong>Date Created:</strong> {time}, <strong>Name:</strong> {data.name}</Typography>
                                         </MenuItem>
                                     );
                                 }
@@ -182,8 +185,11 @@ const ResumeAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
                 </Button>
                 <Typography variant={"body1"}>{audioFileName}</Typography>
             </Box>
-
-            <Button variant={"contained"} disabled={!audioFileName || selectedResume === 'None'} onClick={handleAudioCheckerModal}>
+            <Button
+                variant={"contained"}
+                disabled={!audioFileName || selectedResume === 'None'}
+                onClick={handleAudioCheckerModal}
+            >
                 Load Workspace
             </Button>
         </Stack>

@@ -19,28 +19,7 @@ import {UserContext} from "../../context/UserContext";
 import PHIEntryChecker from "./modals/PHIEntryChecker";
 import {SPEECH_SAMPLE_OPTIONS} from "../../constants";
 import {styled} from "@mui/material";
-
-
-const PulseLoadingButton = styled(LoadingButton)`
-  @keyframes pulse {
-    0% {
-        transform: scale(1);
-        opacity: 0.7;
-    }
-    50% {
-        transform: scale(1.05);
-        opacity: 1;
-    }
-    100% {
-        transform: scale(1);
-        opacity: 0.7;
-    }
-}
-
-  &:not([disabled]) {
-    animation: pulse 1.5s infinite;
-  }
-`;
+import PulsingLoadingButton from "../../components/PulsingLoadingButton";
 
 const NewAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
     const {
@@ -168,10 +147,11 @@ const NewAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
             {showAreYouSure && <AreYouSure setAreYouSure={setShowAreYouSure} setYesNo={setYesNo}/>}
             <PHIEntryChecker isModalOpen={isModalOpen} onYes={handlePhiYes} onNo={handlePhiNo} />
             <Stack spacing={2}>
-                <FormControl sx={{mt: 2, width: 150}}>
+                <FormControl sx={{mt: 2, width: 200}}>
                     <InputLabel>Select Mode</InputLabel>
                     <Select
-                        sx={{minWidth: 100}}
+                        sx={{minWidth: 100, borderColor: '#000'}}
+
                         label={"Select Mode"}
                         value={mode}
                         onChange={handleMode}
@@ -181,11 +161,11 @@ const NewAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
                     </Select>
                 </FormControl>
                 <Box>
-                    <Button sx={{width: 150}} disabled={mode === ''}
+                    <Button sx={{width: 200}} disabled={mode === ''}
                             variant={"outlined"} fullWidth component={"label"} onClick={(event) => {
                         event.currentTarget.blur();
                     }}>
-                        Choose File
+                        Choose Speech Sample
                         <input
                             type={"file"}
                             hidden
@@ -196,7 +176,7 @@ const NewAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
                     <Typography></Typography>
                 </Box>
                 <FormControl
-                    sx={{width: 150}}
+                    sx={{width: 200}}
                     disabled={audioFileName === ''}
                 >
                     <InputLabel
@@ -227,22 +207,23 @@ const NewAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
                         disabled={!localSpeechContext}
                     />
                 </Stack>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
 
-                    <PulseLoadingButton
+                    <PulsingLoadingButton
                         loading={loadingTranscription}
                         variant={"contained"}
                         disabled={(!!nameError || localWorkspaceName === '')}
+                        shouldPulse={true}
                         onClick={handleCreateWorkspace}
-                        sx={{ flexShrink: 0 }}
+                        sx={{width: 200, flexShrink: 0 }}
                     >
                         Create Workspace
-                    </PulseLoadingButton>
+                    </PulsingLoadingButton>
 
                     {loadingTranscription &&
                         <Stack direction={"row"} sx={{ flexGrow: 1, alignItems: 'center' }}>
                             {/*<CircularProgress/>*/}
-                            <Typography variant={"h5"} fontWeight={"light"}>Hang tight! Processing time is:</Typography>
+                            <Typography variant={"h5"} fontWeight={"light"}>Hang tight! Processing time is: </Typography>
                             <Typography variant={"h5"}>{transcriptionEstimate}</Typography>
                         </Stack>
                     }
