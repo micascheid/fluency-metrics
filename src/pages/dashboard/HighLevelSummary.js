@@ -100,7 +100,7 @@ const HighLevelSummary = (props) => {
                     startIcon={<PrintIcon />}
                     onClick={handlePrintOutClick}
                     disabled={workspaceName === ''}
-                    sx={{fontWeight: 'bold'}}
+                    sx={{fontWeight: 'bold', textTransform: 'none'}}
                 >
                     Summary and Transcription
                 </Button>
@@ -108,7 +108,7 @@ const HighLevelSummary = (props) => {
         } sx={{backgroundColor: theme.palette.success.lighter}}
         >
             {isPrinting && <PrintOut ref={printComponentRef} />}
-            <Collapse in={isExpanded} timout={"auto"}>
+            <Collapse in={isExpanded} timeout={"auto"}>
                 {children}
             </Collapse>
         </MainCard>

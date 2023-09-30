@@ -60,7 +60,7 @@ const InstructionsAutoMode = ({setOverflow}) => {
             </Typography>
             <Typography variant="subtitle1" sx={{alignItems: "center"}} gutterBottom>
                 {/* Increased font size for body text */}
-                Click any of the
+                Clicking the
                 <Tooltip title="Click on these for help.">
                     <HelpOutline sx={{
                         ml: 0.5,
@@ -69,9 +69,9 @@ const InstructionsAutoMode = ({setOverflow}) => {
                         verticalAlign: 'middle'
                     }} fontSize={"small"}/>
                 </Tooltip>
-                icons anytime for guidance.
+                icons will help you learn the tool. Below is just an overview.
             </Typography>
-            <Typography variant={'h5'} sx={{textDecoration: 'underline'}}>Tool Workflow:</Typography>
+            <Typography variant={'h5'} sx={{textDecoration: 'underline'}}>Stutter Analysis Workflow:</Typography>
             <List sx={{
                 '& .MuiListItem-root': {
                     pt: 0,
@@ -80,22 +80,22 @@ const InstructionsAutoMode = ({setOverflow}) => {
             }}>
                 <ListItem>
                     <CustomListItemText
-                        primary="1.) Begin with “New Workspace” or “Resume Workspace”. Upon creation, Fluency Metrics provides an automated transcription and audio player for you to work from or continue from where you left off."
+                        primary="1.) Begin with “New Workspace” or “Resume Workspace”. Upon creation, Fluency Metrics provides an automated transcription and audio player for you to work from or to continue from where you left off."
                     />
                 </ListItem>
                 <ListItem>
                     <CustomListItemText
-                        primary="2.) Next, the workspace will open, now you may utilize the workspace tools to annotate stuttered regions."
+                        primary="2.) Next, the workspace card will open, where you'll utilize the workspace tools to annotate stuttered regions."
                     />
                 </ListItem>
                 <ListItem>
                     <CustomListItemText
-                        primary={`3.) When you're done, scroll down to "Summary" to view, print, or download the auto-generated metrics summary available at the bottom. You may add extra notes within the summary.`}
+                        primary={`3.) Once finished, scroll down to "Summary" at the bottom to view, print, or download the automatically generated metrics. You also have the option to add additional notes within the summary.`}
                     />
                 </ListItem>
                 <ListItem>
                     <CustomListItemText
-                        primary={`Note: Only provide information about the stuttered events through the audio player. Fluency Metrics will handle the rest`}
+                        primary={`Note: Only provide information about the stuttered events through the audio player. Let Fluency Metrics handle the rest.`}
                     />
                 </ListItem>
             </List>

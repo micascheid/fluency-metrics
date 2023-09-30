@@ -100,7 +100,7 @@ const PrintOut = forwardRef((props, ref) => {
                 </Grid>
                 {/* Event Statistics */}
                 <Grid item xs={12}>
-                    <SubtitleTypography variant={"subtitle1"}>Event Statistics</SubtitleTypography>
+                    <SubtitleTypography variant={"subtitle1"}>Event Type Counts</SubtitleTypography>
                     <Stack spacing={1}>
                         <Typography>Rep. Whole Word: {repWholeWord}</Typography>
                         <Typography>Rep. Syllable: {repSyllable}</Typography>

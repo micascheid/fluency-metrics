@@ -24,6 +24,7 @@ import badHealth from "./modals/BadHealth";
 import BadHealth from "./modals/BadHealth";
 import {doc} from "firebase/firestore";
 import {db} from "../../FirebaseConfig";
+import HelpHighLevelSummary from "./help-components/HelpHighLevelSummary";
 
 
 const DefaultDashboard = () => {
@@ -131,7 +132,7 @@ const DefaultDashboard = () => {
                                 </Grid>
 
                                 <Grid item xs={12}>
-                                    <HighLevelSummary expanded={workspaceExpanded}>
+                                    <HighLevelSummary expanded={workspaceExpanded} help={<HelpHighLevelSummary/>}>
                                         <Grid item container xs={12} spacing={2}>
                                             <Grid item xs={12} sm={12} md={6} lg={6}>
                                                 <StutteredEvents help={<HelpDisfluencyEvents/>}/>

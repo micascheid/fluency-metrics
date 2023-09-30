@@ -54,7 +54,7 @@ const Transcription = (props) => {
             {loadingTranscription ? (
                     <Stack alignItems={'center'}>
                         <CircularProgress/>
-                        <Typography variant={"h4"} fontWeight={"light"}>Hang tight! Transcription processing time is:</Typography>
+                        <Typography variant={"h4"} fontWeight={"light"}>Hang tight! Transcription processing time is: </Typography>
                         <Typography variant={"h4"}>{transcriptionEstimate}</Typography>
                     </Stack>
             ) : (
