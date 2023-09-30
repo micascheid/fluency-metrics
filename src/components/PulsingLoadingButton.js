@@ -2,7 +2,7 @@ import React from 'react';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { styled } from '@mui/material/styles';
 
-const StyledPulseLoadingButton = styled(LoadingButton)`
+const StyledPulseLoadingButton = styled(({shouldPulse, ...otherProps}) => <LoadingButton {...otherProps}/>)`
   @keyframes pulse {
     0% {
       transform: scale(1);
@@ -28,7 +28,7 @@ const StyledPulseLoadingButton = styled(LoadingButton)`
 `;
 
 const PulsingLoadingButton = ({shouldPulse, ...props}) => {
-    return <StyledPulseLoadingButton shouldPulse={shouldPulse}{...props} />;
+    return <StyledPulseLoadingButton shouldPulse={shouldPulse} {...props} />;
 }
 
 export default PulsingLoadingButton;

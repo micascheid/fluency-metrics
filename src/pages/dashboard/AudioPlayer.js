@@ -431,7 +431,6 @@ const AudioPlayer = (props) => {
                                         stutteredWords={stutteredWords}
                                         region={currentRegion}
                                         exists={stutteredEvents[currentRegion.id]}
-                                        // setPopoverColor={setPopoverColor}
                                     />
                                 )}
 
@@ -448,9 +447,9 @@ const AudioPlayer = (props) => {
                 )}
 
                 <Box sx={{height: 10}}/>
-                <Stack spacing={1} direction={"row"}>
-                    <Speed/>
-                    <Box sx={{width: 100}}>
+                <Stack spacing={1} direction={"row"} sx={{alignItems: 'center'}}>
+                    <Speed />
+                    <Box sx={{width: 100, pt: 1}}>
                         <Slider
                             aria-label="playbackspeed"
                             defaultValue={1}
@@ -469,13 +468,16 @@ const AudioPlayer = (props) => {
                             sx={{width: 90, mr: 10}}
                         />
                     </Box>
+                    <Box sx={{width: '20px', pr: 3}}>
+                        <Typography>{playBackSpeed}x</Typography>
+                    </Box>
                     <Button variant={"outlined"} onClick={(event) => {
                         play();
                         event.currentTarget.blur();
                     }}
                             disabled={isDisabled}>Play / Pause</Button>
                     <ZoomOut/>
-                    <Box sx={{width: 100}}>
+                    <Box sx={{width: 100, pt: 1}}>
                         <Slider
                             aria-label="Zoom"
                             defaultValue={1}

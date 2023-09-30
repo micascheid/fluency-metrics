@@ -85,7 +85,7 @@ const NewAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
     const handleWorkspaceNameChange = (event) => {
         const value = event.target.value;
 
-        if (value.length > 30) {
+        if (value.length > 50) {
             setNameError('Max length is 30 characters')
         } else if (!/^[a-zA-Z0-9-_ ]*$/.test(value)) {
             setNameError('Only letters, numbers, hypens and underscores are allowed')
