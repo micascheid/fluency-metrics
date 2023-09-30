@@ -1,4 +1,4 @@
-import { lazy } from "react";
+import {lazy, useContext} from "react";
 
 // project import
 import Loadable from 'components/Loadable';
@@ -9,6 +9,7 @@ const AuthLogin = Loadable(lazy(() => import('pages/authentication/Login')));
 const AuthRegister = Loadable(lazy(() => import('pages/authentication/Register')));
 
 // ==============================|| AUTH ROUTING - LOGIN ROUTES ||==============================//
+
 
 const LoginRoutes = {
     path: '/',

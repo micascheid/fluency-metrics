@@ -12,6 +12,7 @@ export const UserProvider = ({children}) => {
     const [isLoading, setIsLoading] = useState(true);
     const [isBlocked, setIsBlocked] = useState(false);
     const [badHealth, setBadHealth] = useState(false);
+    const [registrationComplete, setRegistrationComplete] = useState(false);
     const navigate = useNavigate();
     const login = (user) => {
         setUser(user);
@@ -20,6 +21,8 @@ export const UserProvider = ({children}) => {
     const logout = () => {
         signOut(auth).then(() => {
             navigate('/login');
+            setUser(null);
+            setRegistrationComplete(false);
         });
         setUser(null);
     };
@@ -48,7 +51,7 @@ export const UserProvider = ({children}) => {
                 const orgData = orgSnap.data();
                 console.log("ORG DATA:", orgData);
                 //Check that they're organization is in good standing and they infact exist
-                if (orgData.subscription_status === "active" && orgData.members.includes(userId)){
+                if (orgData.subscription_status === "active" && orgData.members.includes(userId)) {
                     block = false;
                 }
             }
@@ -64,11 +67,11 @@ export const UserProvider = ({children}) => {
         try {
             const healthSnap = await getDoc(healthCheckRef);
             const data = healthSnap.data();
-            if (data.reason !== ""){
+            if (data.reason !== "") {
                 setBadHealth(data.reason);
             }
         } catch (error) {
-            setBadHealth(error);
+            setBadHealth("An issue connecting has occured");
             console.log("HEALTH CHECK ERROR:", error);
         }
     };
@@ -112,7 +115,7 @@ export const UserProvider = ({children}) => {
     useEffect(() => {
         // This will trigger every time 'user' changes.
         // If necessary, add more dependencies to the dependency array.
-        if (user) {
+        if (registrationComplete) {
             shouldBlock(user.uid).then(result => {
                 if (result) {
                     console.log("Should be blocked");
@@ -124,7 +127,25 @@ export const UserProvider = ({children}) => {
                 // Handle the result if needed.
             });
         }
-    }, [user]);
+    }, [registrationComplete]);
+
+    useEffect(() => {
+        if (user) {
+            const userRef = doc(db, 'users', user.uid);
+            const unsubscribe = onSnapshot(userRef, (doc) => {
+                const userData = doc.data();
+                if (userData && userData.subscription) {
+                    setRegistrationComplete(true);
+                    // Also, you can set other user data here if needed
+                } else {
+                    setRegistrationComplete(false);
+                }
+            });
+
+            // Cleanup the listener on component unmount
+            return () => unsubscribe();
+        }
+    }, [user, db]);
 
 
     const contextValues = {
@@ -137,6 +158,7 @@ export const UserProvider = ({children}) => {
         setIsLoading,
         isBlocked,
         badHealth,
+        setRegistrationComplete
     };
 
     return (

@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useContext, useEffect, useState} from 'react';
 import {Link as RouterLink, useNavigate} from 'react-router-dom';
 
 // material-ui
@@ -37,10 +37,12 @@ import {doc, setDoc, getDoc, serverTimestamp} from "firebase/firestore";
 import {db, auth} from "../../../FirebaseConfig";
 import {useTheme} from "@mui/material/styles";
 import OrganizationCodeInfo from "../../dashboard/modals/OrganizationCodeInfo";
+import {UserContext} from "../../../context/UserContext";
 
 // ============================|| FIREBASE - REGISTER ||============================ //
 
 const AuthRegister = () => {
+    const {setRegistrationComplete} = useContext(UserContext);
     const navigate = useNavigate();
     const [level, setLevel] = useState();
     const [showPassword, setShowPassword] = useState(false);
@@ -94,6 +96,27 @@ const AuthRegister = () => {
         setLevel(strengthColor(temp));
     };
 
+    const handleRegistration = async (values) => {
+        try {
+            const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
+            const user = userCredential.user;
+
+            await updateProfile(user, {
+                displayName: values.displayname,
+                photoURL: ''
+            });
+
+            setIsRegistering(true);
+
+            await addUserIfNotExists(user.uid, subscription_info);
+            setRegistrationComplete(true);
+            navigate('/');
+        } catch (error) {
+            console.error("Error during registration:", error);
+            // Handle or display the error to the user.
+        }
+    };
+
     useEffect(() => {
         changePassword('');
     }, []);
@@ -122,33 +145,31 @@ const AuthRegister = () => {
                     setStatus({success: false});
                     setSubmitting(false);
 
-                    //check if they are associated with organization
-                    if (values.organizationCode) {
-                        //do some stuff here
-                    }
-                    createUserWithEmailAndPassword(auth, values.email, values.password)
-                        .then((userCredential) => {
-                            const user = userCredential.user;
-                            updateProfile(user, {
-                                displayName: values.displayname, photoURL: ''
-                            }).then(() => {
-                                setIsRegistering(true);
+                    await handleRegistration(values);
 
-                                addUserIfNotExists(user.uid, subscription_info).then(() => {
-                                    navigate('/dashboard/default')
-                                });
-                            })
-                        })
-                        .catch((error) => {
-                            const errorCode = error.code;
-                            const errorMessage = error.message;
-                            console.error(errorCode);
-                            console.error(errorMessage);
-                            setStatus({success: false});
-                            setErrors({submit: error.message});
-                            setSubmitting(false);
-                            setIsRegistering(false);
-                        })
+                    // createUserWithEmailAndPassword(auth, values.email, values.password)
+                    //     .then((userCredential) => {
+                    //         const user = userCredential.user;
+                    //         updateProfile(user, {
+                    //             displayName: values.displayname, photoURL: ''
+                    //         }).then(() => {
+                    //             setIsRegistering(true);
+                    //
+                    //             addUserIfNotExists(user.uid, subscription_info).then(() => {
+                    //                 navigate('/');
+                    //             });
+                    //         })
+                    //     })
+                    //     .catch((error) => {
+                    //         const errorCode = error.code;
+                    //         const errorMessage = error.message;
+                    //         console.error(errorCode);
+                    //         console.error(errorMessage);
+                    //         setStatus({success: false});
+                    //         setErrors({submit: error.message});
+                    //         setSubmitting(false);
+                    //         setIsRegistering(false);
+                    //     })
 
                 }
                 }
