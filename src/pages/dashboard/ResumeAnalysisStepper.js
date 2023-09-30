@@ -3,7 +3,7 @@ import {
     Box,
     Button,
     CircularProgress,
-    FormControl,
+    FormControl, IconButton,
     InputLabel,
     MenuItem,
     Select,
@@ -12,19 +12,22 @@ import {
 } from "@mui/material";
 import React from "react";
 import {UserContext} from "../../context/UserContext";
-import {collection, doc, getDoc, getDocs} from "firebase/firestore";
+import {collection, doc, deleteDoc, getDoc, getDocs} from "firebase/firestore";
 import {db} from "../../FirebaseConfig";
 import {StutteredContext} from "../../context/StutteredContext";
 import Loader from "../../components/Loader";
 import LoadPreviousAudioFile from "./LoadPreviousAudioFile";
 import CorrectAudioFileChecker from "./modals/CorrectAudioFileChecker";
 import PulsingLoadingButton from "../../components/PulsingLoadingButton";
+import {DeleteForever} from "@mui/icons-material";
+import AreYouSureTwo from "./modals/AreYouSureTwo";
+import AreYouSure from "./modals/AreYouSure";
 
 const ResumeAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
     const {
         user,
         workspacesIndex,
-        workspaceName
+        setWorkspacesIndex,
     } = useContext(UserContext);
     const {
         audioFileName,
@@ -41,6 +44,9 @@ const ResumeAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
     const [localWorkspaceId, setLocalWorkspaceId] = useState(workspaceId);
     const [isLoadingModal, setIsLoadingModal] = useState(false);
     const [isAudioCheckerModal, setIsAudioCheckerModal] = useState(false);
+    const [isDelete, setIsDelete] = useState(false);
+    const [deleteOpen, setDeleteOpen] = useState(false);
+    const [whomToDelete, setWhomToDelete] = useState(null);
 
     const handleResumeSelection = (event) => {
         const id = event.target.value;
@@ -123,12 +129,32 @@ const ResumeAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
         }
     };
 
-    // useEffect(() => {
-    //     setLocalWorkspaceId(workspaceId);
-    // }, [localWorkspaceId]);
 
 
 
+    useEffect(() => {
+        const deleteWorkspace = async () => {
+            await handleWorkspaceDelete(whomToDelete);
+        }
+        if (isDelete) {
+            console.log("were deleting this guy", whomToDelete);
+            deleteWorkspace().then(()=> {
+                setIsDelete(false);
+            })
+        }
+    }, [isDelete]);
+
+    const handleWorkspaceDelete = async (id) => {
+        const workspaceIndexRef = doc(db, 'users', user.uid, 'workspaces_index', id);
+        const workspaceObjRef = doc(db, 'users', user.uid, 'workspaces', id);
+
+        try {
+            await deleteDoc(workspaceIndexRef);
+            await deleteDoc(workspaceObjRef);
+        } catch (error) {
+            console.error("error deleting workspace:", error.message);
+        }
+    };
 
 
     return (
@@ -145,6 +171,14 @@ const ResumeAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
                     id={"resume-label"}
                     value={localWorkspaceId}
                     onChange={handleResumeSelection}
+                    renderValue={(selectedValue) => {
+                        if (!selectedValue || selectedValue === 'None' || !workspacesIndex[selectedValue]) {
+                            return "None";
+                        }
+                        const selectedItem = workspacesIndex[selectedValue];
+                        const time = formatTimestamp(selectedItem.creation_time);
+                        return `${time}, ${selectedItem.name}`;
+                    }}
                 >
                     <MenuItem value={'None'}>
                         <em>None</em>
@@ -158,7 +192,25 @@ const ResumeAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
                                     const time = formatTimestamp(data.creation_time); // Convert Firestore Timestamp to JavaScript Date
                                     return (
                                         <MenuItem key={index} value={id}>
-                                            <Typography><strong>Date Created:</strong> {time}, <strong>Name:</strong> {data.name}</Typography>
+
+                                            <Box sx={{display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center'}}>
+                                                <Typography sx={{flex: 1}}><strong>Date Created:</strong> {time}, <strong>Name:</strong> {data.name}</Typography>
+                                                <IconButton
+                                                    size="small"
+                                                    sx={{
+                                                        flex: 'none',
+                                                        padding: '0px'
+                                                    }}
+                                                    onClick={(event) => {
+                                                        event.stopPropagation();
+                                                        setDeleteOpen(true);
+                                                        setWhomToDelete(id);
+                                                    }}
+                                                >
+                                                    <DeleteForever  sx={{color: 'red'}}/>
+                                                </IconButton>
+                                            </Box>
+
                                         </MenuItem>
                                     );
                                 }
@@ -192,6 +244,7 @@ const ResumeAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
             >
                 Load Workspace
             </Button>
+            {deleteOpen && <AreYouSureTwo open={deleteOpen} setOpen={setDeleteOpen} setIsDelete={setIsDelete} />}
         </Stack>
     );
 };

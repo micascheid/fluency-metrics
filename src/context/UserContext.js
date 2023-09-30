@@ -2,7 +2,7 @@ import {createContext, useEffect, useState} from 'react';
 import {useNavigate} from "react-router-dom";
 import {onAuthStateChanged, signOut} from "firebase/auth";
 import {auth, db} from "../FirebaseConfig";
-import {collection, doc, getDoc, getDocs} from "firebase/firestore";
+import {collection, doc, getDoc, getDocs, onSnapshot} from "firebase/firestore";
 
 export const UserContext = createContext();
 
@@ -75,32 +75,56 @@ export const UserProvider = ({children}) => {
 
     const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
+
     useEffect(() => {
-        const signedIn = onAuthStateChanged(auth, async (currentUser) => {
+        const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
             if (currentUser) {
                 setUser(currentUser);
-                const workspacesIndexTemp = {};
+
                 const workspacesIndexRef = collection(db, 'users', currentUser.uid, 'workspaces_index');
-                const workspacesIndexDocs = await getDocs(workspacesIndexRef);
-                workspacesIndexDocs.docs.forEach((doc) => {
-                    workspacesIndexTemp[doc.id] = doc.data();
+
+                // Setup the real-time listener
+                const unsubscribeSnapshot = onSnapshot(workspacesIndexRef, (snapshot) => {
+                    const workspacesIndexTemp = {};
+                    snapshot.docs.forEach(doc => {
+                        workspacesIndexTemp[doc.id] = doc.data();
+                    });
+                    setWorkspacesIndex(workspacesIndexTemp);
                 });
-                await delay(2000);
-                setWorkspacesIndex(workspacesIndexTemp);
+
                 setIsLoading(false);
-                if (await shouldBlock(currentUser.uid)) {
-                    console.log("Should be blocked");
-                    setIsBlocked(true);
-                }
-                await checkBackendHealth();
+
+                // Clean up the snapshot listener when the component is unmounted
+                return () => {
+                    unsubscribeSnapshot();
+                };
+
             } else {
                 navigate('/login');
             }
         });
+
         return () => {
-            signedIn();
+            unsubscribeAuth();
         };
     }, []);
+
+    useEffect(() => {
+        // This will trigger every time 'user' changes.
+        // If necessary, add more dependencies to the dependency array.
+        if (user) {
+            shouldBlock(user.uid).then(result => {
+                if (result) {
+                    console.log("Should be blocked");
+                    setIsBlocked(true);
+                }
+            });
+
+            checkBackendHealth().then(() => {
+                // Handle the result if needed.
+            });
+        }
+    }, [user]);
 
 
     const contextValues = {

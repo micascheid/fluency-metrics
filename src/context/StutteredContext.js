@@ -330,6 +330,7 @@ export const StutteredProvider = (props) => {
         });
     };
 
+
     const get_transcription = async () => {
         setLoadingTranscription(true);
         const formData = new FormData();

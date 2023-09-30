@@ -37,7 +37,6 @@ const InstructionsAutoMode = ({setOverflow}) => {
     useEffect(() => {
         const checkOverflow = () => {
             if (contentBoxRef.current.scrollHeight > parentContainerRef.current.clientHeight) {
-                console.log("SETTING HERERERERERE");
                 setOverflow(true);
             } else {
                 setOverflow(false);

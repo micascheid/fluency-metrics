@@ -22,10 +22,13 @@ import {useTheme} from "@mui/material/styles";
 import DashboardBlocked from "./modals/DashboardBlocked";
 import badHealth from "./modals/BadHealth";
 import BadHealth from "./modals/BadHealth";
+import {doc} from "firebase/firestore";
+import {db} from "../../FirebaseConfig";
 
 
 const DefaultDashboard = () => {
     const {
+        user,
         isLoading,
         isBlocked,
         badHealth,
@@ -79,6 +82,8 @@ const DefaultDashboard = () => {
         setLoadingTranscription: setLoadingTranscription,
         setWorkspaceExpanded: setWorkspaceExpanded,
     }
+
+
 
     useEffect(() => {
         const beforeUnloadListenter = (event) => {
