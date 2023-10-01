@@ -190,6 +190,40 @@ const AudioPlayer = (props) => {
         })
     }
 
+    const handleMarkStutter = () => {
+        const audioTime = wavesurferRef.current.getCurrentTime();
+        if (!isAudioCursorInsideAnyRegion(audioTime)) {
+            if (!isCreatingRegion) {
+                const newRegionTemp = {start: audioTime};
+                setIsCreatingRegion(true);
+                setCreatingRegion(newRegionTemp);
+            } else {
+                const duration = audioTime - creatingRegion.start;
+                const region = {
+                    start: creatingRegion.start,
+                    end: audioTime,
+                    duration: duration,
+                    color: "rgba(255, 0, 0, .2)",
+                };
+                const id = Object.keys(kiStutteredRegions).length;
+                setkiStutteredRegions(prevRegions => ({
+                    ...prevRegions,
+                    [id]: region
+                }));
+
+                setCreatingRegion(null);
+                setIsCreatingRegion(false);
+            }
+        } else {
+            setIsFlashing(true);
+        }
+    };
+
+    const handleMarkStutterClick = () => {
+        if (wavesurferRef.current && !isDisabled) {
+            handleMarkStutter();
+        }
+    };
     const handleKeyPress = (event) => {
         if (wavesurferRef.current && !isDisabled) {
             const audioTime = wavesurferRef.current.getCurrentTime();
@@ -386,44 +420,44 @@ const AudioPlayer = (props) => {
                     <React.Fragment>
                         <SaveWorkspace sx={{mb: 3}} name={workspaceName}/>
                         <StyledRegion>
-                        <WaveSurfer plugins={plugins} onMount={handleWSMount}>
-                            <WaveForm {...waveformProps}>
-                                {markers.map((marker) => (
-                                    <Marker
-                                        key={marker.label}
-                                        {...marker}
-                                    />
-                                ))}
-                                {Object.entries(kiStutteredRegions).map(([id, regionProps]) => {
-                                    return (
-                                        <Region
-                                            key={id}
-                                            id={id}
-                                            {...regionProps}
-                                            onUpdateEnd={handleRegionUpdate}
-                                            onUpdate={handleUpdate}
-                                            onClick={handlePopoverOpen}
-                                            onOver={handleOnOver}
-
+                            <WaveSurfer plugins={plugins} onMount={handleWSMount}>
+                                <WaveForm {...waveformProps}>
+                                    {markers.map((marker) => (
+                                        <Marker
+                                            key={marker.label}
+                                            {...marker}
                                         />
-                                    )
-                                })}
-                                {anchorEl && currentRegion && (
-                                    <AudioPlayerPopover
-                                        key={popoverKey}
-                                        anchorEl={anchorEl}
-                                        setAnchorEl={setAnchorEl}
-                                        popoverOpen={Boolean(anchorEl)}
-                                        setPopoverOpen={setPopoverOpen}
-                                        stutteredWords={stutteredWords}
-                                        region={currentRegion}
-                                        exists={stutteredEvents[currentRegion.id]}
-                                    />
-                                )}
+                                    ))}
+                                    {Object.entries(kiStutteredRegions).map(([id, regionProps]) => {
+                                        return (
+                                            <Region
+                                                key={id}
+                                                id={id}
+                                                {...regionProps}
+                                                onUpdateEnd={handleRegionUpdate}
+                                                onUpdate={handleUpdate}
+                                                onClick={handlePopoverOpen}
+                                                onOver={handleOnOver}
 
-                            </WaveForm>
-                            <div id="timeline"/>
-                        </WaveSurfer>
+                                            />
+                                        )
+                                    })}
+                                    {anchorEl && currentRegion && (
+                                        <AudioPlayerPopover
+                                            key={popoverKey}
+                                            anchorEl={anchorEl}
+                                            setAnchorEl={setAnchorEl}
+                                            popoverOpen={Boolean(anchorEl)}
+                                            setPopoverOpen={setPopoverOpen}
+                                            stutteredWords={stutteredWords}
+                                            region={currentRegion}
+                                            exists={stutteredEvents[currentRegion.id]}
+                                        />
+                                    )}
+
+                                </WaveForm>
+                                <div id="timeline"/>
+                            </WaveSurfer>
                         </StyledRegion>
                     </React.Fragment>
                 ) : (
@@ -435,7 +469,7 @@ const AudioPlayer = (props) => {
 
                 <Box sx={{height: 10}}/>
                 <Stack spacing={1} direction={"row"} sx={{alignItems: 'center'}}>
-                    <Speed />
+                    <Speed/>
                     <Box sx={{width: 100, pt: 1}}>
                         <Slider
                             aria-label="playbackspeed"
@@ -461,7 +495,14 @@ const AudioPlayer = (props) => {
                         play();
                         event.currentTarget.blur();
                     }}
-                            disabled={isDisabled}>Play / Pause</Button>
+                            disabled={isDisabled}>
+                        Play / Pause
+                    </Button>
+                    <Button variant={"outlined"}
+                            onClick={handleMarkStutterClick}
+                            disabled={isDisabled}>
+                        Mark Stutter
+                    </Button>
                     <ZoomOut/>
                     <Box sx={{width: 100, pt: 1}}>
                         <Slider

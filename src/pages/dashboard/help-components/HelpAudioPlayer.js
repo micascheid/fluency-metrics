@@ -16,6 +16,11 @@ const HelpAudioPlayer = () => {
                 </ListItem>
                 <ListItem>
                     <Typography variant="body1" style={largeText}>
+                        <strong>Audio Cursor</strong>: Move the audio cursor by clicking on the timeline or anywhere on the waveform. Click along timeline if relisteing to marked regions to avoid popups.
+                    </Typography>
+                </ListItem>
+                <ListItem>
+                    <Typography variant="body1" style={largeText}>
                         <strong>Adjusting Playback Speed</strong>: On the left, you'll find a slider. Use this to fine-tune the audio's playback speed for detailed listening.
                     </Typography>
                 </ListItem>
@@ -26,13 +31,12 @@ const HelpAudioPlayer = () => {
                 </ListItem>
                 <ListItem>
                     <Typography variant="body1" style={{...largeText, color: theme.palette.success.light}}>
-                        <strong>Marking Disfluencies</strong>: When you detect the start of a disfluency, press the ’s’ key. To mark its end, press the ’s’ key again. This action will highlight the section on the waveform in red.
+                        <strong>Marking Disfluencies</strong>: When you detect the start of a disfluency, press the ’s’ key or "Mark Stutter" button. To mark its end, press the ’s’ key or "Mark Stutter" again. This action will highlight the section on the waveform in red.
                     </Typography>
                 </ListItem>
                 <ListItem>
                     <Typography variant="body1" style={largeText}>
-                        <strong>Multiple Disfluencies</strong>: Continue using the 's' key method to pinpoint all the disfluency events in the audio.
-                    </Typography>
+                        <strong>Multiple Disfluencies</strong>: Continue marking disfluencies as described above.                    </Typography>
                 </ListItem>
                 <ListItem>
                     <Typography variant="body1" style={largeText}>

@@ -247,7 +247,7 @@ const NewAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
                     </PulsingLoadingButton>
 
                     {loadingTranscription &&
-                        <Stack direction={"row"} sx={{ flexGrow: 1, alignItems: 'center' }}>
+                        <Stack direction={"row"} sx={{ flexGrow: 1, alignItems: 'center' }} spacing={1}>
                             {/*<CircularProgress/>*/}
                             <Typography variant={"h5"} fontWeight={"light"}>Hang tight! Processing time is: </Typography>
                             <Typography variant={"h5"}>{transcriptionEstimate}</Typography>

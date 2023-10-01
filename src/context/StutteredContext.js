@@ -359,7 +359,7 @@ export const StutteredProvider = (props) => {
 
     useEffect(() => {
         //Set Duration
-        if (Object.keys(kiStutteredRegions).length >= 3) {
+        if (Object.keys(kiStutteredRegions).length >= 1) {
             configureDurations();
         }
 
