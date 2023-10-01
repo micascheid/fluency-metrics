@@ -54,7 +54,7 @@ const HelpAudioPlayer = () => {
                 </ListItem>
                 <ListItem>
                     <Typography variant="body1" style={largeText}>
-                        <strong>Event Details</strong>: Click on any highlighted region to open a popup. Here, you can detail the specifics of the disfluency event. Confirm your input by pressing the “Confirm” button. Use the red "trash can" icon if you need to remove.
+                        <strong>Event Details</strong>: Click on any highlighted region to open a popup. Here, you can detail the specifics of the disfluency event. Confirm your input by pressing the “Confirm” button. The region will turn orange. Use the red "trash can" icon if you need to remove.
                     </Typography>
                 </ListItem>
                 <ListItem>
