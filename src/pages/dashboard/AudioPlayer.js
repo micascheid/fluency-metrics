@@ -406,14 +406,14 @@ const AudioPlayer = (props) => {
 
 
     return (
-        <MainCard title={
-            <Box flexGrow={1}>
-                <Help title={"Audio Player"}>
-                    {help}
-                </Help>
-            </Box>
+        <MainCard
+            title={
+                <Box flexGrow={1} sx={{justifyContent: 'space-between'}}>
+                    <Help title={"Audio Player"}>
+                        {help}
+                    </Help>
+                </Box>
         }
-            // sx={{backgroundColor: theme.palette.grey[300]}}
         >
             <Stack>
                 {audioFile ? (

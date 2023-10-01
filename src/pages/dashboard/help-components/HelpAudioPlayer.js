@@ -10,6 +10,15 @@ const HelpAudioPlayer = () => {
         <Box>
             <List>
                 <ListItem>
+                    <Typography variant="body1" style={largeText} component="div">
+                        <strong>Keyboard Shortcuts</strong>:
+                        <ul>
+                            <li><strong>'s'</strong>: To mark or end stuttered event.</li>
+                            <li><strong>'space-bar</strong>: Play/Pause audio.</li>
+                        </ul>
+                    </Typography>
+                </ListItem>
+                <ListItem>
                     <Typography variant="body1" style={largeText}>
                         <strong>Play & Pause</strong>: Begin your analysis by pressing the “space-bar” or using the “Play/Pause” button.
                     </Typography>
@@ -30,7 +39,7 @@ const HelpAudioPlayer = () => {
                     </Typography>
                 </ListItem>
                 <ListItem>
-                    <Typography variant="body1" style={{...largeText, color: theme.palette.success.light}}>
+                    <Typography variant="body1" style={{...largeText, color: theme.palette.success.main}}>
                         <strong>Marking Disfluencies</strong>: When you detect the start of a disfluency, press the ’s’ key or "Mark Stutter" button. To mark its end, press the ’s’ key or "Mark Stutter" again. This action will highlight the section on the waveform in red.
                     </Typography>
                 </ListItem>

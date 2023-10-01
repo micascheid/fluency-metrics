@@ -25,7 +25,7 @@ const Navigation = () => {
             <Typography variant={"subtitle2"} color={"textSecondary"}>Support</Typography>
             <Stack direction={"row"} spacing={1}>
                 <SupportAgent fontSize={"small"} />
-                <Typography variant={"h6"}>1-907-942-2446</Typography>
+                <Typography variant={"h6"}>1-907-942-2446(call/text)</Typography>
             </Stack>
             <Stack direction={"row"} spacing={1}>
                 <MailOutline fontSize={"small"} />

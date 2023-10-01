@@ -33,7 +33,7 @@ const OrganizationCodeInfo = ({setIsShow}) => {
                     <Typography>Please contact:</Typography>
                     <Typography>micalinscheid@fluencymetrics.com</Typography>
                     <Typography>or</Typography>
-                    <Typography>1-907-942-2446</Typography>
+                    <Typography>1-907-942-2446 (call/text)</Typography>
                     <Typography fontWeight={"bold"}>And we will get you a free account as soon as possible</Typography>
                     <Button variant={"outlined"} onClick={handleOk}>
                         Ok
