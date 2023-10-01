@@ -2,7 +2,6 @@ import react, {useContext, useEffect, useState} from 'react';
 import {
     Box,
     Button,
-    CircularProgress,
     FormControl,
     InputLabel,
     MenuItem,
@@ -11,14 +10,11 @@ import {
     TextField,
     Typography
 } from "@mui/material";
-import {MANUAL} from "../../constants";
 import React from "react";
-import LoadingButton from '@mui/lab/LoadingButton';
 import AreYouSure from "./modals/AreYouSure";
 import {UserContext} from "../../context/UserContext";
 import PHIEntryChecker from "./modals/PHIEntryChecker";
 import {SPEECH_SAMPLE_OPTIONS} from "../../constants";
-import {styled} from "@mui/material";
 import PulsingLoadingButton from "../../components/PulsingLoadingButton";
 
 const NewAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
@@ -64,9 +60,39 @@ const NewAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
         }
     };
 
+    const checkValidAudioFile = async (file) => {
+        return new Promise((resolve, reject) => {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const reader = new FileReader();
+
+            reader.onload = function(event) {
+                const audioData = event.target.result;
+                audioContext.decodeAudioData(audioData, function(buffer) {
+                    resolve(true);  // Successful decoding means it's a valid audio file.
+                }, function(error) {
+                    reject(false);  // Failed decoding.
+                });
+            };
+
+            reader.onerror = function(event) {
+                reject(false);
+            };
+
+            reader.readAsArrayBuffer(file);
+        });
+    };
+
+
     const handleFileChange = (event) => {
         const file = event.target.files[0];
         if (!file) {
+            setFileChosen(false);
+            return;
+        }
+
+        const allowedFileTypes = ['audio/mp3', 'audio/mpeg', 'audio/wav', 'audio/x-wav', 'audio/mp4', 'audio/x-m4a'];
+        if (!allowedFileTypes.includes(file.type)) {
+            alert("Please Upload a valid audio file (MP3, WAV, M4A). For other formats email: micalinscheid@fluencymetrics.com to add additional formats");
             setFileChosen(false);
             return;
         }
@@ -131,7 +157,6 @@ const NewAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
     useEffect(() => {
         (async () => {
             if (yesNo) {
-                console.log("local workspace name", localWorkspaceName);
                 setWorkspaceName(localWorkspaceName);
                 setSpeechSampleContext(localSpeechContext);
                 setIsCreateNewWorkspace(true);
@@ -168,6 +193,7 @@ const NewAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
                         Choose Speech Sample
                         <input
                             type={"file"}
+                            accept={".mp3, .wav, .m4a"}
                             hidden
                             onChange={handleFileChange}
                         />

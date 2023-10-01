@@ -1,8 +1,9 @@
 import {Box, List, ListItem, Typography} from "@mui/material";
-import {headerBoxStyle, howToStyle, titleStyle} from "./HelpStyles";
+import {useTheme} from "@mui/material/styles";
 
 const HelpAudioPlayer = () => {
     const largeText = { fontSize: '1.4em', fontWeight: 'light' };
+    const theme = useTheme();
 
 
     return (
@@ -20,6 +21,11 @@ const HelpAudioPlayer = () => {
                 </ListItem>
                 <ListItem>
                     <Typography variant="body1" style={largeText}>
+                        <strong>Adjusting Waveform Detail</strong>: On the right you'll see a slider which helps you zoom in or out of the speech sample.
+                    </Typography>
+                </ListItem>
+                <ListItem>
+                    <Typography variant="body1" style={{...largeText, color: theme.palette.success.light}}>
                         <strong>Marking Disfluencies</strong>: When you detect the start of a disfluency, press the ’s’ key. To mark its end, press the ’s’ key again. This action will highlight the section on the waveform in red.
                     </Typography>
                 </ListItem>

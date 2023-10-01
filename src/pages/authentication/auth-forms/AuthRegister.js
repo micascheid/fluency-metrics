@@ -187,7 +187,7 @@ const AuthRegister = () => {
                                         name="displayname"
                                         onBlur={handleBlur}
                                         onChange={handleChange}
-                                        placeholder="Mica"
+                                        placeholder={"Amazing SLP"}
                                         fullWidth
                                         error={Boolean(touched.displayname && errors.displayname)}
                                     />
@@ -210,8 +210,7 @@ const AuthRegister = () => {
                                         name="email"
                                         onBlur={handleBlur}
                                         onChange={handleChange}
-                                        placeholder="coolemail@coolemail.com"
-                                        inputProps={{}}
+                                        placeholder={"AmazingSLP@email.com"}
                                     />
                                     {touched.email && errors.email && (
                                         <FormHelperText error id="helper-text-email-signup">

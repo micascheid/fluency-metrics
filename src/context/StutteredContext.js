@@ -38,11 +38,12 @@ export const StutteredProvider = (props) => {
         loadWorkspaceByObj,
         workspaceId,
         setWorkspaceId,
-        expanded,
         setExpanded,
         setWorkspaceExpanded,
         loadingTranscription,
-        setLoadingTranscription
+        setLoadingTranscription,
+        isUpdateWorkspace,
+        setIsUpdateWorkspace
     } = props;
 
     const initialState = {
@@ -395,7 +396,7 @@ export const StutteredProvider = (props) => {
                 }
             }
 
-            update();
+            update().then();
         }
 
     }, [customNotes]);
@@ -433,6 +434,21 @@ export const StutteredProvider = (props) => {
             updateStateFromObject(loadWorkspaceByObj);
         }
     }, [loadWorkspaceByObj])
+
+    // useEffect(() => {
+    //     const makeUpdate = async () => {
+    //         if (isUpdateWorkspace) {
+    //             await updateWorkspace(workspaceName);
+    //             setIsUpdateWorkspace(false);
+    //         }
+    //     }
+    //     makeUpdate().then(() => {
+    //         // setWsSaveStatus(UPD_WS_STATUS.SUCCESS);
+    //
+    //     }).catch(() => {
+    //         // setWsSaveStatus(UPD_WS_STATUS.ERROR);
+    //     });
+    // }, [isUpdateWorkspace]);
 
 
     const transcriptError = () => {

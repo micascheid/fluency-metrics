@@ -57,7 +57,6 @@ const WordComponent = ({word, word_obj, index, style}) => {
 
     // FUNCTIONS
     const handlePopoverOpen = (event) => {
-        console.log(event.currentTarget);
         setAnchorEl(event.currentTarget);
         setIsClicked(true);
     };
@@ -98,14 +97,10 @@ const WordComponent = ({word, word_obj, index, style}) => {
 
     const handleSyllableChange = (event) => {
         const value = parseInt(event.target.value);
-        console.log("Input value: ", event.target.value);
-        console.log("Parsed value: ", value);
         if (!Number.isNaN(value)) {
-            console.log("Setting syllableCount to ", value);
             setSyllableCount(value);
             // setAdjustedSyllableCount(index, value);
         } else {
-            console.log("Setting syllableCount to 0");
             setSyllableCount(0);
         }
     };

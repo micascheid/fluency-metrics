@@ -78,14 +78,12 @@ const ResumeAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
 
     const handleFileChange = (event) => {
         const file = event.target.files[0];
-        console.log(file.name);
 
         if (!file) {
             setFileChosen(false);
             return;
         }
         if (!isSameAudioFile(file.name)){
-            console.log("YOU SURE ABOUT THAT BOSS?");
         }
         setAudioFile(file);
         setAudioFileName(file.name);
@@ -137,7 +135,6 @@ const ResumeAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
             await handleWorkspaceDelete(whomToDelete);
         }
         if (isDelete) {
-            console.log("were deleting this guy", whomToDelete);
             deleteWorkspace().then(()=> {
                 setIsDelete(false);
             })

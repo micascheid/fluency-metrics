@@ -88,6 +88,7 @@ const DefaultDashboard = () => {
 
     useEffect(() => {
         const beforeUnloadListenter = (event) => {
+            // setIsUpdateWorkspace(true)
             event.preventDefault();
             event.returnValue = 'Refreshing will result in loss of unsaved work';
         };

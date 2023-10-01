@@ -8,7 +8,6 @@ const Spacer = ({leftId, rightId, onClick}) => {
 
     const handleOnClick = (event) => {
         setAnchorEl(event.currentTarget);
-        console.log("spacer clicked");
     }
     return (
         <span

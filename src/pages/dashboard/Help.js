@@ -49,7 +49,6 @@ const Help = ({children, title}) => {
                     <IconButton
                         onClick={() => {
                             setIsShowHelp(prevState => {
-                                console.log("set help");
                                 return !prevState;
                             })
                         }}>

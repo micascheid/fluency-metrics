@@ -50,7 +50,6 @@ const AudioPlayer = (props) => {
 
     const {help, cardColor} = props;
     const theme = useTheme();
-    // console.log("AUDIO FILE NAME", audioFile);
     const [timelineVis, setTimelineVis] = useState(true);
     const [zoomLevel, setZoomLevel] = useState(1);
     const [markers, setMarkers] = useState([]);
@@ -111,24 +110,24 @@ const AudioPlayer = (props) => {
             if (waveSurfer.markers) {
                 waveSurfer.clearMarkers();
             }
-            console.log("WS MOUNT");
+            // console.log("WS MOUNT");
             wavesurferRef.current = waveSurfer;
 
             if (wavesurferRef.current) {
                 // wavesurferRef.current.on("region-created", regionCreatedHandler);
 
                 wavesurferRef.current.on("ready", () => {
-                    console.log("WaveSurfer is ready");
+                    // console.log("WaveSurfer is ready");
                     setAudioFileDuration(Math.round(wavesurferRef.current.getDuration()));
 
                 });
 
                 wavesurferRef.current.on("region-removed", (region) => {
-                    console.log("region-removed --> ", region);
+                    // console.log("region-removed --> ", region);
                 });
 
                 wavesurferRef.current.on("loading", (data) => {
-                    console.log("loading --> ", data);
+                    // console.log("loading --> ", data);
                 });
                 if (window) {
                     window.surferidze = wavesurferRef.current;
@@ -139,10 +138,9 @@ const AudioPlayer = (props) => {
     );
 
     const handlePopoverOpen = (region, smth) => {
-        console.log("Stuttered words:",)
+        // console.log("Stuttered words:",)
         const anchorElement = smth.currentTarget;
         if (anchorElement) {
-            console.log("REGION", region);
             setPopoverOpen(true);
             setAnchorEl(anchorElement);
             setCurrentRegion(region);
@@ -159,7 +157,6 @@ const AudioPlayer = (props) => {
     }, [playBackSpeed]);
 
     const loadAudioFile = (file) => {
-        console.log("Setting Audio File");
         if (file && wavesurferRef.current) {
             const reader = new FileReader();
             reader.onloadend = () => {
@@ -195,7 +192,6 @@ const AudioPlayer = (props) => {
 
     const handleKeyPress = (event) => {
         if (wavesurferRef.current && !isDisabled) {
-            console.log("WAVESURFER: ", wavesurferRef.current);
             const audioTime = wavesurferRef.current.getCurrentTime();
             if (event.key === 's') {
                 if (!isAudioCursorInsideAnyRegion(audioTime)) {
@@ -225,12 +221,6 @@ const AudioPlayer = (props) => {
                 }
             }
 
-            if (event.key === 'r') {
-                console.log("r");
-                wavesurferRef.current.setBackgroundColor('rgba(255,0,0,.5)');
-                setIsFlashing(true);
-            }
-
             if (event.key === " ") {
                 event.preventDefault();
                 playPause();
@@ -239,9 +229,7 @@ const AudioPlayer = (props) => {
     };
 
     const handleRegionUpdate = useCallback((region, smth) => {
-        console.log("Dragging Region", region.id);
         let changeRegion = kiStutteredRegions[region.id];
-        console.log("Change regions", changeRegion);
         const duration = region.end - region.start;
         changeRegion.start = region.start;
         changeRegion.end = region.end;
@@ -280,7 +268,6 @@ const AudioPlayer = (props) => {
 
     // USE EFFECTS
     useEffect(() => {
-        console.log("Load file");
         loadAudioFile(audioFile);
         if (wavesurferRef.current !== null) {
             setAudioPlayerControl({
@@ -461,7 +448,6 @@ const AudioPlayer = (props) => {
                             max={1}
                             value={playBackSpeed}
                             onChange={(event, value) => {
-                                console.log("Getting hit here?");
                                 playbackSpeedHandler(event, value);
                             }}
                             disabled={isDisabled}

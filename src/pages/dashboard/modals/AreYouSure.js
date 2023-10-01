@@ -41,8 +41,8 @@ const AreYouSure = ({setAreYouSure, setYesNo}) => {
             >
                 <Box sx={{display: 'flex', justifyContent: 'center', flexDirection: 'column', alignItems: 'center'}}>
                     <Typography variant={"h4"} sx={{textAlign: 'center', pb: 1}}>
-                        Retrieving transcription will delete your current transcription and edits. Are you sure
-                        you want to continue?
+                        Retrieving transcription will remove your current transcription and edits. Are you sure
+                        you want to continue? Please go back and "Save Work" first if needed.
                     </Typography>
                     <Stack direction={"row"} spacing={1}>
                         <Button variant={"contained"} onClick={handleYesClick}>

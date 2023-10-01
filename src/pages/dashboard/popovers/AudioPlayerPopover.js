@@ -82,7 +82,6 @@ const AudioPlayerPopover = ({anchorEl, setAnchorEl, popoverOpen, setPopoverOpen,
         const start = region.start;
         const end = region.end;
 
-        // TODO: ensure syllable count gets set correctly
         newTranscriptionObj[insertKey] = {
             confidence: 1,
             end: end,
@@ -114,7 +113,6 @@ const AudioPlayerPopover = ({anchorEl, setAnchorEl, popoverOpen, setPopoverOpen,
                 }
             });
         }
-        console.log("COLOR", anchorEl);
         setPopoverOpen(false);
         setAnchorEl(null);
     };

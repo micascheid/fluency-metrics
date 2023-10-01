@@ -1,6 +1,4 @@
-import react from 'react';
 import {Box, List, ListItem, Typography} from "@mui/material";
-import {HelpOutline} from "@mui/icons-material";
 
 
 const HelpMode = () => {
@@ -18,22 +16,27 @@ const HelpMode = () => {
                 </ListItem>
                 <ListItem>
                     <Typography variant="body1" style={largeText}>
-                        2.) Upload your speech sample using the "Choose File" button.
+                        2.) Use the "Select Mode" drop down (currently only one available)
                     </Typography>
                 </ListItem>
                 <ListItem>
                     <Typography variant="body1" style={largeText}>
-                        3.) Choose the type of speech sample (e.g., "Reading Passage, Describing Task").
+                        3.) Upload your speech sample using the "Upload Speech Sample" button. (Formats: m4a, mp3, wav)
                     </Typography>
                 </ListItem>
                 <ListItem>
                     <Typography variant="body1" style={largeText}>
-                        4.) Assign a name to your workspace. Please note that due to our tool not being HIPAA-compliant, avoid using specific names or any PHI (Protected Health Information). Name it such that you can recall its purpose without identifying details. We apologize for the limitation.
+                        4.) Choose the type of speech sample (e.g., "Reading Passage, Describing Task, ...").
                     </Typography>
                 </ListItem>
                 <ListItem>
                     <Typography variant="body1" style={largeText}>
-                        5.) Click "Create Workspace". Fluency Metrics will auto-generate a transcription of your speech sample. Estimated completion time can be found in the yellow workspace card below. Typically, it takes about 6 seconds per minute of speech.
+                        5.) Assign a name to your workspace. Please note that due to our tool not being HIPAA-compliant, avoid using specific names or any PHI (Protected Health Information). Name it such that you can recall its purpose without identifying details. We apologize for the limitation.
+                    </Typography>
+                </ListItem>
+                <ListItem>
+                    <Typography variant="body1" style={largeText}>
+                        6.) Click "Create Workspace". Fluency Metrics will auto-generate a transcription of your speech sample. Estimated completion time can be found in the yellow workspace card below. Typically, it takes about 6 seconds per minute of speech.
                     </Typography>
                 </ListItem>
             </List>
@@ -54,7 +57,7 @@ const HelpMode = () => {
                 </ListItem>
                 <ListItem>
                     <Typography variant="body1" style={largeText}>
-                        3.) Link the audio file associated with your chosen workspace by clicking "Link Audio File".
+                        3.) Link the audio file associated with your chosen workspace by clicking "Link Audio File". We don't store audio files as of now.
                     </Typography>
                 </ListItem>
                 <ListItem>

@@ -15,14 +15,12 @@ const TranscriptionAuto = () => {
     const keys = Object.keys(transcriptionObj);
 
     const handleSpacerClick = (leftId, rightId) => {
-        console.log("Clicked between", leftId, " and ", rightId);
+
     }
 
     useEffect(() => {
 
     },[kiStutteredRegions]);
-    // console.log("HEY GETTING RE RENDERED HERE:", transcriptionObj);
-    // console.log("CURRENT WORD INDEX: " + typeof currentWordIndex);
     return (
         <Typography variant={"h4"}>
             {Object.keys(transcriptionObj).map((key, index) => (
