@@ -21,7 +21,7 @@ const Transcription = (props) => {
     const {help} = props;
 
     const transcriptionTimeEstimate = () => {
-        const finalDur = Math.round(audioFileDuration / 60) * 6;
+        const finalDur = Math.round(audioFileDuration / 60) * 8;
         const minutes = Math.floor(finalDur / 60);
         const seconds = finalDur % 60;
         let displayTime = '';
