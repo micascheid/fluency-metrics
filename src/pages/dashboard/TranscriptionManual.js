@@ -35,7 +35,6 @@ const TranscriptionManual = () => {
 
         if (event.key.match(/[0-9]/)) {
             event.preventDefault();
-            console.log("SETTING PLAYBACK SPEED");
             if (event.key === "0"){
                 setPlayBackSpeed(1);
             } else {
@@ -52,7 +51,6 @@ const TranscriptionManual = () => {
         if (editing) {
             const data = {"data" : textFieldRef.current.value};
             axios.post(`${BASE_URL}/manual_transcription`, data).then((response) => {
-                console.log("RESPONSE TRANSCRIPTION OBJ", response.data.transcription_obj);
                 setTranscriptionObj(response.data.transcription_obj);
             }).catch((error) => {
                 console.log("Error handling manual_transcription: ", error);

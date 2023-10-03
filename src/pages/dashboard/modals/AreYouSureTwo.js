@@ -11,46 +11,45 @@ const style = {
     width: 400,
 }
 
-const AreYouSure = ({setAreYouSure, setYesNo}) => {
+const AreYouSureTwo = ({open, setOpen, setIsDelete}) => {
 
-    const [isOpen, setIsOpen] = useState(false);
 
     const handleClose = () => {
-        setAreYouSure(false);
+        setOpen(false);
     };
 
 
-    const handleYesClick = async () => {
-        setYesNo(true);
+    const handleDeleteClick = async () => {
+        setIsDelete(true);
         handleClose();
     };
 
 
-    const handleNoClick = () => {
-        setYesNo(false);
+    const handleKeepClick = () => {
+        setIsDelete(false);
         handleClose();
     };
 
     return (
         <Modal
-            open={true}
+            open={open}
             onClose={handleClose}
-            >
+        >
             <MainCard
-            sx={style}
+                sx={style}
             >
                 <Box sx={{display: 'flex', justifyContent: 'center', flexDirection: 'column', alignItems: 'center'}}>
-                    <Typography variant={"h4"} sx={{textAlign: 'center', pb: 1}}>
-                        Retrieving transcription will remove your current transcription and edits. Are you sure
-                        you want to continue? Please go back and "Save Work" first if needed.
+                    <Typography variant={"h4"} sx={{textAlign: 'center', pb: 1, color: 'red'}}>
+                        Warning: This is a permanent action and cannot be reverted.
                     </Typography>
+                    <Typography sx={{ textAlign: 'center', pb: 1}}>Are you sure you would like to delete the workspace you selected?</Typography>
                     <Stack direction={"row"} spacing={1}>
-                        <Button variant={"contained"} onClick={handleYesClick}>
-                            Yes
+                        <Button variant={"contained"} color={"error"} onClick={handleDeleteClick}>
+                            Delete
                         </Button>
-                        <Button variant={"contained"} onClick={handleNoClick}
+                        <Button variant={"contained"} color={"success"} onClick={handleKeepClick}
                         >
-                            No
+                            Keep
                         </Button>
                     </Stack>
                 </Box>
@@ -59,4 +58,4 @@ const AreYouSure = ({setAreYouSure, setYesNo}) => {
     )
 }
 
-export default AreYouSure;
+export default AreYouSureTwo;

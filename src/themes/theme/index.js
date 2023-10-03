@@ -1,11 +1,4 @@
 // ==============================|| PRESET THEME - THEME SELECTOR ||============================== //
-/*
-Logo Hex's
-blue/purple = 2F2E64
-orange = EF985D
-red = EF985D
-grey = BCC3C9
-*/
 const Theme = (colors) => {
     const { blue, red, gold, cyan, green, grey } = colors;
     const greyColors = {
@@ -68,7 +61,8 @@ const Theme = (colors) => {
             contrastText
         },
         warning: {
-            lighter: gold[0],
+            lightest: gold[0],
+            lighter: gold[1],
             light: gold[3],
             main: gold[5],
             dark: gold[7],
@@ -84,7 +78,8 @@ const Theme = (colors) => {
             contrastText
         },
         success: {
-            lighter: green[0],
+            lightest: green[0],
+            lighter: green[1],
             light: green[3],
             main: green[5],
             dark: green[7],

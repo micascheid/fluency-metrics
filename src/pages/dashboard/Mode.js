@@ -16,6 +16,7 @@ import InstructionsAutoMode from "./InstructionsAutoMode";
 import Help from "./Help";
 import HelpMode from "./help-components/HelpMode";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ArrowDropDownCircleIcon from "@mui/icons-material/ArrowDropDownCircle";
 
 
 const ExpandMore = styled((props) => {
@@ -32,8 +33,8 @@ const ExpandMore = styled((props) => {
 const Mode = (props) => {
     const {
         expanded,
-        setExpanded,
         help,
+        setExpanded,
         setAudioFileName,
         setAudioFile,
         setFileChosen,
@@ -41,6 +42,7 @@ const Mode = (props) => {
     } = props;
     const [showAreYouSure, setShowAreYouSure] = useState(false);
     const [tabValue, setTabValue] = useState(0);
+    const [autoInstuctionsHasOverflow, setAutoInstuctHasOverflow] = useState();
 
 
     useEffect(() => {
@@ -87,70 +89,90 @@ const Mode = (props) => {
         setTabValue(newValue);
     };
 
-    return (
-        <Fragment>
+    const handleScroll = (event) => {
+        const element = event.target;
+        if (element.scrollHeight - element.scrollTop === element.clientHeight) {
+            // User has scrolled to the bottom
+            setAutoInstuctHasOverflow(false);
+        } else {
+            setAutoInstuctHasOverflow(true);
+        }
+    }
 
-            {/*<Collapse in={expanded} timeout="auto" unmountOnExit>*/}
-            <MainCard title={
-                <Stack direction={"row"} sx={{alignItems: 'center'}}>
-                    <ExpandMore
-                        expand={expanded}
-                        onClick={() => {
-                            setExpanded(!expanded)
-                        }}
-                        aria-expanded={expanded}
-                        aria-label="show more"
-                    >
-                        <ExpandMoreIcon/>
-                    </ExpandMore>
-                    <Box flexGrow={1}>
-                        <Help title={"Start/Resume Analysis"}>
-                            <HelpMode/>
-                        </Help>
-                    </Box>
-                </Stack>
-            }>
-                <Collapse in={expanded} timeout="auto" unmountOnExit>
-                    {showAreYouSure && <AreYouSure setAreYouSure={setShowAreYouSure}/>}
-                    {/*<Collapse in={expanded} timeout="auto" unmountOnExit>*/}
-                    <Grid container spacing={2}>
-                        <Grid item xs={5} sm={5} md={5} lg={5}>
-                            <Box width={"100%"}>
-                                <Box sx={{mb: 2}}>
-                                    <Tabs value={tabValue} onChange={handleTabChange} variant={'fullWidth'}
-                                          sx={{boxShadow: '0px 2px 4px rgba(0,0,0,0.2)'}}>
-                                        <Tab label={"New Analysis"}/>
-                                        <Tab label={"Resume Analysis"}/>
-                                    </Tabs>
-                                </Box>
-                                <Box>
-                                    <CustomTabPanel value={tabValue} index={0}>
-                                        <NewAnalysisStepper {...props} setExpanded={setExpanded} expanded={expanded}/>
-                                    </CustomTabPanel>
-                                    <CustomTabPanel value={tabValue} index={1}>
-                                        <ResumeAnalysisStepper {...props} setExpanded={setExpanded}/>
-                                    </CustomTabPanel>
-                                </Box>
+    return (
+        <MainCard title={
+            <Stack direction={"row"} sx={{alignItems: 'center'}}>
+                <ExpandMore
+                    expand={expanded}
+                    onClick={() => {
+                        setExpanded(!expanded)
+                    }}
+                    aria-expanded={expanded}
+                    aria-label="show more"
+                >
+                    <ExpandMoreIcon/>
+                </ExpandMore>
+                <Box flexGrow={1}>
+                    <Help title={"Start/Resume Workspace"}>
+                        {help}
+                    </Help>
+                </Box>
+            </Stack>
+        }>
+            <Collapse in={expanded} timeout="auto" unmountOnExit>
+                {showAreYouSure && <AreYouSure setAreYouSure={setShowAreYouSure}/>}
+                <Grid container spacing={2}>
+                    <Grid item xs={5}>
+                        <Box width={"100%"}>
+                            <Box sx={{mb: 2}}>
+                                <Tabs value={tabValue} onChange={handleTabChange} variant={'fullWidth'}
+                                      sx={{boxShadow: '0px 2px 4px rgba(0,0,0,0.2)'}}>
+                                    <Tab label={"New Workspace"}/>
+                                    <Tab label={"Resume Workspace"}/>
+                                </Tabs>
                             </Box>
-                        </Grid>
-                        <Grid item xs={7} sm={7} md={7} lg={7}>
-                            <Grid container style={{height: '100%'}} spacing={2}>
-                                <Grid item xs={1} sm={1} md={1} lg={1}>
-                                    <Divider orientation={"vertical"} style={{borderColor: "darkgray"}}/>
-                                </Grid>
-                                <Grid item xs={11} sm={11} md={11} lg={11}>
-                                    <Box style={{overflowY: 'scroll', maxHeight: '335px'}}>
-                                        <InstructionsAutoMode/>
+                            <Box>
+                                <CustomTabPanel value={tabValue} index={0}>
+                                    <NewAnalysisStepper {...props} setExpanded={setExpanded} expanded={expanded}/>
+                                </CustomTabPanel>
+                                <CustomTabPanel value={tabValue} index={1}>
+                                    <ResumeAnalysisStepper {...props} setExpanded={setExpanded}/>
+                                </CustomTabPanel>
+                            </Box>
+                        </Box>
+                    </Grid>
+                    <Grid item xs={7}>
+                        <Grid container style={{height: '100%'}} spacing={2}>
+                            <Grid item xs={1}>
+                                <Divider orientation={"vertical"} style={{borderColor: "darkgray"}}/>
+                            </Grid>
+                            <Grid item xs={11} style={{position: 'relative'}}>
+
+                                <Box style={{overflowY: 'scroll', maxHeight: '335px'}}
+                                     onScroll={handleScroll}>
+                                    <InstructionsAutoMode setOverflow={setAutoInstuctHasOverflow}/>
+                                </Box>
+                                {autoInstuctionsHasOverflow &&
+                                    <Box
+                                        sx={{
+                                            position: 'absolute',
+                                            bottom: 0,
+                                            left: '50%',
+                                            transform: 'translateX(-50%)',
+                                            display: 'flex',
+                                            justifyContent: 'center'
+                                        }}
+                                    >
+                                        <ArrowDropDownCircleIcon color={"primary"}/>
                                     </Box>
-                                </Grid>
+                                }
+
                             </Grid>
                         </Grid>
                     </Grid>
-                </Collapse>
-            </MainCard>
-        </Fragment>
-
-
+                </Grid>
+            </Collapse>
+        </MainCard>
     );
 };
 

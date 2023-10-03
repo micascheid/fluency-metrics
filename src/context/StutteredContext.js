@@ -38,8 +38,12 @@ export const StutteredProvider = (props) => {
         loadWorkspaceByObj,
         workspaceId,
         setWorkspaceId,
-        expanded,
         setExpanded,
+        setWorkspaceExpanded,
+        loadingTranscription,
+        setLoadingTranscription,
+        isUpdateWorkspace,
+        setIsUpdateWorkspace
     } = props;
 
     const initialState = {
@@ -71,7 +75,7 @@ export const StutteredProvider = (props) => {
     const [transcriptionObj, setTranscriptionObj] = useState(initialState.transcriptionObj);
     const [currentWordIndex, setCurrentWordIndex] = useState(initialState.currentWordIndex);
     const [averageDuration, setAverageDuration] = useState(initialState.averageDuration);
-    const [loadingTranscription, setLoadingTranscription] = useState(initialState.loadingTranscription);
+    // const [loadingTranscription, setLoadingTranscription] = useState(initialState.loadingTranscription);
     const [kiStutteredRegions, setkiStutteredRegions] = useState(initialState.kiStutteredRegions);
     const [fileChosen, setFileChosen] = useState(initialState.fileChosen);
     const [longest3Durations, setLongest3Durations] = useState(initialState.longest3Durations);
@@ -158,7 +162,7 @@ export const StutteredProvider = (props) => {
             setWsSaveStatus(UPD_WS_STATUS.SUCCESS);
             const timer = setTimeout(() => {
                 setWsSaveStatus(UPD_WS_STATUS.IDLE);
-            }, 3000);
+            }, 1000);
 
             return () => clearTimeout(timer);
         } catch (e) {
@@ -206,6 +210,7 @@ export const StutteredProvider = (props) => {
             setWorkspaceId(docData.id);
             setWorkspaceName(name);
             setExpanded(false);
+            setWorkspaceExpanded(true);
         } catch (error) {
             console.log("Trouble with workspaces or workspaces index:", error)
         }
@@ -326,6 +331,7 @@ export const StutteredProvider = (props) => {
         });
     };
 
+
     const get_transcription = async () => {
         setLoadingTranscription(true);
         const formData = new FormData();
@@ -353,7 +359,7 @@ export const StutteredProvider = (props) => {
 
     useEffect(() => {
         //Set Duration
-        if (Object.keys(kiStutteredRegions).length >= 3) {
+        if (Object.keys(kiStutteredRegions).length >= 1) {
             configureDurations();
         }
 
@@ -390,7 +396,7 @@ export const StutteredProvider = (props) => {
                 }
             }
 
-            update();
+            update().then();
         }
 
     }, [customNotes]);
@@ -414,7 +420,7 @@ export const StutteredProvider = (props) => {
                     await createNewWorkspace(workspaceName, transcriptObj);
                     await updateWorkspacesIndex();
                     setIsCreateNewWorkspace(false);
-
+                    setWorkspaceExpanded(true);
                 } catch (error) {
                     console.log("TROUBLE CREATING WORKSPACE", error);
                 }
@@ -428,6 +434,21 @@ export const StutteredProvider = (props) => {
             updateStateFromObject(loadWorkspaceByObj);
         }
     }, [loadWorkspaceByObj])
+
+    // useEffect(() => {
+    //     const makeUpdate = async () => {
+    //         if (isUpdateWorkspace) {
+    //             await updateWorkspace(workspaceName);
+    //             setIsUpdateWorkspace(false);
+    //         }
+    //     }
+    //     makeUpdate().then(() => {
+    //         // setWsSaveStatus(UPD_WS_STATUS.SUCCESS);
+    //
+    //     }).catch(() => {
+    //         // setWsSaveStatus(UPD_WS_STATUS.ERROR);
+    //     });
+    // }, [isUpdateWorkspace]);
 
 
     const transcriptError = () => {

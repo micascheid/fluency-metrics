@@ -1,17 +1,20 @@
 import react, {useCallback, useContext, useEffect, useState} from 'react';
 import MainCard from "../../components/MainCard";
-import {Button, Stack, TextField, Typography} from "@mui/material";
+import {Box, Button, Stack, TextField, Typography} from "@mui/material";
 import {StutteredContext} from "../../context/StutteredContext";
 import {UPD_WS_STATUS} from "../../constants";
 import {useTheme} from "@mui/material/styles";
 import useStatusMessage from "./custom-hooks/useStatusMessage";
+import Help from "./Help";
+import React from "react";
 
-const CustomNotes = () => {
+const AdditionalNotes = (props) => {
     const {
         workspaceName,
         setCustomNotes,
         customNotes,
     } = useContext(StutteredContext);
+    const {help} = props;
     const [localNotes, setLocalNotes] = useState(customNotes);
     const saveNotesDisabled = !workspaceName;
     const theme = useTheme();
@@ -33,12 +36,18 @@ const CustomNotes = () => {
     }, [customNotes]);
 
     return (
-      <MainCard title={"Additional Notes"}>
+      <MainCard title={
+          <Box flexGrow={1}>
+              <Help title={"Additional Notes"}>
+                  {help}
+              </Help>
+          </Box>
+      }>
           <Stack spacing={1}>
               <TextField
                 multiline
                 minRows={5}
-                maxRows={15}
+                maxRows={10}
                 fullWidth
                 placeholder={"Notes Here"}
                 onKeyPress={(event) => {event.stopPropagation();}}
@@ -50,7 +59,7 @@ const CustomNotes = () => {
               >Enter Your Notes Here</TextField>
               <Stack direction={"row"} sx={{alignItems: 'center'}} spacing={1}>
                   <Button
-                      variant={"contained"}
+                      variant={"outlined"}
                       sx={{maxWidth: 105}}
                       onClick={handleSaveNotes}
                       disabled={saveNotesDisabled}
@@ -66,4 +75,4 @@ const CustomNotes = () => {
     );
 };
 
-export default CustomNotes;
+export default AdditionalNotes;

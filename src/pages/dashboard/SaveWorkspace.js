@@ -7,19 +7,12 @@ import EditIcon from '@mui/icons-material/Edit';
 import {useTheme} from '@mui/material/styles';
 import {UserContext} from "../../context/UserContext";
 import useStatusMessage from "./custom-hooks/useStatusMessage";
-import {SPEECH_SAMPLE_OPTIONS} from "../../constants";
-import FolderOpenIcon from '@mui/icons-material/FolderOpen';
-import PrintIcon from "@mui/icons-material/Print";
-import ReactToPrint, {useReactToPrint} from "react-to-print";
-import PrintOut from "../PrintOut";
 
 const SaveWorkspace = ({sx}) => {
     const {
         workspaceName,
         setWorkspaceName,
         updateWorkspace,
-        audioFileName,
-        speechSampleContext,
     } = useContext(StutteredContext);
     const {
         workspacesIndex,
@@ -29,10 +22,8 @@ const SaveWorkspace = ({sx}) => {
     const theme = useTheme();
     const [isNameError, setIsNameError] = useState(false);
     const [nameError, setNameError] = useState("");
-    const [isPrinting, setIsPrinting] = useState(false);
 
     const statusMessage = useStatusMessage();
-    const printComponentRef = useRef();
 
     const handleOnClick = () => {
         if (localName.trim() === "") {
@@ -42,21 +33,6 @@ const SaveWorkspace = ({sx}) => {
         setWorkspaceName(localName);
         updateWorkspace(localName);
     };
-
-    const handlePrint = useReactToPrint({
-        content: () => printComponentRef.current,
-        onAfterPrint: () => setIsPrinting(false),
-    });
-
-    const handlePrintOutClick = () => {
-        setIsPrinting(true);
-    }
-
-    useEffect(() => {
-        if (isPrinting && printComponentRef.current) {
-            handlePrint();
-        }
-    }, [isPrinting]);
 
 
 
@@ -77,40 +53,50 @@ const SaveWorkspace = ({sx}) => {
         event.stopPropagation();
     };
 
+
     useEffect(() => {
         setLocalName(workspaceName);
     }, [workspaceName])
 
 
+
+
     return (
         <Box sx={sx}>
-            <Stack direction={"row"} sx={{alignItems: 'center'}} spacing={1}>
-                <Typography variant={"h5"}>Current Workspace: </Typography>
-                <TextField
-                    required
-                    error={isNameError}
-                    helperText={isNameError ? "Name this analysis" : ""}
-                    disabled={!editWorkspaceName}
-                    value={localName}
-                    onKeyPress={handleKeyPress}
-                    onChange={handleOnChange}
-                    label={"Workspace Name"}
-                />
-                <ButtonBase disabled={editWorkspaceName === ''} disableRipple>
-                    <EditIcon sx={editWorkspaceName ? {color: theme.palette.primary.main} : {color: theme.palette.secondary.main}}
-                              onClick={() => setEditWorkspaceName(!editWorkspaceName)}
+            <Stack direction={"row"}
+                   sx={{
+                       alignItems: 'center',
+                       justifyContent: 'space-between',  // Add this line
+                       width: '100%'                     // Ensure it takes full width
+                   }}
+                   spacing={1}>
+                <Stack direction={"row"} sx={{alignItems: 'center'}} spacing={1}>
+                    <Typography variant={"h5"} fontWeight={"medium"}>Current Workspace: </Typography>
+                    <TextField
+                        required
+                        error={isNameError}
+                        helperText={isNameError ? "Name this analysis" : ""}
+                        disabled={!editWorkspaceName}
+                        value={localName}
+                        onKeyPress={handleKeyPress}
+                        onChange={handleOnChange}
+                        label={"Workspace Name"}
                     />
-                </ButtonBase>
-                <ButtonBase disabled={workspaceName === ''}>
-                    <PrintIcon
-                        sx={workspaceName ? {color: theme.palette.primary.main} : {color: theme.palette.secondary.main}}
-                        onClick={handlePrintOutClick} />
-                </ButtonBase>
-
-                {isPrinting && <PrintOut ref={printComponentRef} />}
-
+                    <ButtonBase disabled={editWorkspaceName === ''}>
+                        <EditIcon
+                            sx={{
+                                borderRadius: '5px',
+                                color: editWorkspaceName ? theme.palette.primary.main : theme.palette.secondary.main,
+                                '&:hover': {
+                                    color: theme.palette.primary.main
+                                }
+                            }}
+                            onClick={() => setEditWorkspaceName(!editWorkspaceName)}
+                        />
+                    </ButtonBase>
+                </Stack>
             </Stack>
-            <Button variant={"contained"} onClick={handleOnClick} disabled={workspaceName === '' || !!nameError}>
+            <Button variant={"outlined"} onClick={handleOnClick} disabled={workspaceName === '' || !!nameError}>
                 Save Work
             </Button>
             <Typography

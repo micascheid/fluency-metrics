@@ -1,112 +1,107 @@
-import react from 'react';
-import {Box, Divider, List, ListItem, Stack, Typography} from "@mui/material";
+import react, {Fragment, useEffect, useRef, useState} from 'react';
+import {
+    Box,
+    Divider,
+    IconButton,
+    List,
+    ListItem,
+    ListItemText,
+    Stack,
+    styled, TextField,
+    Tooltip,
+    Typography
+} from "@mui/material";
+import {useTheme} from "@mui/material/styles";
+import {HelpOutline} from "@mui/icons-material";
+import ArrowDropDownCircleIcon from '@mui/icons-material/ArrowDropDownCircle';
 
-const InstructionsAutoMode = () => {
+function HelpOutlineIcon() {
+    return null;
+}
+
+const CustomListItemText = styled(ListItemText)(({theme}) => ({
+    fontSize: theme.typography.h5.fontSize,
+    fontWeight: 'medium',
+}));
+
+CustomListItemText.defaultProps = {
+    disableTypography: true,
+}
+
+
+const InstructionsAutoMode = ({setOverflow}) => {
+    const theme = useTheme();
+    const contentBoxRef = useRef(null);
+    const parentContainerRef = useRef(null);
+
+    useEffect(() => {
+        const checkOverflow = () => {
+            if (contentBoxRef.current.scrollHeight > parentContainerRef.current.clientHeight) {
+                setOverflow(true);
+            } else {
+                setOverflow(false);
+            }
+        };
+
+        checkOverflow();
+
+        window.addEventListener('resize', checkOverflow);
+
+        return () => window.removeEventListener('resize', checkOverflow);
+
+    }, []);
+
 
     return (
-        <Box>
-            {/* Title for Getting Started with Auto Mode */}
-            <Typography variant="h5">
-                Creating your First Analysis (auto-mode):
+        <Box ref={parentContainerRef} sx={{height: '335px'}}>
+        <Box ref={contentBoxRef}>
+            <Typography variant="h4" gutterBottom>
+                Getting Started:
             </Typography>
-
-            <List>
-                {/* Upload Audio */}
-                <Stack direction={"row"} spacing={1}>
-                    <Typography variant="subtitle1" gutterBottom>
-                        Upload Audio:
-                    </Typography>
-                    <Typography>
-                        Use the 'New Analysis' tab and provide an audio speech sample using the 'Choose File' option.
-                    </Typography>
-                </Stack>
-
-                {/* Workspace Name */}
-                <Stack direction={"row"} spacing={1}>
-                    <Typography gutterBottom>
-                        <strong>Workspace Name:</strong> Give your analysis a name.
-                    </Typography>
-
-                </Stack>
-                <ListItem>
-                    <Typography variant="body2" sx={{color: 'red'}}>
-                        Note: Ensure the name doesn't contain any PHI (Personal Health Information). The tool currently
-                        is not HIPAA compliant.
-                    </Typography>
-                </ListItem>
-
-                {/* Create Workspace */}
-                <Typography gutterBottom>
-                    <strong>Create Workspace:</strong> Click 'Create Workspace' and Fluency Metrics will create a
-                    workspace and automated transcription
-                    for you to work from
-                </Typography>
-            </List>
-
-            {/* Divider between sections */
-            }
-            <Divider style={{borderColor: "#000"}}/>
-
-            {/* Title for Using the Tool */
-            }
-            <Typography variant={"h5"}>
-                Using the Tool:
+            <Typography variant="subtitle1" sx={{alignItems: "center"}} gutterBottom>
+                {/* Increased font size for body text */}
+                Clicking the
+                <Tooltip title="Click on these for help.">
+                    <HelpOutline sx={{
+                        ml: 0.5,
+                        mr: 0.5,
+                        color: theme.palette.primary.main,
+                        verticalAlign: 'middle'
+                    }} fontSize={"small"}/>
+                </Tooltip>
+                icons will help you learn the tool. Below is just an overview.
             </Typography>
-            <List>
-                {/* Audio Controls */}
-                <Typography variant="subtitle1">
-                    Audio Controls:
-                </Typography>
+            <Typography variant={'h5'} sx={{textDecoration: 'underline'}}>Stutter Analysis Workflow:</Typography>
+            <List sx={{
+                '& .MuiListItem-root': {
+                    pt: 0,
+                    pb: 0,
+                }
+            }}>
                 <ListItem>
-                    <Stack>
-                        <Typography>
-                            <strong>Left Slider:</strong> Controls audio playback speed.
-                        </Typography>
-                        <Typography>
-                            <strong>Right Slider:</strong> Adjusts zoom on the waveform.
-                        </Typography>
-                    </Stack>
+                    <CustomListItemText
+                        primary="1.) Begin with “New Workspace” or “Resume Workspace”. Upon creation, Fluency Metrics provides an automated transcription and audio player for you to work from or to continue from where you left off."
+                    />
                 </ListItem>
-
-                {/* Editing Words */}
-
-                <Typography gutterBottom>
-                    <strong>Editing Words:</strong> Click on a word to modify or delete it.
-                </Typography>
-
-                {/* Playback */}
-                <Typography variant="subtitle1">
-                    Marking Stuttered Events at Playback:
-                </Typography>
                 <ListItem>
-                    <Stack>
-                        <Typography>
-                            <strong>Space Bar:</strong> Use to toggle between play and pause.
-                        </Typography>
-                        <Typography>
-                            <strong>'s' Key:</strong> Press during playback to mark the start and end of a stuttered
-                            event. A shaded region will display on the waveform.
-                        </Typography>
-                    </Stack>
+                    <CustomListItemText
+                        primary="2.) Next, the workspace card will open, where you'll utilize the workspace tools to annotate stuttered regions."
+                    />
                 </ListItem>
-                <Typography>
-                    <strong>Once Stuttered Events are Marked:</strong>
-                </Typography>
                 <ListItem>
-                    <Stack>
-                        <Typography>- Click on a shaded region to review and make any necessary edits.</Typography>
-                        <Typography>
-                            - Confirm your edits by selecting "Done". The region will then turn orange. Edits can still be
-                            made afterwards.
-                        </Typography>
-                        <Typography>
-                           - The "Fluency Metrics" card updates in real-time with each confirmed stuttered region.
-                        </Typography>
-                    </Stack>
+                    <CustomListItemText
+                        primary={`3.) Once finished, scroll down to "Summary" at the bottom to view, print, or download the automatically generated metrics. You also have the option to add additional notes within the summary.`}
+                    />
+                </ListItem>
+                <ListItem>
+                    <CustomListItemText
+                        primary={`Note: Only provide information about the stuttered events through the audio player. Let Fluency Metrics handle the rest.`}
+                    />
                 </ListItem>
             </List>
         </Box>
-    )
+        </Box>
+    );
 };
 
 export default InstructionsAutoMode;

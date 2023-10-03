@@ -3,8 +3,10 @@ import MainCard from "../../components/MainCard";
 import {Box, Typography} from "@mui/material";
 import {StutteredContext} from "../../context/StutteredContext";
 import { DataGrid } from '@mui/x-data-grid';
+import Help from "./Help";
 
-const StutteredEvents = () => {
+const StutteredEvents = (props) => {
+    const {help} = props;
     const { stutteredEvents } = useContext(StutteredContext);
     const columns = [
         {field: 'id', headerName: "Event #", flex: 1, valueGetter: (param) => (Number(param.id)+1).toString()},
@@ -19,7 +21,13 @@ const StutteredEvents = () => {
     }, [stutteredEvents]);
 
     return (
-      <MainCard title={"Disfluency Events"} sx={{minHeight: '475px', maxHeight: '475px'}}>
+      <MainCard title={
+          <Box flexGrow={1}>
+              <Help title={"Disfluency Events"}>
+                  {help}
+              </Help>
+          </Box>
+      } sx={{minHeight: '475px', maxHeight: '475px'}}>
           {Object.keys(stutteredEvents).length > 0 ? (
               <DataGrid
                   rows={Object.values(stutteredEvents)}
@@ -34,7 +42,7 @@ const StutteredEvents = () => {
               />
           ) : (
            <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-               <Typography variant={"h4"}>Disfluency events will show up here</Typography>
+               <Typography variant={"h4"} fontWeight={"medium"}>Disfluency events will show up here</Typography>
            </Box>
           )
           }

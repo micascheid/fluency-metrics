@@ -1,14 +1,21 @@
 import react, {useContext, useEffect, useState} from 'react';
-import {Box, Button, FormControl, InputLabel, MenuItem, Select, Stack, TextField, Typography} from "@mui/material";
-import {MANUAL} from "../../constants";
+import {
+    Box,
+    Button,
+    FormControl,
+    InputLabel,
+    MenuItem,
+    Select,
+    Stack,
+    TextField,
+    Typography
+} from "@mui/material";
 import React from "react";
-import {StutteredContext} from "../../context/StutteredContext";
-import saveWorkSpace from "./SaveWorkspace";
 import AreYouSure from "./modals/AreYouSure";
 import {UserContext} from "../../context/UserContext";
 import PHIEntryChecker from "./modals/PHIEntryChecker";
 import {SPEECH_SAMPLE_OPTIONS} from "../../constants";
-
+import PulsingLoadingButton from "../../components/PulsingLoadingButton";
 
 const NewAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
     const {
@@ -23,6 +30,8 @@ const NewAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
         setFileChosen,
         setIsCreateNewWorkspace,
         setAudioFileDuration,
+        audioFileDuration,
+        loadingTranscription,
     } = otherProps;
     const {
         workspacesIndex,
@@ -51,9 +60,39 @@ const NewAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
         }
     };
 
+    const checkValidAudioFile = async (file) => {
+        return new Promise((resolve, reject) => {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const reader = new FileReader();
+
+            reader.onload = function(event) {
+                const audioData = event.target.result;
+                audioContext.decodeAudioData(audioData, function(buffer) {
+                    resolve(true);  // Successful decoding means it's a valid audio file.
+                }, function(error) {
+                    reject(false);  // Failed decoding.
+                });
+            };
+
+            reader.onerror = function(event) {
+                reject(false);
+            };
+
+            reader.readAsArrayBuffer(file);
+        });
+    };
+
+
     const handleFileChange = (event) => {
         const file = event.target.files[0];
         if (!file) {
+            setFileChosen(false);
+            return;
+        }
+
+        const allowedFileTypes = ['audio/mp3', 'audio/mpeg', 'audio/wav', 'audio/x-wav', 'audio/mp4', 'audio/x-m4a'];
+        if (!allowedFileTypes.includes(file.type)) {
+            alert("Please Upload a valid audio file (MP3, WAV, M4A). For other formats email: micalinscheid@fluencymetrics.com to add additional formats");
             setFileChosen(false);
             return;
         }
@@ -72,7 +111,7 @@ const NewAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
     const handleWorkspaceNameChange = (event) => {
         const value = event.target.value;
 
-        if (value.length > 30) {
+        if (value.length > 50) {
             setNameError('Max length is 30 characters')
         } else if (!/^[a-zA-Z0-9-_ ]*$/.test(value)) {
             setNameError('Only letters, numbers, hypens and underscores are allowed')
@@ -100,11 +139,24 @@ const NewAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
         setLocalSpeechContext(event.target.value);
     };
 
+    const transcriptionTimeEstimate = () => {
+        const finalDur = Math.round(audioFileDuration / 60) * 8;
+        const minutes = Math.floor(finalDur / 60);
+        const seconds = finalDur % 60;
+        let displayTime = '';
+        if (minutes > 0) {
+            displayTime += `${minutes} minute${minutes === 1 ? '' : 's'} and `
+        }
+        displayTime += `${seconds} second${seconds === 1 ? '' : 's'}`;
+        return displayTime;
+    };
+
+    const transcriptionEstimate = transcriptionTimeEstimate();
+
 
     useEffect(() => {
         (async () => {
             if (yesNo) {
-                console.log("local workspace name", localWorkspaceName);
                 setWorkspaceName(localWorkspaceName);
                 setSpeechSampleContext(localSpeechContext);
                 setIsCreateNewWorkspace(true);
@@ -116,30 +168,32 @@ const NewAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
 
 
     return (
-        <Box maxWidth={"150px"}>
+        <Box>
             {showAreYouSure && <AreYouSure setAreYouSure={setShowAreYouSure} setYesNo={setYesNo}/>}
             <PHIEntryChecker isModalOpen={isModalOpen} onYes={handlePhiYes} onNo={handlePhiNo} />
             <Stack spacing={2}>
-                <FormControl sx={{mt: 2}}>
+                <FormControl sx={{mt: 2, width: 200}}>
                     <InputLabel>Select Mode</InputLabel>
                     <Select
-                        sx={{minWidth: 100}}
+                        sx={{minWidth: 100, borderColor: '#000'}}
+
                         label={"Select Mode"}
                         value={mode}
                         onChange={handleMode}
                     >
                         <MenuItem value={"auto"}>Automated-Transcriptions</MenuItem>
-                        <MenuItem value={"manual"} disabled>Manual (Coming Soon)</MenuItem>
+                        {/*<MenuItem value={"manual"} disabled>Manual (Coming Soon)</MenuItem>*/}
                     </Select>
                 </FormControl>
                 <Box>
-                    <Button disabled={mode === ''}
-                            variant={"contained"} fullWidth component={"label"} onClick={(event) => {
+                    <Button sx={{width: 200}} disabled={mode === ''}
+                            variant={"outlined"} fullWidth component={"label"} onClick={(event) => {
                         event.currentTarget.blur();
                     }}>
-                        Choose File
+                        Choose Speech Sample
                         <input
                             type={"file"}
+                            accept={".mp3, .wav, .m4a"}
                             hidden
                             onChange={handleFileChange}
                         />
@@ -148,6 +202,7 @@ const NewAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
                     <Typography></Typography>
                 </Box>
                 <FormControl
+                    sx={{width: 200}}
                     disabled={audioFileName === ''}
                 >
                     <InputLabel
@@ -178,12 +233,27 @@ const NewAnalysisStepper = ({setExpanded, expanded, ...otherProps}) => {
                         disabled={!localSpeechContext}
                     />
                 </Stack>
+                <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
 
-                <Button
-                    variant={"outlined"}
-                    disabled={(!!nameError || localWorkspaceName === '') && localSpeechContext !== ''}
-                    onClick={handleCreateWorkspace}
-                >Create Workspace</Button>
+                    <PulsingLoadingButton
+                        loading={loadingTranscription}
+                        variant={"contained"}
+                        disabled={(!!nameError || localWorkspaceName === '')}
+                        shouldPulse={true}
+                        onClick={handleCreateWorkspace}
+                        sx={{width: 200, flexShrink: 0 }}
+                    >
+                        Create Workspace
+                    </PulsingLoadingButton>
+
+                    {loadingTranscription &&
+                        <Stack direction={"row"} sx={{ flexGrow: 1, alignItems: 'center' }} spacing={1}>
+                            {/*<CircularProgress/>*/}
+                            <Typography variant={"h5"} fontWeight={"light"}>Hang tight! Processing time is: </Typography>
+                            <Typography variant={"h5"}>{transcriptionEstimate}</Typography>
+                        </Stack>
+                    }
+                </Box>
             </Stack>
         </Box>
     )

@@ -9,7 +9,7 @@ import {WaveSurfer, WaveForm, Marker, Region} from 'wavesurfer-react';
 import RegionsPlugin from "wavesurfer.js/dist/plugin/wavesurfer.regions.min";
 import TimelinePlugin from "wavesurfer.js/dist/plugin/wavesurfer.timeline.min";
 import MarkersPlugin from "wavesurfer.js/src/plugin/markers";
-import {Box, Button, Slider, Stack, Typography} from "@mui/material";
+import {Box, Button, IconButton, Slider, Stack, Typography} from "@mui/material";
 import MainCard from "../../components/MainCard";
 import ZoomIn from '@mui/icons-material/ZoomIn';
 import ZoomOut from '@mui/icons-material/ZoomOut';
@@ -17,10 +17,21 @@ import Speed from '@mui/icons-material/Speed';
 import {StutteredContext} from "../../context/StutteredContext";
 import AudioPlayerPopover from "./popovers/AudioPlayerPopover";
 import SaveWorkspace from "./SaveWorkspace";
-import ReactToPrint from "react-to-print";
-import PrintIcon from '@mui/icons-material/Print';
+import Help from "./Help";
+import {useTheme} from "@mui/material/styles";
+import {styled} from "@mui/material";
 
-const AudioPlayer = () => {
+
+const StyledRegion = styled('div')({
+    '& .wavesurfer-region': {
+        borderRadius: '15px',
+    },
+    '& .wavesurfer-handle': {
+        borderRadius: '25%',
+    },
+});
+
+const AudioPlayer = (props) => {
     // VARIABLES
     const {
         transcriptionObj,
@@ -37,9 +48,11 @@ const AudioPlayer = () => {
         setAudioFileDuration,
     } = useContext(StutteredContext);
 
-    // console.log("AUDIO FILE NAME", audioFile);
-    const [timelineVis, setTimelineVis] = useState(true);
+    const {help, cardColor} = props;
+    const theme = useTheme();
+    const [minZoomLevel, setMinZoomLevel] = useState(0);
     const [zoomLevel, setZoomLevel] = useState(1);
+    const [timeLineInterval, setTimeLineInterval] = useState(5);
     const [markers, setMarkers] = useState([]);
     const [creatingRegion, setCreatingRegion] = useState(null);
     const [isCreatingRegion, setIsCreatingRegion] = useState(false);
@@ -50,7 +63,9 @@ const AudioPlayer = () => {
     const [stutteredWords, setStutteredWords] = useState({});
     const [popoverKey, setPopoverKey] = useState(null);
     const [isFlashing, setIsFlashing] = useState(false);
+    const [waveSurferReady, setWavesurferReady] = useState(false);
     const isDisabled = transcriptionObj === null;
+    const timeLineIntervalRef = useRef();
 
 
     const waveformProps = {
@@ -59,6 +74,7 @@ const AudioPlayer = () => {
         cursorWidth: 2,
         scrollParent: true,
         fillParent: true,
+        barWidth: 1,
     }
 
     //FUNCTIONS
@@ -68,11 +84,12 @@ const AudioPlayer = () => {
                 plugin: RegionsPlugin,
                 options: {enableDragSelection: false}
             },
-            timelineVis && {
+            {
                 plugin: TimelinePlugin,
                 options: {
                     container: "#timeline",
-                    timeInterval: .5,
+                    timeInterval: 1, //this is an initial sec per tick as the timelineIntervalREf will update it once audio is loaded
+                    height: 20,
                 }
             },
             {
@@ -80,42 +97,69 @@ const AudioPlayer = () => {
                 options: {draggable: false}
             },
         ].filter(Boolean);
-    }, [timelineVis]);
-
-    const toggleTimeline = useCallback(() => {
-        setTimelineVis(prevTimelineVis => !prevTimelineVis);
     }, []);
 
-    const zoomInHandler = (event, value) => {
-        setZoomLevel(value);
+    const changeZoom = useCallback((zoom) => {
         if (wavesurferRef.current) {
-            wavesurferRef.current.zoom(value);
+            wavesurferRef.current.zoom(zoom);
         }
-    };
+    }, [zoomLevel])
+
+    const calculateTimeInterval = (duration) => {
+        return Math.round((duration/60)*10)/10;
+    }
+
+    const timelineIntervalRedraw = (zoomLevel) => {
+        if (wavesurferRef.current) {
+            const width = document.getElementById('waveform').offsetWidth;
+            const seconds_displayed = width / zoomLevel;
+            const secondsPerTick = Math.round((seconds_displayed / 60)*10)/10;
+
+            timeLineIntervalRef.current = wavesurferRef.current.timeline;
+            timeLineIntervalRef.current.params.timeInterval = secondsPerTick;
+            timeLineIntervalRef.current._onRedraw();
+        }
+    }
+
 
     const handleWSMount = useCallback(
         (waveSurfer) => {
             if (waveSurfer.markers) {
                 waveSurfer.clearMarkers();
             }
-            console.log("WS MOUNT");
             wavesurferRef.current = waveSurfer;
 
             if (wavesurferRef.current) {
-                // wavesurferRef.current.on("region-created", regionCreatedHandler);
 
                 wavesurferRef.current.on("ready", () => {
-                    console.log("WaveSurfer is ready");
-                    setAudioFileDuration(Math.round(wavesurferRef.current.getDuration()));
+                    // 1. Get the width of the waveform container
+                    const waveformContainerWidth = document.getElementById('waveform').offsetWidth;
+
+                    // 2. Get the duration of the audio in seconds
+                    const audioDurationInSeconds = wavesurferRef.current.getDuration();
+                    const timeInterval = calculateTimeInterval(audioDurationInSeconds);
+
+
+                    // 3. Calculate the minimum zoom level
+                    const minimumZoomLevel = waveformContainerWidth / audioDurationInSeconds;
+                    // Set this zoom level to the waveform
+                    wavesurferRef.current.zoom(minimumZoomLevel);
+
+                    timelineIntervalRedraw(minimumZoomLevel);
+
+                    setAudioFileDuration(Math.round(audioDurationInSeconds));
+                    setMinZoomLevel(minimumZoomLevel);
+                    setZoomLevel(minimumZoomLevel);
+                    // setTimeLineInterval(timeInterval);
 
                 });
 
                 wavesurferRef.current.on("region-removed", (region) => {
-                    console.log("region-removed --> ", region);
+                    // console.log("region-removed --> ", region);
                 });
 
                 wavesurferRef.current.on("loading", (data) => {
-                    console.log("loading --> ", data);
+                    // console.log("loading --> ", data);
                 });
                 if (window) {
                     window.surferidze = wavesurferRef.current;
@@ -126,10 +170,8 @@ const AudioPlayer = () => {
     );
 
     const handlePopoverOpen = (region, smth) => {
-        console.log("Stuttered words:",)
         const anchorElement = smth.currentTarget;
         if (anchorElement) {
-            console.log("REGION", region);
             setPopoverOpen(true);
             setAnchorEl(anchorElement);
             setCurrentRegion(region);
@@ -146,7 +188,6 @@ const AudioPlayer = () => {
     }, [playBackSpeed]);
 
     const loadAudioFile = (file) => {
-        console.log("Setting Audio File");
         if (file && wavesurferRef.current) {
             const reader = new FileReader();
             reader.onloadend = () => {
@@ -166,7 +207,7 @@ const AudioPlayer = () => {
         if (wavesurferRef.current) {
             wavesurferRef.current.setPlaybackRate(value);
         }
-    },[playBackSpeed]);
+    }, [playBackSpeed]);
 
     const playPause = () => {
         if (wavesurferRef.current !== null) {
@@ -180,9 +221,42 @@ const AudioPlayer = () => {
         })
     }
 
+    const handleMarkStutter = () => {
+        const audioTime = wavesurferRef.current.getCurrentTime();
+        if (!isAudioCursorInsideAnyRegion(audioTime)) {
+            if (!isCreatingRegion) {
+                const newRegionTemp = {start: audioTime};
+                setIsCreatingRegion(true);
+                setCreatingRegion(newRegionTemp);
+            } else {
+                const duration = audioTime - creatingRegion.start;
+                const region = {
+                    start: creatingRegion.start,
+                    end: audioTime,
+                    duration: duration,
+                    color: "rgba(255, 0, 0, .2)",
+                };
+                const id = Object.keys(kiStutteredRegions).length;
+                setkiStutteredRegions(prevRegions => ({
+                    ...prevRegions,
+                    [id]: region
+                }));
+
+                setCreatingRegion(null);
+                setIsCreatingRegion(false);
+            }
+        } else {
+            setIsFlashing(true);
+        }
+    };
+
+    const handleMarkStutterClick = () => {
+        if (wavesurferRef.current && !isDisabled) {
+            handleMarkStutter();
+        }
+    };
     const handleKeyPress = (event) => {
         if (wavesurferRef.current && !isDisabled) {
-            console.log("WAVESURFER: ", wavesurferRef.current);
             const audioTime = wavesurferRef.current.getCurrentTime();
             if (event.key === 's') {
                 if (!isAudioCursorInsideAnyRegion(audioTime)) {
@@ -212,12 +286,6 @@ const AudioPlayer = () => {
                 }
             }
 
-            if (event.key === 'r') {
-                console.log("r");
-                wavesurferRef.current.setBackgroundColor('rgba(255,0,0,.5)');
-                setIsFlashing(true);
-            }
-
             if (event.key === " ") {
                 event.preventDefault();
                 playPause();
@@ -226,9 +294,7 @@ const AudioPlayer = () => {
     };
 
     const handleRegionUpdate = useCallback((region, smth) => {
-        console.log("Dragging Region", region.id);
         let changeRegion = kiStutteredRegions[region.id];
-        console.log("Change regions", changeRegion);
         const duration = region.end - region.start;
         changeRegion.start = region.start;
         changeRegion.end = region.end;
@@ -267,7 +333,6 @@ const AudioPlayer = () => {
 
     // USE EFFECTS
     useEffect(() => {
-        console.log("Load file");
         loadAudioFile(audioFile);
         if (wavesurferRef.current !== null) {
             setAudioPlayerControl({
@@ -289,7 +354,6 @@ const AudioPlayer = () => {
     }, [isFlashing])
 
     useEffect(() => {
-
         if (transcriptionObj) {
             wavesurferRef.current.on('audioprocess', function (time) {
                 if (isCreatingRegion && isAudioCursorInsideAnyRegion(time)) {
@@ -352,83 +416,102 @@ const AudioPlayer = () => {
         }
     }, [wavesurferRef, transcriptionObj, handleKeyPress, playBackSpeed, kiStutteredRegions]);
 
-    useEffect(() => {
-        if (wavesurferRef.current) {
-            const timelineElem = document.getElementById('timeline');
+    const handleZoomIn = (event) => {
+        event.currentTarget.blur();
+        if (zoomLevel+10 >= 100){
+            setZoomLevel(100);
+            changeZoom(100);
+            timelineIntervalRedraw(100);
+        } else
+            setZoomLevel(prevState => {
+                changeZoom(prevState+10);
+                timelineIntervalRedraw(prevState+10);
+                return prevState+10
+            });
+    }
 
-            const handleTimelineClick = (event) => {
-                const clickPosition = event.offsetX / timelineElem.offsetWidth;
-                // const clickTime = clickPosition * wavesurferRef.current.getDuration();
-                wavesurferRef.current.seekTo(clickPosition);
-            };
-
-            timelineElem.addEventListener('click', handleTimelineClick);
-
-            return () => {
-                timelineElem.removeEventListener('click', handleTimelineClick);
-            };
-        }
-    }, [wavesurferRef]);
-
+    const handleZoomOut = (event) => {
+        event.currentTarget.blur();
+        if (zoomLevel-10 <= minZoomLevel){
+            setZoomLevel(minZoomLevel);
+            changeZoom(minZoomLevel);
+            timelineIntervalRedraw(minZoomLevel);
+        } else
+            setZoomLevel(prevState => {
+                changeZoom(prevState-10);
+                timelineIntervalRedraw(prevState-10);
+                return prevState-10;
+            });
+    }
 
 
 
     return (
-        <MainCard>
+        <MainCard
+            title={
+                <Box flexGrow={1} sx={{justifyContent: 'space-between'}}>
+                    <Help title={"Audio Player"}>
+                        {help}
+                    </Help>
+                </Box>
+            }
+        >
             <Stack>
                 {audioFile ? (
                     <React.Fragment>
                         <SaveWorkspace sx={{mb: 3}} name={workspaceName}/>
-                        <WaveSurfer plugins={plugins} onMount={handleWSMount}>
-                            <WaveForm {...waveformProps}>
-                                {markers.map((marker) => (
-                                    <Marker
-                                        key={marker.label}
-                                        {...marker}
-                                    />
-                                ))}
-                                {Object.entries(kiStutteredRegions).map(([id, regionProps]) => {
-                                    return (
-                                        <Region
-                                            key={id}
-                                            id={id}
-                                            {...regionProps}
-                                            onUpdateEnd={handleRegionUpdate}
-                                            onUpdate={handleUpdate}
-                                            onClick={handlePopoverOpen}
-                                            onOver={handleOnOver}
-
+                        <StyledRegion>
+                            <WaveSurfer plugins={plugins} onMount={handleWSMount}>
+                                <WaveForm {...waveformProps}>
+                                    {markers.map((marker) => (
+                                        <Marker
+                                            key={marker.label}
+                                            {...marker}
                                         />
-                                    )
-                                })}
-                                {anchorEl && currentRegion && (
-                                    <AudioPlayerPopover
-                                        key={popoverKey}
-                                        anchorEl={anchorEl}
-                                        setAnchorEl={setAnchorEl}
-                                        popoverOpen={Boolean(anchorEl)}
-                                        setPopoverOpen={setPopoverOpen}
-                                        stutteredWords={stutteredWords}
-                                        region={currentRegion}
-                                        exists={stutteredEvents[currentRegion.id]}
-                                        // setPopoverColor={setPopoverColor}
-                                    />
-                                )}
+                                    ))}
+                                    {Object.entries(kiStutteredRegions).map(([id, regionProps]) => {
+                                        return (
+                                            <Region
+                                                key={id}
+                                                id={id}
+                                                {...regionProps}
+                                                onUpdateEnd={handleRegionUpdate}
+                                                onUpdate={handleUpdate}
+                                                onClick={handlePopoverOpen}
+                                                onOver={handleOnOver}
 
-                            </WaveForm>
-                            <div id="timeline"/>
-                        </WaveSurfer>
+                                            />
+                                        )
+                                    })}
+                                    {anchorEl && currentRegion && (
+                                        <AudioPlayerPopover
+                                            key={popoverKey}
+                                            anchorEl={anchorEl}
+                                            setAnchorEl={setAnchorEl}
+                                            popoverOpen={Boolean(anchorEl)}
+                                            setPopoverOpen={setPopoverOpen}
+                                            stutteredWords={stutteredWords}
+                                            region={currentRegion}
+                                            exists={stutteredEvents[currentRegion.id]}
+                                        />
+                                    )}
+
+                                </WaveForm>
+                                <div id="timeline" />
+                            </WaveSurfer>
+                        </StyledRegion>
                     </React.Fragment>
                 ) : (
                     <Box sx={{height: 128, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                        <Typography variant={"h2"} fontWeight={"light"}>Start or load a new Analysis to get started!</Typography>
+                        <Typography variant={"h2"} fontWeight={"light"}>Start or load a new Analysis to get
+                            started!</Typography>
                     </Box>
                 )}
 
                 <Box sx={{height: 10}}/>
-                <Stack spacing={1} direction={"row"}>
+                <Stack spacing={2} direction={"row"} sx={{alignItems: 'center'}}>
                     <Speed/>
-                    <Box sx={{width: 100}}>
+                    <Box sx={{width: 100, pt: 1}}>
                         <Slider
                             aria-label="playbackspeed"
                             defaultValue={1}
@@ -440,37 +523,37 @@ const AudioPlayer = () => {
                             max={1}
                             value={playBackSpeed}
                             onChange={(event, value) => {
-                                console.log("Getting hit here?");
                                 playbackSpeedHandler(event, value);
                             }}
                             disabled={isDisabled}
                             sx={{width: 90, mr: 10}}
                         />
                     </Box>
-                    <Button variant={"contained"} onClick={(event) => {
+                    <Box sx={{width: '20px', pr: 3}}>
+                        <Typography>{playBackSpeed}x</Typography>
+                    </Box>
+                    <Button variant={"outlined"} onClick={(event) => {
                         play();
                         event.currentTarget.blur();
                     }}
-                            disabled={isDisabled}>Play / Pause</Button>
-                    <Button variant={"contained"} onClick={(event) => {
-                        toggleTimeline();
-                        event.currentTarget.blur();
-                    }} disabled={isDisabled}>
-                        Toggle
-                        timeline</Button>
-                    <ZoomOut/>
-                    <Box sx={{width: 100}}>
-                        <Slider
-                            aria-label="Zoom"
-                            defaultValue={1}
-                            min={0} // Adjust the minimum zoom level according to your needs
-                            max={100} // Adjust the maximum zoom level according to your needs
-                            value={zoomLevel}
-                            onChange={zoomInHandler}
+                            disabled={isDisabled}>
+                        Play / Pause
+                    </Button>
+                    <Button variant={"outlined"}
+                            onClick={(event) => {
+                                handleMarkStutterClick()
+                                event.currentTarget.blur();
+                            }}
                             disabled={isDisabled}
-                        />
-                    </Box>
-                    <ZoomIn/>
+                    >
+                        Mark Stutter
+                    </Button>
+                    <IconButton disabled={isDisabled} color={"primary"} onClick={handleZoomOut}>
+                        <ZoomOut fontSize={"large"}/>
+                    </IconButton>
+                    <IconButton disabled={isDisabled} color={"primary"} onClick={handleZoomIn}>
+                        <ZoomIn fontSize={"large"}/>
+                    </IconButton>
                 </Stack>
             </Stack>
         </MainCard>

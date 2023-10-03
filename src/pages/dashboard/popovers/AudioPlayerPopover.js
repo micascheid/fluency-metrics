@@ -82,7 +82,6 @@ const AudioPlayerPopover = ({anchorEl, setAnchorEl, popoverOpen, setPopoverOpen,
         const start = region.start;
         const end = region.end;
 
-        // TODO: ensure syllable count gets set correctly
         newTranscriptionObj[insertKey] = {
             confidence: 1,
             end: end,
@@ -114,7 +113,6 @@ const AudioPlayerPopover = ({anchorEl, setAnchorEl, popoverOpen, setPopoverOpen,
                 }
             });
         }
-        console.log("COLOR", anchorEl);
         setPopoverOpen(false);
         setAnchorEl(null);
     };
@@ -127,7 +125,6 @@ const AudioPlayerPopover = ({anchorEl, setAnchorEl, popoverOpen, setPopoverOpen,
     };
 
     const handleKeyPress = (event) => {
-        event.stopPropagation();
         event.stopPropagation();
     };
 
@@ -224,7 +221,7 @@ const AudioPlayerPopover = ({anchorEl, setAnchorEl, popoverOpen, setPopoverOpen,
                         variant={"contained"}
                         disabled={doneDisabled}
                         sx={{width: '40px', mb: 1, mt: 1}}
-                            onClick={handleDonePopoverClose}>Done</Button>
+                            onClick={handleDonePopoverClose}>Confirm</Button>
                 </Stack>
             </Box>
         </Popover>

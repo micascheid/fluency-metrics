@@ -6,9 +6,10 @@ import WordComponent from "./WordComponent";
 import TranscriptionAuto from "./TranscriptionAuto";
 import TranscriptionManual from "./TranscriptionManual";
 import {AUTO, MANUAL} from "../../constants";
+import Help from "./Help";
 
 
-const Transcription = () => {
+const Transcription = (props) => {
     // variables
     const {
         mode,
@@ -17,9 +18,10 @@ const Transcription = () => {
         countTotalSyllables,
         audioFileDuration,
     } = useContext(StutteredContext);
+    const {help} = props;
 
     const transcriptionTimeEstimate = () => {
-        const finalDur = Math.round(audioFileDuration / 60) * 6;
+        const finalDur = Math.round(audioFileDuration / 60) * 8;
         const minutes = Math.floor(finalDur / 60);
         const seconds = finalDur % 60;
         let displayTime = '';
@@ -41,12 +43,18 @@ const Transcription = () => {
     const transcriptionEstimate = transcriptionTimeEstimate();
 
     return (
-        <MainCard>
+        <MainCard title={
+            <Box flexGrow={1}>
+                <Help title={"Transcription"}>
+                    {help}
+                </Help>
+            </Box>
+        }
+        >
             {loadingTranscription ? (
-                // <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', pt: 2}}>
-                    <Stack alignItems={'center'}>
+                    <Stack alignItems={'center'} spacing={1}>
                         <CircularProgress/>
-                        <Typography variant={"h4"} fontWeight={"light"}>Hang tight! Transcription processing time is:</Typography>
+                        <Typography variant={"h4"} fontWeight={"light"}>Hang tight! Processing time is:</Typography>
                         <Typography variant={"h4"}>{transcriptionEstimate}</Typography>
                     </Stack>
             ) : (
