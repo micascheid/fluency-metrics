@@ -105,13 +105,13 @@ const SaveWorkspace = ({sx}) => {
                     >
                         Save work before leaving or refreshing site
                     </Typography>
-
-
                     <FormControlLabel
                         control={
                             <Checkbox
                                 checked={isShowSaveWarning}
-                                onChange={() => setIsShowSaveWarning(!isShowSaveWarning)}
+                                onChange={(event) => {
+                                    event.currentTarget.blur();
+                                    setIsShowSaveWarning(!isShowSaveWarning)}}
                                 color="primary"
                                 size={"small"}
                             />
@@ -129,7 +129,6 @@ const SaveWorkspace = ({sx}) => {
                     sx={{color: theme.palette.success.main}}
                 >{statusMessage}</Typography>
             </Stack>
-
         </Box>
     );
 };

@@ -68,21 +68,45 @@ const AudioPlayerPopover = ({anchorEl, setAnchorEl, popoverOpen, setPopoverOpen,
         }, {});
     };
 
-    const updateTranscriptionObj = () => {
-        const wordKeys = Object.keys(stutteredWords);
-        const insertKey = wordKeys[0];
-        let newTranscriptionObj = {...transcriptionObj};
+    const findNearestLeftWord = (startTime) => {
+            let closestKey = null;
+            let closestDifference = Infinity;
 
+            for (let [key, value] of Object.entries(transcriptionObj)) {
+                if (value.end < startTime) {
+                    let difference = Math.abs(value.end - startTime);
+                    if (difference < closestDifference) {
+                        closestDifference = difference;
+                        closestKey = key;
+                    }
+                }
+            }
+            return closestKey;
+    };
 
-        wordKeys.forEach(key => {
-            delete newTranscriptionObj[key];
+    const addNewWord = (insertKey, add_obj) => {
+        let updatedTranscription = {};
+        Object.keys(transcriptionObj).forEach((tKey) => {
+            const currentKey = parseInt(tKey, 10);
+            if (currentKey < insertKey) {
+                updatedTranscription[currentKey] = transcriptionObj[currentKey]
+            } else {
+                updatedTranscription[currentKey + 1] = transcriptionObj[currentKey];
+            }
+
         });
+        updatedTranscription[insertKey] = add_obj;
+        return updatedTranscription;
 
+    };
+
+    const updateTranscriptionObj = () => {
+        let newTranscriptionObj = {...transcriptionObj};
+        let insertKey;
         const duration = region.end - region.start;
         const start = region.start;
         const end = region.end;
-
-        newTranscriptionObj[insertKey] = {
+        const add_obj = {
             confidence: 1,
             end: end,
             start: start,
@@ -90,8 +114,20 @@ const AudioPlayerPopover = ({anchorEl, setAnchorEl, popoverOpen, setPopoverOpen,
             syllable_count: syllableCount,
             punctuated_word: localStutteredWords
         }
-        newTranscriptionObj = reIndexKeys(newTranscriptionObj);
-        setTranscriptionObj(newTranscriptionObj);
+        if (Object.keys(stutteredWords).length !== 0) {
+            const wordKeys = Object.keys(stutteredWords);
+            insertKey = wordKeys[0];
+            wordKeys.forEach(key => {
+                delete newTranscriptionObj[key];
+            });
+            newTranscriptionObj[insertKey] = add_obj
+            newTranscriptionObj = reIndexKeys(newTranscriptionObj);
+            setTranscriptionObj(newTranscriptionObj);
+        } else {
+            insertKey = findNearestLeftWord(region.start);
+            setTranscriptionObj(addNewWord(insertKey, add_obj));
+        }
+
     };
 
     const handleDonePopoverClose = () => {
