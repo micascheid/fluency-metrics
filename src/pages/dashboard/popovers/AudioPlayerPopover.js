@@ -126,7 +126,6 @@ const AudioPlayerPopover = ({anchorEl, setAnchorEl, popoverOpen, setPopoverOpen,
 
     const handleKeyPress = (event) => {
         event.stopPropagation();
-        event.stopPropagation();
     };
 
     const handleRegionDelete = () => {

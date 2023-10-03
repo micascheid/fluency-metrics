@@ -1,5 +1,7 @@
 import {Box, List, ListItem, Typography} from "@mui/material";
 import {useTheme} from "@mui/material/styles";
+import ZoomOut from "@mui/icons-material/ZoomOut";
+import ZoomIn from "@mui/icons-material/ZoomIn";
 
 const HelpAudioPlayer = () => {
     const largeText = { fontSize: '1.4em', fontWeight: 'light' };
@@ -25,7 +27,7 @@ const HelpAudioPlayer = () => {
                 </ListItem>
                 <ListItem>
                     <Typography variant="body1" style={largeText}>
-                        <strong>Audio Cursor</strong>: Move the audio cursor by clicking on the timeline or anywhere on the waveform. Click along timeline if relisteing to marked regions to avoid popups.
+                        <strong>Audio Cursor</strong>: Move the audio cursor by clicking anywhere on the waveform.
                     </Typography>
                 </ListItem>
                 <ListItem>
@@ -35,7 +37,15 @@ const HelpAudioPlayer = () => {
                 </ListItem>
                 <ListItem>
                     <Typography variant="body1" style={largeText}>
-                        <strong>Adjusting Waveform Detail</strong>: On the right you'll see a slider which helps you zoom in or out of the speech sample.
+                        <strong>Adjusting Waveform Zoom</strong>: On the farthest right side of your controls you'll find the <ZoomOut color={"primary"} sx={{
+                        ml: .5,
+                        verticalAlign: 'middle'
+                    }} fontSize={"small"}/>
+                        and the
+                        <ZoomIn color={"primary"} fontSize={"small"} sx={{
+                            ml: .5,
+                            verticalAlign: 'middle'
+                        }}/> options. Use these to adjust the view of the audio waveform.
                     </Typography>
                 </ListItem>
                 <ListItem>

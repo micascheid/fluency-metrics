@@ -9,7 +9,7 @@ import {WaveSurfer, WaveForm, Marker, Region} from 'wavesurfer-react';
 import RegionsPlugin from "wavesurfer.js/dist/plugin/wavesurfer.regions.min";
 import TimelinePlugin from "wavesurfer.js/dist/plugin/wavesurfer.timeline.min";
 import MarkersPlugin from "wavesurfer.js/src/plugin/markers";
-import {Box, Button, Slider, Stack, Typography} from "@mui/material";
+import {Box, Button, IconButton, Slider, Stack, Typography} from "@mui/material";
 import MainCard from "../../components/MainCard";
 import ZoomIn from '@mui/icons-material/ZoomIn';
 import ZoomOut from '@mui/icons-material/ZoomOut';
@@ -50,8 +50,9 @@ const AudioPlayer = (props) => {
 
     const {help, cardColor} = props;
     const theme = useTheme();
-    const [timelineVis, setTimelineVis] = useState(true);
+    const [minZoomLevel, setMinZoomLevel] = useState(0);
     const [zoomLevel, setZoomLevel] = useState(1);
+    const [timeLineInterval, setTimeLineInterval] = useState(5);
     const [markers, setMarkers] = useState([]);
     const [creatingRegion, setCreatingRegion] = useState(null);
     const [isCreatingRegion, setIsCreatingRegion] = useState(false);
@@ -62,7 +63,9 @@ const AudioPlayer = (props) => {
     const [stutteredWords, setStutteredWords] = useState({});
     const [popoverKey, setPopoverKey] = useState(null);
     const [isFlashing, setIsFlashing] = useState(false);
+    const [waveSurferReady, setWavesurferReady] = useState(false);
     const isDisabled = transcriptionObj === null;
+    const timeLineIntervalRef = useRef();
 
 
     const waveformProps = {
@@ -71,6 +74,7 @@ const AudioPlayer = (props) => {
         cursorWidth: 2,
         scrollParent: true,
         fillParent: true,
+        barWidth: 1,
     }
 
     //FUNCTIONS
@@ -80,11 +84,12 @@ const AudioPlayer = (props) => {
                 plugin: RegionsPlugin,
                 options: {enableDragSelection: false}
             },
-            timelineVis && {
+            {
                 plugin: TimelinePlugin,
                 options: {
                     container: "#timeline",
-                    timeInterval: .5,
+                    timeInterval: 1, //this is an initial sec per tick as the timelineIntervalREf will update it once audio is loaded
+                    height: 20,
                 }
             },
             {
@@ -92,33 +97,60 @@ const AudioPlayer = (props) => {
                 options: {draggable: false}
             },
         ].filter(Boolean);
-    }, [timelineVis]);
-
-    const toggleTimeline = useCallback(() => {
-        setTimelineVis(prevTimelineVis => !prevTimelineVis);
     }, []);
 
-    const zoomInHandler = (event, value) => {
-        setZoomLevel(value);
+    const changeZoom = useCallback((zoom) => {
         if (wavesurferRef.current) {
-            wavesurferRef.current.zoom(value);
+            wavesurferRef.current.zoom(zoom);
         }
-    };
+    }, [zoomLevel])
+
+    const calculateTimeInterval = (duration) => {
+        return Math.round((duration/60)*10)/10;
+    }
+
+    const timelineIntervalRedraw = (zoomLevel) => {
+        if (wavesurferRef.current) {
+            const width = document.getElementById('waveform').offsetWidth;
+            const seconds_displayed = width / zoomLevel;
+            const secondsPerTick = Math.round((seconds_displayed / 60)*10)/10;
+
+            timeLineIntervalRef.current = wavesurferRef.current.timeline;
+            timeLineIntervalRef.current.params.timeInterval = secondsPerTick;
+            timeLineIntervalRef.current._onRedraw();
+        }
+    }
+
 
     const handleWSMount = useCallback(
         (waveSurfer) => {
             if (waveSurfer.markers) {
                 waveSurfer.clearMarkers();
             }
-            // console.log("WS MOUNT");
             wavesurferRef.current = waveSurfer;
 
             if (wavesurferRef.current) {
-                // wavesurferRef.current.on("region-created", regionCreatedHandler);
 
                 wavesurferRef.current.on("ready", () => {
-                    // console.log("WaveSurfer is ready");
-                    setAudioFileDuration(Math.round(wavesurferRef.current.getDuration()));
+                    // 1. Get the width of the waveform container
+                    const waveformContainerWidth = document.getElementById('waveform').offsetWidth;
+
+                    // 2. Get the duration of the audio in seconds
+                    const audioDurationInSeconds = wavesurferRef.current.getDuration();
+                    const timeInterval = calculateTimeInterval(audioDurationInSeconds);
+
+
+                    // 3. Calculate the minimum zoom level
+                    const minimumZoomLevel = waveformContainerWidth / audioDurationInSeconds;
+                    // Set this zoom level to the waveform
+                    wavesurferRef.current.zoom(minimumZoomLevel);
+
+                    timelineIntervalRedraw(minimumZoomLevel);
+
+                    setAudioFileDuration(Math.round(audioDurationInSeconds));
+                    setMinZoomLevel(minimumZoomLevel);
+                    setZoomLevel(minimumZoomLevel);
+                    // setTimeLineInterval(timeInterval);
 
                 });
 
@@ -138,7 +170,6 @@ const AudioPlayer = (props) => {
     );
 
     const handlePopoverOpen = (region, smth) => {
-        // console.log("Stuttered words:",)
         const anchorElement = smth.currentTarget;
         if (anchorElement) {
             setPopoverOpen(true);
@@ -323,7 +354,6 @@ const AudioPlayer = (props) => {
     }, [isFlashing])
 
     useEffect(() => {
-
         if (transcriptionObj) {
             wavesurferRef.current.on('audioprocess', function (time) {
                 if (isCreatingRegion && isAudioCursorInsideAnyRegion(time)) {
@@ -386,23 +416,34 @@ const AudioPlayer = (props) => {
         }
     }, [wavesurferRef, transcriptionObj, handleKeyPress, playBackSpeed, kiStutteredRegions]);
 
-    useEffect(() => {
-        if (wavesurferRef.current) {
-            const timelineElem = document.getElementById('timeline');
+    const handleZoomIn = (event) => {
+        event.currentTarget.blur();
+        if (zoomLevel+10 >= 100){
+            setZoomLevel(100);
+            changeZoom(100);
+            timelineIntervalRedraw(100);
+        } else
+            setZoomLevel(prevState => {
+                changeZoom(prevState+10);
+                timelineIntervalRedraw(prevState+10);
+                return prevState+10
+            });
+    }
 
-            const handleTimelineClick = (event) => {
-                const clickPosition = event.offsetX / timelineElem.offsetWidth;
-                // const clickTime = clickPosition * wavesurferRef.current.getDuration();
-                wavesurferRef.current.seekTo(clickPosition);
-            };
+    const handleZoomOut = (event) => {
+        event.currentTarget.blur();
+        if (zoomLevel-10 <= minZoomLevel){
+            setZoomLevel(minZoomLevel);
+            changeZoom(minZoomLevel);
+            timelineIntervalRedraw(minZoomLevel);
+        } else
+            setZoomLevel(prevState => {
+                changeZoom(prevState-10);
+                timelineIntervalRedraw(prevState-10);
+                return prevState-10;
+            });
+    }
 
-            timelineElem.addEventListener('click', handleTimelineClick);
-
-            return () => {
-                timelineElem.removeEventListener('click', handleTimelineClick);
-            };
-        }
-    }, [wavesurferRef]);
 
 
     return (
@@ -413,7 +454,7 @@ const AudioPlayer = (props) => {
                         {help}
                     </Help>
                 </Box>
-        }
+            }
         >
             <Stack>
                 {audioFile ? (
@@ -456,7 +497,7 @@ const AudioPlayer = (props) => {
                                     )}
 
                                 </WaveForm>
-                                <div id="timeline"/>
+                                <div id="timeline" />
                             </WaveSurfer>
                         </StyledRegion>
                     </React.Fragment>
@@ -468,7 +509,7 @@ const AudioPlayer = (props) => {
                 )}
 
                 <Box sx={{height: 10}}/>
-                <Stack spacing={1} direction={"row"} sx={{alignItems: 'center'}}>
+                <Stack spacing={2} direction={"row"} sx={{alignItems: 'center'}}>
                     <Speed/>
                     <Box sx={{width: 100, pt: 1}}>
                         <Slider
@@ -499,23 +540,20 @@ const AudioPlayer = (props) => {
                         Play / Pause
                     </Button>
                     <Button variant={"outlined"}
-                            onClick={handleMarkStutterClick}
-                            disabled={isDisabled}>
+                            onClick={(event) => {
+                                handleMarkStutterClick()
+                                event.currentTarget.blur();
+                            }}
+                            disabled={isDisabled}
+                    >
                         Mark Stutter
                     </Button>
-                    <ZoomOut/>
-                    <Box sx={{width: 100, pt: 1}}>
-                        <Slider
-                            aria-label="Zoom"
-                            defaultValue={1}
-                            min={0} // Adjust the minimum zoom level according to your needs
-                            max={100} // Adjust the maximum zoom level according to your needs
-                            value={zoomLevel}
-                            onChange={zoomInHandler}
-                            disabled={isDisabled}
-                        />
-                    </Box>
-                    <ZoomIn/>
+                    <IconButton disabled={isDisabled} color={"primary"} onClick={handleZoomOut}>
+                        <ZoomOut fontSize={"large"}/>
+                    </IconButton>
+                    <IconButton disabled={isDisabled} color={"primary"} onClick={handleZoomIn}>
+                        <ZoomIn fontSize={"large"}/>
+                    </IconButton>
                 </Stack>
             </Stack>
         </MainCard>
