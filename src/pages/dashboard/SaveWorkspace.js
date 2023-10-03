@@ -22,7 +22,7 @@ const SaveWorkspace = ({sx}) => {
     const theme = useTheme();
     const [isNameError, setIsNameError] = useState(false);
     const [nameError, setNameError] = useState("");
-
+    const [isShowSaveWarning, setIsShowSaveWarning] = useState(true);
     const statusMessage = useStatusMessage();
 
     const handleOnClick = () => {
@@ -35,11 +35,10 @@ const SaveWorkspace = ({sx}) => {
     };
 
 
-
     const handleOnChange = (event) => {
         const value = (event.target.value);
         const doesExist = Object.values(workspacesIndex).some(workspace => workspace.name === value);
-        if (doesExist){
+        if (doesExist) {
             setNameError("Name already in use");
         } else {
             setNameError('');
@@ -57,8 +56,6 @@ const SaveWorkspace = ({sx}) => {
     useEffect(() => {
         setLocalName(workspaceName);
     }, [workspaceName])
-
-
 
 
     return (
@@ -95,14 +92,44 @@ const SaveWorkspace = ({sx}) => {
                         />
                     </ButtonBase>
                 </Stack>
+                <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'flex-end'}}>
+                    <Typography
+                        variant={"body1"}
+                        color={theme.palette.error.main}
+                        sx={{
+                            visibility: isShowSaveWarning ? 'visible' : 'hidden',
+                            opacity: isShowSaveWarning ? 1 : 0,
+                            transition: 'opacity 0.3s',
+                            mb: '-12px'
+                        }}
+                    >
+                        Save work before leaving or refreshing site
+                    </Typography>
+
+
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={isShowSaveWarning}
+                                onChange={() => setIsShowSaveWarning(!isShowSaveWarning)}
+                                color="primary"
+                                size={"small"}
+                            />
+                        }
+                        label={isShowSaveWarning ? "Hide Warning" : "Show Warning"}
+                    />
+                </Box>
             </Stack>
-            <Button variant={"outlined"} onClick={handleOnClick} disabled={workspaceName === '' || !!nameError}>
-                Save Work
-            </Button>
-            <Typography
-                variant={"body"}
-                sx={{color: theme.palette.success.main}}
-            >{statusMessage}</Typography>
+            <Stack direction={"row"} sx={{alignItems: 'center'}}>
+                <Button variant={"outlined"} onClick={handleOnClick} disabled={workspaceName === '' || !!nameError}>
+                    Save Work
+                </Button>
+                <Typography
+                    variant={"body1"}
+                    sx={{color: theme.palette.success.main}}
+                >{statusMessage}</Typography>
+            </Stack>
+
         </Box>
     );
 };
