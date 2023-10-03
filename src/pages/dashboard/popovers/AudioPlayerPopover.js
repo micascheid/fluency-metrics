@@ -81,7 +81,7 @@ const AudioPlayerPopover = ({anchorEl, setAnchorEl, popoverOpen, setPopoverOpen,
                     }
                 }
             }
-            return closestKey;
+            return Number(closestKey) + 1;
     };
 
     const addNewWord = (insertKey, add_obj) => {
