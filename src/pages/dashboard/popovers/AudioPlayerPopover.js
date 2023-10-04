@@ -33,7 +33,7 @@ const AudioPlayerPopover = ({anchorEl, setAnchorEl, popoverOpen, setPopoverOpen,
     const [syllableCount, setSyllableCount] = useState(exists ? stutteredEvent["syllable_count"] : 0);
     const typeList = [repWholeWord, repSyllable, prolongation, block, interjection];
     const pcList = [0, 1, 2, 3, 4, 5];
-    const doneDisabled = !(stutterType !== 'None');
+    const doneDisabled = (stutterType === 'None');
     const stutteredWordsDisplay = (words) => {
         return Object.values(words).map(word_obj => word_obj.punctuated_word).join(' ');
     };
@@ -200,7 +200,7 @@ const AudioPlayerPopover = ({anchorEl, setAnchorEl, popoverOpen, setPopoverOpen,
                             <DeleteForeverIcon sx={{color: 'red'}}/>
                         </IconButton>
                     </Box>
-                    <Divider textAlign={"left"} sx={dividerStyles}>Stuttered Text</Divider>
+                    <Divider textAlign={"left"} sx={dividerStyles}>Stuttered Text or Annotate</Divider>
                     <Box sx={{display: 'flex', alignItems: "center", justifyContent: "left"}}>
                         <CustomWordInput
                             value={localStutteredWords}

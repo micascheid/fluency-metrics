@@ -19,10 +19,10 @@ const HelpTranscription = () => {
                 </ListItem>
                 <ListItem>
                     <Typography variant="body1" style={largeText} component="div">
-                        <strong>Adding a Word</strong>:
+                        <strong>Adding Text or Annotation</strong>:
                         <ul>
                             <li>Position your cursor between two words. A white plus sign will appear. Click it.</li>
-                            <li>Enter the desired text and specify the syllables. Click "Done" to insert the new word.</li>
+                            <li>Enter the desired text or annotation and specify syllables if needed. Click "Done" to insert the new word.</li>
                         </ul>
                     </Typography>
                 </ListItem>

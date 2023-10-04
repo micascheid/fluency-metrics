@@ -11,7 +11,7 @@ const AddTextPopover = ({leftId, rightId, setAnchorEl, anchorEl,}) => {
     } = useContext(StutteredContext);
     const [addedText, setAddedText] = useState('');
     const [syllables, setSyllables] = useState(0);
-    const isButtonDisabled = !addedText.trim() || syllables <= 0;
+    const isButtonDisabled = !addedText.trim();
     const handleClose = (event) => {
         event.stopPropagation();
         setAnchorEl(null);
@@ -70,7 +70,7 @@ const AddTextPopover = ({leftId, rightId, setAnchorEl, anchorEl,}) => {
         >
             <Box sx={{display: 'flex', alignItems: 'center', padding: 1}}>
                 <Stack>
-                    <Divider sx={dividerStyles}>Text</Divider>
+                    <Divider sx={dividerStyles}>Text or Annotate</Divider>
                     <CustomWordInput
                         value={addedText}
                         onChange={(event) => {
