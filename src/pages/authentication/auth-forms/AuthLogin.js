@@ -68,7 +68,7 @@ const AuthLogin = () => {
                     signInWithEmailAndPassword(auth, values.email, values.password)
                         .then(() => {
                             login(auth.currentUser);
-                            navigate('/')
+                            navigate('/tool')
                         })
                         .catch((error) => {
                             const errorCode = error.code;

@@ -106,14 +106,14 @@ const AudioPlayer = (props) => {
     }, [zoomLevel])
 
     const calculateTimeInterval = (duration) => {
-        return Math.round((duration/60)*10)/10;
+        return Math.round((duration / 60) * 10) / 10;
     }
 
     const timelineIntervalRedraw = (zoomLevel) => {
         if (wavesurferRef.current) {
             const width = document.getElementById('waveform').offsetWidth;
             const seconds_displayed = width / zoomLevel;
-            const secondsPerTick = Math.round((seconds_displayed / 60)*10)/10;
+            const secondsPerTick = Math.round((seconds_displayed / 60) * 10) / 10;
 
             timeLineIntervalRef.current = wavesurferRef.current.timeline;
             timeLineIntervalRef.current.params.timeInterval = secondsPerTick;
@@ -418,32 +418,31 @@ const AudioPlayer = (props) => {
 
     const handleZoomIn = (event) => {
         event.currentTarget.blur();
-        if (zoomLevel+10 >= 100){
+        if (zoomLevel + 10 >= 100) {
             setZoomLevel(100);
             changeZoom(100);
             timelineIntervalRedraw(100);
         } else
             setZoomLevel(prevState => {
-                changeZoom(prevState+10);
-                timelineIntervalRedraw(prevState+10);
-                return prevState+10
+                changeZoom(prevState + 10);
+                timelineIntervalRedraw(prevState + 10);
+                return prevState + 10
             });
     }
 
     const handleZoomOut = (event) => {
         event.currentTarget.blur();
-        if (zoomLevel-10 <= minZoomLevel){
+        if (zoomLevel - 10 <= minZoomLevel) {
             setZoomLevel(minZoomLevel);
             changeZoom(minZoomLevel);
             timelineIntervalRedraw(minZoomLevel);
         } else
             setZoomLevel(prevState => {
-                changeZoom(prevState-10);
-                timelineIntervalRedraw(prevState-10);
-                return prevState-10;
+                changeZoom(prevState - 10);
+                timelineIntervalRedraw(prevState - 10);
+                return prevState - 10;
             });
     }
-
 
 
     return (
@@ -497,7 +496,7 @@ const AudioPlayer = (props) => {
                                     )}
 
                                 </WaveForm>
-                                <div id="timeline" />
+                                <div id="timeline"/>
                             </WaveSurfer>
                         </StyledRegion>
                     </React.Fragment>
@@ -509,36 +508,39 @@ const AudioPlayer = (props) => {
                 )}
 
                 <Box sx={{height: 10}}/>
-                <Stack spacing={2} direction={"row"} sx={{alignItems: 'center'}}>
-                    <Speed/>
-                    <Box sx={{width: 100, pt: 1}}>
-                        <Slider
-                            aria-label="playbackspeed"
-                            defaultValue={1}
-                            getAriaValueText={valuetext}
-                            valueLabelDisplay="auto"
-                            step={.1}
-                            marks
-                            min={.4}
-                            max={1}
-                            value={playBackSpeed}
-                            onChange={(event, value) => {
-                                playbackSpeedHandler(event, value);
-                            }}
-                            disabled={isDisabled}
-                            sx={{width: 90, mr: 10}}
-                        />
+                <Stack spacing={2} direction={"row"} sx={{alignItems: 'flex-start'}}>
+                    <Box sx={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+                        <Speed />
+                        <Box sx={{width: 100, pt: 1, marginX: 1}}>
+                            <Slider
+                                aria-label="playbackspeed"
+                                defaultValue={1}
+                                getAriaValueText={valuetext}
+                                valueLabelDisplay="auto"
+                                step={.1}
+                                marks
+                                min={.4}
+                                max={1}
+                                value={playBackSpeed}
+                                onChange={(event, value) => {
+                                    playbackSpeedHandler(event, value);
+                                }}
+                                disabled={isDisabled}
+                            />
+                        </Box>
+                        <Typography sx={{width: '20px', ml: 1}}>{playBackSpeed}x</Typography>
                     </Box>
-                    <Box sx={{width: '20px', pr: 3}}>
-                        <Typography>{playBackSpeed}x</Typography>
+                    <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', alignSelf: 'center', pt: .5}}>
+                        <Button variant={"outlined"} onClick={(event) => {
+                            play();
+                            event.currentTarget.blur();
+                        }}
+                                disabled={isDisabled}>
+                            Play / Pause
+                        </Button>
+                        <Typography variant={"caption"} color={theme.palette.grey.A200}>'space-bar'</Typography>
                     </Box>
-                    <Button variant={"outlined"} onClick={(event) => {
-                        play();
-                        event.currentTarget.blur();
-                    }}
-                            disabled={isDisabled}>
-                        Play / Pause
-                    </Button>
+                    <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', alignSelf: 'center', pt: .5}}>
                     <Button variant={"outlined"}
                             onClick={(event) => {
                                 handleMarkStutterClick()
@@ -548,10 +550,12 @@ const AudioPlayer = (props) => {
                     >
                         Mark Stutter
                     </Button>
-                    <IconButton disabled={isDisabled} color={"primary"} onClick={handleZoomOut}>
+                        <Typography variant={"caption"} color={theme.palette.grey.A200}>'s'</Typography>
+                    </Box>
+                    <IconButton sx={{pt: 2}} disabled={isDisabled} color={"primary"} onClick={handleZoomOut}>
                         <ZoomOut fontSize={"large"}/>
                     </IconButton>
-                    <IconButton disabled={isDisabled} color={"primary"} onClick={handleZoomIn}>
+                    <IconButton sx={{pt: 2}} disabled={isDisabled} color={"primary"} onClick={handleZoomIn}>
                         <ZoomIn fontSize={"large"}/>
                     </IconButton>
                 </Stack>

@@ -3,6 +3,8 @@ import {lazy} from 'react';
 // project import
 import Loadable from 'components/Loadable';
 import MainLayout from 'layout/MainLayout';
+import {Support} from "@mui/icons-material";
+import Terms from "../pages/extra-pages/Terms";
 
 // render - dashboard
 const DashboardDefault = Loadable(lazy(() => import('pages/dashboard')));
@@ -28,20 +30,18 @@ const MainRoutes = {
 
         },
         {
-            path: 'dashboard',
-            children: [
-                {
-                    path: 'default',
-                    element:
+            path: '/tool',
+            element:
+                <DashboardDefault/>
 
-                        <DashboardDefault/>
-
-                }
-            ]
         },
         {
-            // path: 'support',
-            // element: <Support/>
+            path: 'support',
+            element: <SupportPage/>
+        },
+        {
+            path: 'terms-of-service',
+            element: <Terms />
         }
     ]
 };
