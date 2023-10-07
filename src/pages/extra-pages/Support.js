@@ -7,7 +7,7 @@ import MainCard from '../../components/MainCard';
 // ==============================|| SAMPLE PAGE ||============================== //
 
 const Support = () => (
-    <MainCard title="Support">
+    <MainCard sx={{borderRadius: 0}} title="Support">
         <Stack direction={"row"} spacing={2}>
             <Typography variant="h6">
                 Email:

@@ -110,7 +110,7 @@ const AuthRegister = () => {
 
             await addUserIfNotExists(user.uid, subscription_info);
             setRegistrationComplete(true);
-            navigate('/');
+            navigate('/tool');
         } catch (error) {
             console.error("Error during registration:", error);
             // Handle or display the error to the user.
