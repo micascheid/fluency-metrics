@@ -1,4 +1,4 @@
-import {useContext, useEffect, useState} from 'react';
+import {Fragment, useContext, useEffect, useState} from 'react';
 import {Link as RouterLink, useNavigate} from 'react-router-dom';
 
 // material-ui
@@ -15,7 +15,7 @@ import {
     InputLabel,
     OutlinedInput,
     Stack,
-    Typography, Tooltip
+    Typography, Tooltip, Checkbox, FormControlLabel
 } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
 
@@ -48,6 +48,9 @@ const AuthRegister = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [isRegistering, setIsRegistering] = useState(false);
     const [isShowOrgInfoModal, setIsShowOrgInfoModal] = useState(false);
+    const termsOfService = "https://app.termly.io/document/terms-of-service/b16b9152-1772-4f08-b8f6-d2891f75917e";
+    const privacyPolicy = "https://app.termly.io/document/privacy-policy/3f05d55c-d115-4406-99e3-97d039c224f6";
+
     const theme = useTheme();
 
     //
@@ -72,7 +75,7 @@ const AuthRegister = () => {
         const userRef = doc(db, 'users', `${userId}`)
         const userSnap = await getDoc(userRef);
 
-        if (!userSnap.exists()){
+        if (!userSnap.exists()) {
             await setDoc(userRef, {subscription: userData});
         } else {
             console.log("user already exists")
@@ -122,9 +125,9 @@ const AuthRegister = () => {
     }, []);
 
     return (
-        <>
+        <Fragment>
             {isShowOrgInfoModal &&
-                <OrganizationCodeInfo setIsShow={setIsShowOrgInfoModal} />
+                <OrganizationCodeInfo setIsShow={setIsShowOrgInfoModal}/>
             }
             <Formik
                 initialValues={{
@@ -134,42 +137,20 @@ const AuthRegister = () => {
                     password: '',
                     submit: null,
                     organizationCode: '',
+                    termsAccepted: false,
                 }}
                 validationSchema={Yup.object().shape({
                     displayname: Yup.string().max(255).required('First Name is required'),
                     email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
                     password: Yup.string().max(255).required('Password is required'),
-                    organizationCode: Yup.string().max(50)
+                    organizationCode: Yup.string().max(50),
+                    termsAccepted: Yup.bool().oneOf([true], 'You must accept terms of service to sign up.'),
                 })}
                 onSubmit={async (values, {setErrors, setStatus, setSubmitting}) => {
                     setStatus({success: false});
                     setSubmitting(false);
 
                     await handleRegistration(values);
-
-                    // createUserWithEmailAndPassword(auth, values.email, values.password)
-                    //     .then((userCredential) => {
-                    //         const user = userCredential.user;
-                    //         updateProfile(user, {
-                    //             displayName: values.displayname, photoURL: ''
-                    //         }).then(() => {
-                    //             setIsRegistering(true);
-                    //
-                    //             addUserIfNotExists(user.uid, subscription_info).then(() => {
-                    //                 navigate('/');
-                    //             });
-                    //         })
-                    //     })
-                    //     .catch((error) => {
-                    //         const errorCode = error.code;
-                    //         const errorMessage = error.message;
-                    //         console.error(errorCode);
-                    //         console.error(errorMessage);
-                    //         setStatus({success: false});
-                    //         setErrors({submit: error.message});
-                    //         setSubmitting(false);
-                    //         setIsRegistering(false);
-                    //     })
 
                 }
                 }
@@ -220,33 +201,34 @@ const AuthRegister = () => {
                                 </Stack>
                             </Grid>
                             <Grid item xs={12}>
-                            <Stack spacing={1}>
-                                <Stack direction={"row"} sx={{alignItems: 'center'}} spacing={1}>
-                                    <Tooltip title={"Don't pay?"}>
-                                        <IconButton onClick={handleOrgInfo}>
-                                            <InfoIcon sx={{color: theme.palette.primary.main}}/>
-                                        </IconButton>
-                                    </Tooltip>
-                                    <InputLabel htmlFor="organizationCode-signup">Organization Code (Optional)</InputLabel>
+                                <Stack spacing={1}>
+                                    <Stack direction={"row"} sx={{alignItems: 'center'}} spacing={1}>
+                                        <Tooltip title={"Don't pay?"}>
+                                            <IconButton onClick={handleOrgInfo}>
+                                                <InfoIcon sx={{color: theme.palette.primary.main}}/>
+                                            </IconButton>
+                                        </Tooltip>
+                                        <InputLabel htmlFor="organizationCode-signup">Organization Code
+                                            (Optional)</InputLabel>
+                                    </Stack>
+                                    <OutlinedInput
+                                        fullWidth
+                                        error={Boolean(touched.organizationCode && errors.organizationCode)}
+                                        id="organizationCode-signup"
+                                        type="text"
+                                        value={values.organizationCode}
+                                        name="organizationCode"
+                                        onBlur={handleBlur}
+                                        onChange={handleChange}
+                                        placeholder="Enter your organization code"
+                                    />
+                                    {touched.organizationCode && errors.organizationCode && (
+                                        <FormHelperText error id="helper-text-organizationCode-signup">
+                                            {errors.organizationCode}
+                                        </FormHelperText>
+                                    )}
                                 </Stack>
-                                <OutlinedInput
-                                    fullWidth
-                                    error={Boolean(touched.organizationCode && errors.organizationCode)}
-                                    id="organizationCode-signup"
-                                    type="text"
-                                    value={values.organizationCode}
-                                    name="organizationCode"
-                                    onBlur={handleBlur}
-                                    onChange={handleChange}
-                                    placeholder="Enter your organization code"
-                                />
-                                {touched.organizationCode && errors.organizationCode && (
-                                    <FormHelperText error id="helper-text-organizationCode-signup">
-                                        {errors.organizationCode}
-                                    </FormHelperText>
-                                )}
-                            </Stack>
-                        </Grid>
+                            </Grid>
                             <Grid item xs={12}>
                                 <Stack spacing={1}>
                                     <InputLabel htmlFor="password-signup">Password</InputLabel>
@@ -303,16 +285,32 @@ const AuthRegister = () => {
                                 </FormControl>
                             </Grid>
                             <Grid item xs={12}>
-                                <Typography variant="body2">
-                                    By Signing up, you agree to our &nbsp;
-                                    <Link variant="subtitle2" component={RouterLink} to="#">
-                                        Terms of Service
-                                    </Link>
-                                    &nbsp; and &nbsp;
-                                    <Link variant="subtitle2" component={RouterLink} to="#">
-                                        Privacy Policy
-                                    </Link>
-                                </Typography>
+                                <Stack direction={"row"} sx={{alignItems: 'center'}}>
+                                    <FormControlLabel
+                                        control={
+                                            <Checkbox
+                                                checked={values.termsAccepted}
+                                                onChange={handleChange}
+                                                name="termsAccepted"
+                                            />
+                                        }
+                                     label={ <Typography variant="body1">
+                                         I agree to: &nbsp;
+                                         <Link variant="body1" component={RouterLink} to={termsOfService}>
+                                             FluencyMetrics Terms
+                                         </Link>
+                                         &nbsp; and &nbsp;
+                                         <Link variant="body1" component={RouterLink} to={privacyPolicy}>
+                                             Privacy Policy
+                                         </Link>
+                                     </Typography>}/>
+                                    {touched.termsAccepted && errors.termsAccepted && (
+                                        <FormHelperText error>
+                                            {errors.termsAccepted}
+                                        </FormHelperText>
+                                    )}
+
+                                </Stack>
                             </Grid>
                             {errors.submit && (
                                 <Grid item xs={12}>
@@ -323,7 +321,7 @@ const AuthRegister = () => {
                                 <AnimateButton>
                                     <Button
                                         disableElevation
-                                        disabled={isRegistering || Boolean(!touched.email)}
+                                        disabled={isRegistering || Boolean(!touched.email) || !values.termsAccepted}
                                         fullWidth
                                         size="large"
                                         type="submit"
@@ -338,7 +336,7 @@ const AuthRegister = () => {
                     </form>
                 )}
             </Formik>
-        </>
+        </Fragment>
     );
 };
 
