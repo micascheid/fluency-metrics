@@ -318,19 +318,25 @@ const AuthRegister = () => {
                                 </Grid>
                             )}
                             <Grid item xs={12}>
-                                <AnimateButton>
-                                    <Button
-                                        disableElevation
-                                        disabled={isRegistering || Boolean(!touched.email) || !values.termsAccepted}
-                                        fullWidth
-                                        size="large"
-                                        type="submit"
-                                        variant="contained"
-                                        color="primary"
-                                    >
-                                        {isRegistering ? 'Creating Account' : 'Create Account'}
-                                    </Button>
-                                </AnimateButton>
+                                <Stack direction="column"  sx={{width: '100%'}}>
+                                    <AnimateButton>
+                                        <Button
+                                            fullWidth
+                                            disableElevation
+                                            disabled={isRegistering || Boolean(!touched.email) || !values.termsAccepted}
+                                            size="large"
+                                            type="submit"
+                                            variant="contained"
+                                            color="primary"
+                                        >
+                                            {isRegistering ? 'Creating Account' : 'Create Account'}
+                                        </Button>
+                                    </AnimateButton>
+                                    <Box sx={{textAlign: 'center', width: '100%'}}>
+                                        <Typography variant={"caption"} color={theme.palette.grey.A200}>Start 30-day trial</Typography>
+                                    </Box>
+                                </Stack>
+
                             </Grid>
                         </Grid>
                     </form>
