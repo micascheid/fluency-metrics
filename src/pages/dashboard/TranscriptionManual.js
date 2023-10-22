@@ -53,7 +53,7 @@ const TranscriptionManual = () => {
             axios.post(`${BASE_URL}/manual_transcription`, data).then((response) => {
                 setTranscriptionObj(response.data.transcription_obj);
             }).catch((error) => {
-                console.log("Error handling manual_transcription: ", error);
+                console.log("ProfileError handling manual_transcription: ", error);
             });
         }
     };

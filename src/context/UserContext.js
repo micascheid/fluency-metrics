@@ -3,6 +3,8 @@ import {useNavigate} from "react-router-dom";
 import {onAuthStateChanged, signOut} from "firebase/auth";
 import {auth, db} from "../FirebaseConfig";
 import {collection, doc, getDoc, getDocs, onSnapshot} from "firebase/firestore";
+import {BASE_URL, SUBSCRIPTION_STATUS} from "../constants";
+import axios from "axios";
 
 export const UserContext = createContext();
 
@@ -33,6 +35,11 @@ export const UserProvider = ({children}) => {
         return firestoreDate > currentDate;
     }
 
+    const subscriptionCanceledCheck = (subscriptionEpochEnd) => {
+        const currentEpochInSeconds = Math.floor(Date.now() / 1000);
+        return subscriptionEpochEnd <= currentEpochInSeconds;
+    }
+
     const shouldBlock = async (userId) => {
         // First check if they are individual or organizational
         const subscriptionRef = doc(db, 'users', userId,);
@@ -42,7 +49,7 @@ export const UserProvider = ({children}) => {
             const subscriptionData = userSnap.data().subscription;
             const trial_valid = trialValid(subscriptionData.trial_end_date);
 
-            if (subscriptionData.subscription_status === "active" || trial_valid) {
+            if (subscriptionData.subscription_status === SUBSCRIPTION_STATUS.ACTIVE || trial_valid) {
                 block = false;
             }
             if (subscriptionData.organization_id) {
@@ -51,8 +58,20 @@ export const UserProvider = ({children}) => {
                 const orgData = orgSnap.data();
                 console.log("ORG DATA:", orgData);
                 //Check that they're organization is in good standing and they infact exist
-                if (orgData.subscription_status === "active" && orgData.members.includes(userId)) {
+                if (orgData.subscription_status === SUBSCRIPTION_STATUS.ACTIVE && orgData.members.includes(userId)) {
                     block = false;
+                }
+            }
+
+
+            if (subscriptionData.subscription_status === SUBSCRIPTION_STATUS.ACTIVE && subscriptionCanceledCheck(subscriptionData.subscription_end_time)) {
+                block = true;
+                try {
+                    await axios.post(`${BASE_URL}/subscription_cancel`, {
+                        "userId": userId,
+                    })
+                } catch (error) {
+                    console.log("Unable to reach backend and deactivate user subscription: ", error);
                 }
             }
         } catch (error) {
@@ -80,28 +99,41 @@ export const UserProvider = ({children}) => {
 
 
     useEffect(() => {
-        const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
+        const unsubscribeAuth = onAuthStateChanged(auth, async (currentUser) => {
             if (currentUser) {
-                setUser(currentUser);
+                const userRef = doc(db, 'users', currentUser.uid);
+                try {
+                    const userDoc = await getDoc(userRef);
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        const userExtended = {
+                            ...currentUser,
+                            subscription: userData.subscription
+                        }
+                        setUser(userExtended);
 
-                const workspacesIndexRef = collection(db, 'users', currentUser.uid, 'workspaces_index');
+                        const workspacesIndexRef = collection(db, 'users', currentUser.uid, 'workspaces_index');
 
-                // Setup the real-time listener
-                const unsubscribeSnapshot = onSnapshot(workspacesIndexRef, (snapshot) => {
-                    const workspacesIndexTemp = {};
-                    snapshot.docs.forEach(doc => {
-                        workspacesIndexTemp[doc.id] = doc.data();
-                    });
-                    setWorkspacesIndex(workspacesIndexTemp);
-                });
+                        // Setup the real-time listener
+                        const unsubscribeSnapshot = onSnapshot(workspacesIndexRef, (snapshot) => {
+                            const workspacesIndexTemp = {};
+                            snapshot.docs.forEach(doc => {
+                                workspacesIndexTemp[doc.id] = doc.data();
+                            });
+                            setWorkspacesIndex(workspacesIndexTemp);
+                        });
 
-                setIsLoading(false);
+                        setIsLoading(false);
 
-                // Clean up the snapshot listener when the component is unmounted
-                return () => {
-                    unsubscribeSnapshot();
-                };
-
+                        // Clean up the snapshot listener when the component is unmounted
+                        return () => {
+                            unsubscribeSnapshot();
+                        };
+                    } else {
+                        navigate('/profile-error')
+                    }
+                } catch (error) {
+                }
             } else {
                 navigate('/login');
             }

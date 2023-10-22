@@ -38,6 +38,7 @@ import {db, auth} from "../../../FirebaseConfig";
 import {useTheme} from "@mui/material/styles";
 import OrganizationCodeInfo from "../../dashboard/modals/OrganizationCodeInfo";
 import {UserContext} from "../../../context/UserContext";
+import {SUBSCRIPTION_STATUS} from "../../../constants";
 
 // ============================|| FIREBASE - REGISTER ||============================ //
 
@@ -62,13 +63,13 @@ const AuthRegister = () => {
 
 
     const subscription_info = {
-        subscription_status: "trial",
+        subscription_status: SUBSCRIPTION_STATUS.TRIAL,
         trial_start_date: trialStartDate,
         trial_end_date: trialEndDate,
         subscription_end_time: "",
         organization_id: "",
         stripe_id: "",
-        subscription_type: 1,
+        subscription_type: 0,
     }
 
     const addUserIfNotExists = async (userId, userData) => {
@@ -115,7 +116,7 @@ const AuthRegister = () => {
             setRegistrationComplete(true);
             navigate('/tool');
         } catch (error) {
-            console.error("Error during registration:", error);
+            console.error("ProfileError during registration:", error);
             // Handle or display the error to the user.
         }
     };

@@ -6,7 +6,7 @@ import MainLayout from 'layout/MainLayout';
 import {Support} from "@mui/icons-material";
 import Terms from "../pages/extra-pages/Terms";
 import Pricing from "../pages/extra-pages/Pricing";
-
+import ProfileError from "../pages/extra-pages/ProfileError";
 // render - dashboard
 const DashboardDefault = Loadable(lazy(() => import('pages/dashboard')));
 
@@ -47,6 +47,10 @@ const MainRoutes = {
         {
             path: 'pricing',
             element: <Pricing />
+        },
+        {
+            path: 'profile-error',
+            element: <ProfileError />
         }
     ]
 };
