@@ -8,7 +8,7 @@ import TranscriptionManual from "./TranscriptionManual";
 import {AUTO, MANUAL} from "../../constants";
 import Help from "./Help";
 import {useNavigate} from "react-router-dom";
-import SupportModal from "./modals/Support";
+import SupportModal from "./modals/SupportModal";
 
 
 const Transcription = (props) => {
