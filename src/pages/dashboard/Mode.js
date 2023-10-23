@@ -17,6 +17,7 @@ import Help from "./Help";
 import HelpMode from "./help-components/HelpMode";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ArrowDropDownCircleIcon from "@mui/icons-material/ArrowDropDownCircle";
+import {useTheme} from "@mui/material/styles";
 
 
 const ExpandMore = styled((props) => {
@@ -40,6 +41,8 @@ const Mode = (props) => {
         setFileChosen,
         isCreateNewWorkspace,
     } = props;
+
+    const theme = useTheme();
     const [showAreYouSure, setShowAreYouSure] = useState(false);
     const [tabValue, setTabValue] = useState(0);
     const [autoInstuctionsHasOverflow, setAutoInstuctHasOverflow] = useState();
@@ -118,7 +121,8 @@ const Mode = (props) => {
                     </Help>
                 </Box>
             </Stack>
-        }>
+        }
+        >
             <Collapse in={expanded} timeout="auto" unmountOnExit>
                 {showAreYouSure && <AreYouSure setAreYouSure={setShowAreYouSure}/>}
                 <Grid container spacing={2}>

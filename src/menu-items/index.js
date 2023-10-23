@@ -7,7 +7,7 @@ import {Modal} from "@mui/material";
 // ==============================|| MENU ITEMS ||============================== //
 
 const menuItems = {
-    items: [dashboard, support, pages]
+    items: [dashboard, pages]
 };
 
 export default menuItems;
