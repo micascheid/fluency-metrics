@@ -85,6 +85,7 @@ export const StutteredProvider = (props) => {
     const [percentSS, setPercentSS] = useState(0);
     const [customNotes, setCustomNotes] = useState(initialState.customNotes);
     const [wsSaveStatus, setWsSaveStatus] = useState(UPD_WS_STATUS.IDLE);
+    const [failedTranscription, setFailedTranscription] = useState(false);
     const {user, setWorkspacesIndex} = useContext(UserContext);
 
     //FUNCTIONS
@@ -336,10 +337,8 @@ export const StutteredProvider = (props) => {
         setLoadingTranscription(true);
         const formData = new FormData();
         formData.append('file', audioFile);
-        const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-        await delay(3000);
         try {
-            const response = await axios.post(`${BASE_URL}/get_transcription2`, formData, {
+            const response = await axios.post(`${BASE_URL}/get_transcription2a`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
@@ -353,6 +352,7 @@ export const StutteredProvider = (props) => {
         } catch (error) {
             console.log("ERROR handling get_transcription:", error);
             setLoadingTranscription(false);
+            setFailedTranscription(true);
             return null;
         }
     };
@@ -525,7 +525,8 @@ export const StutteredProvider = (props) => {
             wsSaveStatus,
             setAudioFileDuration,
             audioFileDuration,
-            speechSampleContext
+            speechSampleContext,
+            failedTranscription
         }
         return (
             <StutteredContext.Provider value={contextValues}>

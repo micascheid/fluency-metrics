@@ -41,7 +41,7 @@ const Navigation = () => {
     return (
         <Box sx={{pt: 2}}>
             {navGroups}
-            {/*{renderSupportBox()}*/}
+            {renderSupportBox()}
         </Box>
     );
 };
