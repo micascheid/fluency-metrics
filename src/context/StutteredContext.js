@@ -338,7 +338,7 @@ export const StutteredProvider = (props) => {
         const formData = new FormData();
         formData.append('file', audioFile);
         try {
-            const response = await axios.post(`${BASE_URL}/get_transcription2a`, formData, {
+            const response = await axios.post(`${BASE_URL}/get_transcription2`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
@@ -347,6 +347,7 @@ export const StutteredProvider = (props) => {
             setTranscriptionObj(transcriptionObj);
             countTotalSyllables();
             setLoadingTranscription(false);
+            setFailedTranscription(false);
 
             return transcriptionObj;
         } catch (error) {
