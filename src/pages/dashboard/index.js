@@ -25,6 +25,7 @@ import BadHealth from "./modals/BadHealth";
 import {doc} from "firebase/firestore";
 import {db} from "../../FirebaseConfig";
 import HelpHighLevelSummary from "./help-components/HelpHighLevelSummary";
+import {DashboardContext} from "../../context/ToolContext";
 
 
 const DefaultDashboard = () => {
@@ -34,7 +35,9 @@ const DefaultDashboard = () => {
         isBlocked,
         badHealth,
     } = useContext(UserContext);
+
     const theme = useTheme();
+
     const [mode, setMode] = useState('');
     const [speechSampleContext, setSpeechSampleContext] = useState('');
     const [audioFile, setAudioFile] = useState(null)
@@ -96,6 +99,7 @@ const DefaultDashboard = () => {
         window.addEventListener('beforeunload', beforeUnloadListenter);
 
         return () => {
+            console.log("Get called here?");
             window.removeEventListener('beforeunload', beforeUnloadListenter);
         }
     }, []);

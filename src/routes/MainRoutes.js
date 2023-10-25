@@ -1,4 +1,4 @@
-import {lazy} from 'react';
+import {Fragment, lazy} from 'react';
 
 // project import
 import Loadable from 'components/Loadable';
@@ -34,7 +34,6 @@ const MainRoutes = {
             path: '/tool',
             element:
                 <DashboardDefault/>
-
         },
         {
             path: 'support',
@@ -42,15 +41,15 @@ const MainRoutes = {
         },
         {
             path: 'terms-of-service',
-            element: <Terms />
+            element: <Terms/>
         },
         {
             path: 'pricing',
-            element: <Pricing />
+            element: <Pricing/>
         },
         {
             path: 'profile-error',
-            element: <ProfileError />
+            element: <ProfileError/>
         }
     ]
 };

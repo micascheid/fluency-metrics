@@ -1,19 +1,18 @@
 // material-ui
-import {Box, Button, Card, CardActions, CardContent, Grid, Stack, Typography} from '@mui/material';
+import {Backdrop, Box, Button, Card, CardActions, CardContent, Grid, Stack, Typography} from '@mui/material';
 
 import {BASE_URL, CUSTOMER_PORTAL} from "../../constants";
 // project import
 import MainCard from '../../components/MainCard';
 import {Fragment, useContext, useState} from "react";
 import {UserContext} from "../../context/UserContext";
-import {useTheme} from "@mui/material/styles";
+import {alpha, useTheme} from "@mui/material/styles";
 import axios from "axios";
 import {useNavigate} from "react-router-dom";
 
 
 const Pricing = () => {
     //Variables
-    const [open, setOpen] = useState(false);
     const [loadingPortal, setLoadingPortal] = useState(false);
     const {
         user,
@@ -27,8 +26,7 @@ const Pricing = () => {
     const organizationalUser = user ? user.subscription.organization_id : null;
     const subscriptionType = user ? user.subscription.subscription_status : null;
     const theme = useTheme();
-    const handleOpen = () => setOpen(true);
-    const handleClose = () => setOpen(false);
+
     const navigate = useNavigate();
 
     //Functions
@@ -258,7 +256,6 @@ const Pricing = () => {
                 Manage Plan
             </Button>
         </Fragment>
-
 
     );
 };

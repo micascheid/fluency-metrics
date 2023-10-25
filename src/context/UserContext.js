@@ -15,6 +15,7 @@ export const UserProvider = ({children}) => {
     const [isBlocked, setIsBlocked] = useState(false);
     const [badHealth, setBadHealth] = useState(false);
     const [registrationComplete, setRegistrationComplete] = useState(false);
+    const [openPricing, setOpenPricing] = useState(false);
     const navigate = useNavigate();
     const login = (user) => {
         setUser(user);
