@@ -25,7 +25,7 @@ import BadHealth from "./modals/BadHealth";
 import {doc} from "firebase/firestore";
 import {db} from "../../FirebaseConfig";
 import HelpHighLevelSummary from "./help-components/HelpHighLevelSummary";
-import {DashboardContext} from "../../context/ToolContext";
+import {DashboardContext, ToolContext} from "../../context/ToolContext";
 
 
 const DefaultDashboard = () => {
@@ -36,23 +36,24 @@ const DefaultDashboard = () => {
         badHealth,
     } = useContext(UserContext);
 
+    const {
+        mode, setMode,
+        speechSampleContext, setSpeechSampleContext,
+        audioFile, setAudioFile,
+        fileChosen, setFileChosen,
+        audioFileName, setAudioFileName,
+        workspaceName, setWorkspaceName,
+        workspaceId, setWorkspaceId,
+        audioFileDuration, setAudioFileDuration,
+        isGetTranscription, setIsGetTranscription,
+        isCreateNewWorkspace, setIsCreateNewWorkspace,
+        isUpdateWorkspace, setIsUpdateWorkspace,
+        loadWorkspaceByObj, setLoadWorkspaceByObj,
+        expanded, setExpanded,
+        workspaceExpanded, setWorkspaceExpanded,
+        loadingTranscription, setLoadingTranscription
+    } = useContext(ToolContext);
     const theme = useTheme();
-
-    const [mode, setMode] = useState('');
-    const [speechSampleContext, setSpeechSampleContext] = useState('');
-    const [audioFile, setAudioFile] = useState(null)
-    const [fileChosen, setFileChosen] = useState('');
-    const [audioFileName, setAudioFileName] = useState('');
-    const [audioFileDuration, setAudioFileDuration] = useState(0);
-    const [workspaceName, setWorkspaceName] = useState('');
-    const [isGetTranscription, setIsGetTranscription] = useState(false);
-    const [isCreateNewWorkspace, setIsCreateNewWorkspace] = useState(false);
-    const [isUpdateWorkspace, setIsUpdateWorkspace] = useState(false);
-    const [loadWorkspaceByObj, setLoadWorkspaceByObj] = useState(null);
-    const [workspaceId, setWorkspaceId] = useState('None');
-    const [expanded, setExpanded] = useState(true);
-    const [workspaceExpanded, setWorkspaceExpanded] = useState(false);
-    const [loadingTranscription, setLoadingTranscription] = useState(false);
 
 
     const propValues = {
@@ -90,17 +91,17 @@ const DefaultDashboard = () => {
 
 
     useEffect(() => {
-        const beforeUnloadListenter = (event) => {
+        const beforeUnloadListener = (event) => {
             // setIsUpdateWorkspace(true)
             event.preventDefault();
             event.returnValue = 'Refreshing will result in loss of unsaved work';
         };
 
-        window.addEventListener('beforeunload', beforeUnloadListenter);
+        window.addEventListener('beforeunload', beforeUnloadListener);
 
         return () => {
             console.log("Get called here?");
-            window.removeEventListener('beforeunload', beforeUnloadListenter);
+            window.removeEventListener('beforeunload', beforeUnloadListener);
         }
     }, []);
 
@@ -120,7 +121,6 @@ const DefaultDashboard = () => {
                             <Grid item xs={12} sm={12} md={12} lg={12}>
                                 <Mode {...propValues} help={<HelpMode/>}/>
                             </Grid>
-                            <StutteredProvider {...propValues}>
                                 <Grid item xs={12}>
                                     <Workspace expanded={workspaceExpanded} help={<HelpWorkspace/>}>
                                         <Grid item container xs={12} spacing={2}>
@@ -152,7 +152,6 @@ const DefaultDashboard = () => {
                                         </Grid>
                                     </HighLevelSummary>
                                 </Grid>
-                            </StutteredProvider>
                         </Grid>
                     )}
                 </React.Fragment>

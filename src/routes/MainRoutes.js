@@ -7,6 +7,7 @@ import {Support} from "@mui/icons-material";
 import Terms from "../pages/extra-pages/Terms";
 import Pricing from "../pages/extra-pages/Pricing";
 import ProfileError from "../pages/extra-pages/ProfileError";
+import {DashboardProvider, ToolProvider} from "../context/ToolContext";
 // render - dashboard
 const DashboardDefault = Loadable(lazy(() => import('pages/dashboard')));
 
@@ -28,7 +29,6 @@ const MainRoutes = {
             path: '/',
             element:
                 <DashboardDefault/>
-
         },
         {
             path: '/tool',

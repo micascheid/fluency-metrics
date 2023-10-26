@@ -1,8 +1,8 @@
 import React, {useState, createContext} from "react";
 
-export const DashboardContext = createContext();
+export const ToolContext = createContext();
 
-export const DashboardProvider = ({children}) => {
+export const ToolProvider = ({children}) => {
 
     const [mode, setMode] = useState('');
     const [speechSampleContext, setSpeechSampleContext] = useState('');
@@ -21,7 +21,7 @@ export const DashboardProvider = ({children}) => {
     const [loadingTranscription, setLoadingTranscription] = useState(false);
 
     return (
-        <DashboardContext.Provider value={{
+        <ToolContext.Provider value={{
             mode, setMode,
             speechSampleContext, setSpeechSampleContext,
             audioFile, setAudioFile,
@@ -39,6 +39,6 @@ export const DashboardProvider = ({children}) => {
             loadingTranscription, setLoadingTranscription
         }}>
             {children}
-        </DashboardContext.Provider>
+        </ToolContext.Provider>
     )
 }
