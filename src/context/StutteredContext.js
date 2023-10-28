@@ -89,6 +89,7 @@ export const StutteredProvider = ({children}) => {
     const [percentSS, setPercentSS] = useState(0);
     const [customNotes, setCustomNotes] = useState(initialState.customNotes);
     const [wsSaveStatus, setWsSaveStatus] = useState(UPD_WS_STATUS.IDLE);
+    const [failedTranscription, setFailedTranscription] = useState(false);
     const {user, setWorkspacesIndex} = useContext(UserContext);
 
     //FUNCTIONS
@@ -351,11 +352,13 @@ export const StutteredProvider = ({children}) => {
             setTranscriptionObj(transcriptionObj);
             countTotalSyllables();
             setLoadingTranscription(false);
+            setFailedTranscription(false);
 
             return transcriptionObj;
         } catch (error) {
             console.log("ERROR handling get_transcription:", error);
             setLoadingTranscription(false);
+            setFailedTranscription(true);
             return null;
         }
     };
@@ -513,7 +516,8 @@ export const StutteredProvider = ({children}) => {
             wsSaveStatus,
             setAudioFileDuration,
             audioFileDuration,
-            speechSampleContext
+            speechSampleContext,
+            failedTranscription
         }
         return (
             <StutteredContext.Provider value={contextValues}>

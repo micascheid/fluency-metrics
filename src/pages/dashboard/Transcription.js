@@ -1,12 +1,14 @@
 import {Fragment, React, useContext, useEffect, useState} from "react";
 import MainCard from "../../components/MainCard";
-import {Box, CircularProgress, Stack, Typography} from "@mui/material";
+import {Box, CircularProgress, Stack, Typography, Link} from "@mui/material";
 import {StutteredContext} from "../../context/StutteredContext";
 import WordComponent from "./WordComponent";
 import TranscriptionAuto from "./TranscriptionAuto";
 import TranscriptionManual from "./TranscriptionManual";
 import {AUTO, MANUAL} from "../../constants";
 import Help from "./Help";
+import {useNavigate} from "react-router-dom";
+import SupportModal from "./modals/SupportModal";
 
 
 const Transcription = (props) => {
@@ -17,8 +19,11 @@ const Transcription = (props) => {
         loadingTranscription,
         countTotalSyllables,
         audioFileDuration,
+        failedTranscription,
     } = useContext(StutteredContext);
     const {help} = props;
+    const navigate = useNavigate();
+    const [showSupport, setShowSupport] = useState(false);
 
     const transcriptionTimeEstimate = () => {
         const finalDur = Math.round((audioFileDuration / 60) * 10);
@@ -30,6 +35,10 @@ const Transcription = (props) => {
         }
         displayTime += `${seconds} second${seconds === 1 ? '' : 's'}`;
         return displayTime;
+    };
+
+    const handleSupport = () => {
+        setShowSupport(true);
     };
 
 
@@ -67,6 +76,23 @@ const Transcription = (props) => {
                     }
                 </Box>
             )}
+            {failedTranscription &&
+                <Box>
+                    <Typography variant={"h3"} fontWeight={"light"} align={'center'}>
+                        We're currently experiencing issues processing the transcription. We apologize for the inconvenience. Please contact&nbsp;
+                        <Link
+                            component={"button"}
+                            variant={"h3"}
+                            fontWeight={"light"}
+                            onClick={handleSupport}
+                        >
+                            support.
+                        </Link>
+                    </Typography>
+
+                    <SupportModal isShow={showSupport} setIsShow={setShowSupport}/>
+                </Box>
+            }
         </MainCard>
     );
 
