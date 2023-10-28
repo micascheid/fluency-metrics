@@ -37,3 +37,7 @@ export const SUBSCRIPTION_STATUS = {
     ACTIVE: 'active',
     INACTIVE: 'inactive'
 }
+
+export const ENDPOINTS = {
+    AUTO_TRANSCRIPTION: 'get_auto_transcription'
+}

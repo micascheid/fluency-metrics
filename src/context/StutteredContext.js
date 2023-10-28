@@ -11,7 +11,7 @@ import {
 import {db} from "../FirebaseConfig";
 import {UserContext} from "./UserContext";
 import axios from "axios";
-import {BASE_URL, UPD_WS_STATUS} from "../constants";
+import {BASE_URL, ENDPOINTS, UPD_WS_STATUS} from "../constants";
 import {ToolContext} from "./ToolContext";
 
 export const StutteredContext = createContext();
@@ -82,7 +82,6 @@ export const StutteredProvider = ({children}) => {
     const [currentWordIndex, setCurrentWordIndex] = useState(initialState.currentWordIndex);
     const [averageDuration, setAverageDuration] = useState(initialState.averageDuration);
     const [kiStutteredRegions, setkiStutteredRegions] = useState(initialState.kiStutteredRegions);
-    // const [fileChosen, setFileChosen] = useState(initialState.fileChosen);
     const [longest3Durations, setLongest3Durations] = useState(initialState.longest3Durations);
     const [audioPlayerControl, setAudioPlayerControl] = useState(initialState.audioPlayerControl);
     const [playBackSpeed, setPlayBackSpeed] = useState(initialState.playBackSpeed);
@@ -341,10 +340,9 @@ export const StutteredProvider = ({children}) => {
         setLoadingTranscription(true);
         const formData = new FormData();
         formData.append('file', audioFile);
-        const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-        await delay(3000);
+
         try {
-            const response = await axios.post(`${BASE_URL}/get_transcription2`, formData, {
+            const response = await axios.post(`${BASE_URL}/${ENDPOINTS.AUTO_TRANSCRIPTION}`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
