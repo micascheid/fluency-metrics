@@ -104,7 +104,7 @@ const Pricing = () => {
                     ) : (userSubscriptionType !== 1 && (
                             <stripe-buy-button
                                 buy-button-id="buy_btn_1Nz3hYHqVA5HTx14aZRI816k"
-                                publishable-key="pk_test_51Nu1sKHqVA5HTx14LtyMiWlnp891ADmUOlHlV1hfa3Fu8HAdfr1Q14LPtPmNg1a4M3xaEIAIOW4mSwchw8qcp3SU00mCWRNhQS"
+                                publishable-key="pk_live_51Nu1sKHqVA5HTx14EhN5oCVe966oawDRHXpbSJIXBTJyTIYrAYilODRxFg9CIXviY6Bs0Fib18M9IkcjzhzLNmHx00bw8FQioj"
                                 client-reference-id={userId}
                                 customer-email={userEmail}
                             >
@@ -156,7 +156,7 @@ const Pricing = () => {
                     ) : (userSubscriptionType !== 2 && (
                             <stripe-buy-button
                                 buy-button-id="buy_btn_1O1W0cHqVA5HTx14dmOOhUQp"
-                                publishable-key="pk_test_51Nu1sKHqVA5HTx14LtyMiWlnp891ADmUOlHlV1hfa3Fu8HAdfr1Q14LPtPmNg1a4M3xaEIAIOW4mSwchw8qcp3SU00mCWRNhQS"
+                                publishable-key="pk_live_51Nu1sKHqVA5HTx14EhN5oCVe966oawDRHXpbSJIXBTJyTIYrAYilODRxFg9CIXviY6Bs0Fib18M9IkcjzhzLNmHx00bw8FQioj"
                                 client-reference-id={userId}
                                 customer-email={userEmail}
                             >
