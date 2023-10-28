@@ -103,7 +103,7 @@ const Pricing = () => {
                         </Button>
                     ) : (userSubscriptionType !== 1 && (
                             <stripe-buy-button
-                                buy-button-id="buy_btn_1Nz3hYHqVA5HTx14aZRI816k"
+                                buy-button-id="buy_btn_1O6ID0HqVA5HTx14lZaHjkk2"
                                 publishable-key="pk_live_51Nu1sKHqVA5HTx14EhN5oCVe966oawDRHXpbSJIXBTJyTIYrAYilODRxFg9CIXviY6Bs0Fib18M9IkcjzhzLNmHx00bw8FQioj"
                                 client-reference-id={userId}
                                 customer-email={userEmail}
@@ -155,7 +155,7 @@ const Pricing = () => {
                         </Button>
                     ) : (userSubscriptionType !== 2 && (
                             <stripe-buy-button
-                                buy-button-id="buy_btn_1O1W0cHqVA5HTx14dmOOhUQp"
+                                buy-button-id="buy_btn_1O6ICxHqVA5HTx14ZvWXp4RH"
                                 publishable-key="pk_live_51Nu1sKHqVA5HTx14EhN5oCVe966oawDRHXpbSJIXBTJyTIYrAYilODRxFg9CIXviY6Bs0Fib18M9IkcjzhzLNmHx00bw8FQioj"
                                 client-reference-id={userId}
                                 customer-email={userEmail}
