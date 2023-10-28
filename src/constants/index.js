@@ -8,6 +8,9 @@ export const MANUAL = 'manual';
 //production
 export const BASE_URL = 'https://fluencymetrics-backend-uroarqqgxa-uc.a.run.app';
 
+
+
+export const CUSTOMER_PORTAL = 'customer_portal';
 export const repWholeWord = "Rep. Whole Word";
 export const repSyllable = "Rep. Syllable";
 export const prolongation = "Prolongation";
@@ -28,3 +31,13 @@ export const SPEECH_SAMPLE_OPTIONS = {
 }
 
 export const MAINTENANCE_CHECK = doc(db, 'health', 'maintenance');
+
+export const SUBSCRIPTION_STATUS = {
+    TRIAL: 'trail',
+    ACTIVE: 'active',
+    INACTIVE: 'inactive'
+}
+
+export const ENDPOINTS = {
+    AUTO_TRANSCRIPTION: 'get_auto_transcription'
+}

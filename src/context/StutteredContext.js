@@ -11,40 +11,46 @@ import {
 import {db} from "../FirebaseConfig";
 import {UserContext} from "./UserContext";
 import axios from "axios";
-import {BASE_URL, UPD_WS_STATUS} from "../constants";
+import {BASE_URL, ENDPOINTS, UPD_WS_STATUS} from "../constants";
+import {ToolContext} from "./ToolContext";
 
 export const StutteredContext = createContext();
 
 
 
-export const StutteredProvider = (props) => {
+export const StutteredProvider = ({children}) => {
     // VARIABLES
     const {
-        children,
+        expanded,
+        setExpanded,
         mode,
+        setMode,
         speechSampleContext,
         setSpeechSampleContext,
-        workspaceName,
-        setWorkspaceName,
-        setMode,
+        fileChosen,
+        setFileChosen,
         audioFileName,
         setAudioFileName,
-        audioFileDuration,
-        setAudioFileDuration,
+        workspaceName,
+        setWorkspaceName,
+        workspaceId,
+        setWorkspaceId,
         audioFile,
         setAudioFile,
         isCreateNewWorkspace,
+        setIsGetTranscription,
+        isGetTranscription,
         setIsCreateNewWorkspace,
+        setIsUpdateWorkspace,
+        isUpdateWorkspace,
+        setLoadWorkspaceByObj,
         loadWorkspaceByObj,
-        workspaceId,
-        setWorkspaceId,
-        setExpanded,
-        setWorkspaceExpanded,
+        setAudioFileDuration,
+        audioFileDuration,
         loadingTranscription,
         setLoadingTranscription,
-        isUpdateWorkspace,
-        setIsUpdateWorkspace
-    } = props;
+        setWorkspaceExpanded,
+    } = useContext(ToolContext);
 
     const initialState = {
         percentSS: 0,
@@ -75,9 +81,7 @@ export const StutteredProvider = (props) => {
     const [transcriptionObj, setTranscriptionObj] = useState(initialState.transcriptionObj);
     const [currentWordIndex, setCurrentWordIndex] = useState(initialState.currentWordIndex);
     const [averageDuration, setAverageDuration] = useState(initialState.averageDuration);
-    // const [loadingTranscription, setLoadingTranscription] = useState(initialState.loadingTranscription);
     const [kiStutteredRegions, setkiStutteredRegions] = useState(initialState.kiStutteredRegions);
-    const [fileChosen, setFileChosen] = useState(initialState.fileChosen);
     const [longest3Durations, setLongest3Durations] = useState(initialState.longest3Durations);
     const [audioPlayerControl, setAudioPlayerControl] = useState(initialState.audioPlayerControl);
     const [playBackSpeed, setPlayBackSpeed] = useState(initialState.playBackSpeed);
@@ -337,8 +341,9 @@ export const StutteredProvider = (props) => {
         setLoadingTranscription(true);
         const formData = new FormData();
         formData.append('file', audioFile);
+
         try {
-            const response = await axios.post(`${BASE_URL}/get_transcription2`, formData, {
+            const response = await axios.post(`${BASE_URL}/${ENDPOINTS.AUTO_TRANSCRIPTION}`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
@@ -435,21 +440,6 @@ export const StutteredProvider = (props) => {
             updateStateFromObject(loadWorkspaceByObj);
         }
     }, [loadWorkspaceByObj])
-
-    // useEffect(() => {
-    //     const makeUpdate = async () => {
-    //         if (isUpdateWorkspace) {
-    //             await updateWorkspace(workspaceName);
-    //             setIsUpdateWorkspace(false);
-    //         }
-    //     }
-    //     makeUpdate().then(() => {
-    //         // setWsSaveStatus(UPD_WS_STATUS.SUCCESS);
-    //
-    //     }).catch(() => {
-    //         // setWsSaveStatus(UPD_WS_STATUS.ERROR);
-    //     });
-    // }, [isUpdateWorkspace]);
 
 
     const transcriptError = () => {
