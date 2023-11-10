@@ -9,7 +9,6 @@ export const MANUAL = 'manual';
 export const BASE_URL = 'https://fluencymetrics-backend-uroarqqgxa-uc.a.run.app';
 
 
-
 export const CUSTOMER_PORTAL = 'customer_portal';
 export const repWholeWord = "Rep. Whole Word";
 export const repSyllable = "Rep. Syllable";
@@ -33,7 +32,7 @@ export const SPEECH_SAMPLE_OPTIONS = {
 export const MAINTENANCE_CHECK = doc(db, 'health', 'maintenance');
 
 export const SUBSCRIPTION_STATUS = {
-    TRIAL: 'trail',
+    TRIAL: 'trial',
     ACTIVE: 'active',
     INACTIVE: 'inactive'
 }

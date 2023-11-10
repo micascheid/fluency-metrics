@@ -2,13 +2,6 @@ import { initializeApp } from "firebase/app";
 import {getAuth, connectAuthEmulator} from "firebase/auth";
 import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
 
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-// Your web app's Firebase configuration
-// export declare function connectFirestoreEmulator(firestore: Firestore, host: string, port: number, options?: {
-//   mockUserToken?: EmulatorMockTokenOptions | string;
-// }): void;
-
 //Enter the apikey and info provided by firebase below
 const firebaseConfig = {
     apiKey: "AIzaSyASGbbJMemMQ7dgaA3UYv99cKkMtHTcoFs",
@@ -22,11 +15,9 @@ const firebaseConfig = {
 
 
 // Initialize Firebase
-
 const app = initializeApp(firebaseConfig);
 
 const db = getFirestore(app);
-
 //local
 // connectFirestoreEmulator(db, 'localhost', 8080);
 
