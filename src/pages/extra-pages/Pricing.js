@@ -119,19 +119,16 @@ const Pricing = () => {
     );
 
     const yearlyOptionRender = () => (
-        <Card style={{height: '100%', display: 'flex', flexDirection: 'column'}}>
+        <Card style={{height: '100%', display: 'flex', flexDirection: 'column', maxWidth: 300}}>
             <CardContent sx={{alignItems: 'center'}} style={{flexGrow: 1}}>
                 <Stack direction={"row"} sx={{justifyContent: 'center', alignItems: 'baseline'}}>
                     <Typography variant="h2">
-                        $16
+                        $39
                     </Typography>
                     <Typography variant="h4" fontWeight={"light"}>
-                        /mo
+                        /yr
                     </Typography>
                 </Stack>
-                <Typography align={"center"} variant="subtitle1" fontWeight={"light"}>
-                    billed yearly
-                </Typography>
                 <Typography>
                     &bull; Individual plan
                 </Typography>
@@ -169,7 +166,7 @@ const Pricing = () => {
     );
 
     const organizationalOptionRender = () => (
-        <Card style={{height: '100%', display: 'flex', flexDirection: 'column'}}>
+        <Card style={{height: '100%', display: 'flex', flexDirection: 'column', maxWidth: 300}}>
             <CardContent sx={{alignItems: 'center'}} style={{flexGrow: 1}}>
                 <Typography align={"center"} variant="h3">
                     Organization
@@ -218,7 +215,7 @@ const Pricing = () => {
                 }}
             >
                 <MainCard title={"Plans"} sx={{height: '100%', marginBottom: 1}}>
-                    <Grid container spacing={3}>
+                    <Stack direction={"row"} spacing={2} justifyContent={"center"}>
                         {trial &&
                             <Grid item xs={12} sm={12}>
                                 <Box sx={{display: 'flex', justifyContent: 'center'}}>
@@ -227,23 +224,18 @@ const Pricing = () => {
                                 </Box>
                             </Grid>
                         }
-                        <Grid item xs={12} sm={4}>
-                            {userSubscriptionType === 1 &&
-                                <Typography variant={"h4"} fontWeight={"light"} gutterBottom>Current Plan</Typography>}
-                            {monthlyOptionRender()}
-                        </Grid>
-                        <Grid item xs={12} sm={4}>
+                        <Box>
                             {userSubscriptionType === 2 &&
                                 <Typography variant={"h4"} fontWeight={"light"} gutterBottom>Current Plan</Typography>}
                             {yearlyOptionRender()}
-                        </Grid>
+                        </Box>
 
-                        <Grid item xs={12} sm={4}>
+                        <Box>
                             {userSubscriptionType === 3 &&
                                 <Typography variant={"h4"} fontWeight={"light"} gutterBottom>Current Plan</Typography>}
                             {organizationalOptionRender()}
-                        </Grid>
-                    </Grid>
+                        </Box>
+                    </Stack>
                 </MainCard>
 
             </Box>
