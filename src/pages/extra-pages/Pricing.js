@@ -215,15 +215,15 @@ const Pricing = () => {
                 }}
             >
                 <MainCard title={"Plans"} sx={{height: '100%', marginBottom: 1}}>
+                    {trial &&
+                        <Grid item xs={12} sm={12}>
+                            <Box sx={{display: 'flex', justifyContent: 'center'}}>
+                                <Typography variant={"h3"} fontWeight={"light"}>Trial Ends
+                                    In: {trialDaysRemaining()}</Typography>
+                            </Box>
+                        </Grid>
+                    }
                     <Stack direction={"row"} spacing={2} justifyContent={"center"}>
-                        {trial &&
-                            <Grid item xs={12} sm={12}>
-                                <Box sx={{display: 'flex', justifyContent: 'center'}}>
-                                    <Typography variant={"h3"} fontWeight={"light"}>Trial Ends
-                                        In: {trialDaysRemaining()}</Typography>
-                                </Box>
-                            </Grid>
-                        }
                         <Box>
                             {userSubscriptionType === 2 &&
                                 <Typography variant={"h4"} fontWeight={"light"} gutterBottom>Current Plan</Typography>}
