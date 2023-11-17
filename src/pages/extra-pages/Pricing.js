@@ -4,18 +4,20 @@ import {Backdrop, Box, Button, Card, CardActions, CardContent, Grid, Stack, Typo
 import {BASE_URL, CUSTOMER_PORTAL} from "../../constants";
 // project import
 import MainCard from '../../components/MainCard';
-import {Fragment, useContext, useState} from "react";
+import {Fragment, useContext, useEffect, useState} from "react";
 import {UserContext} from "../../context/UserContext";
 import {alpha, useTheme} from "@mui/material/styles";
 import axios from "axios";
 import {useNavigate} from "react-router-dom";
+import LoadingOverlay from "../dashboard/LoadingOverlay";
 
 
 const Pricing = () => {
     //Variables
-    const [loadingPortal, setLoadingPortal] = useState(false);
+
     const {
         user,
+        isLoading
     } = useContext(UserContext);
     const userId = user ? user.uid : null;
     const userEmail = user ? user.email : null;
@@ -25,7 +27,6 @@ const Pricing = () => {
     const customerId = user ? user.subscription.stripe_id : null;
     const organizationalUser = user ? user.subscription.organization_id : null;
     const subscriptionType = user ? user.subscription.subscription_status : null;
-    const theme = useTheme();
 
     const navigate = useNavigate();
 
@@ -35,7 +36,12 @@ const Pricing = () => {
     }
 
     const trialDaysRemaining = () => {
-        const trialEndDate = trialEnd.toDate();
+        let trialEndDate;
+        if (!(trialEnd instanceof Date)) {
+            trialEndDate = trialEnd.toDate();
+        } else {
+            trialEndDate = trialEnd;
+        }
         const now = new Date();
         now.setHours(0, 0, 0, 0);
 
@@ -202,51 +208,59 @@ const Pricing = () => {
 
     return (
         <Fragment>
-            {orgDisable &&
-                <Typography variant={"h3"} fontWeight={"light"}>This page is unavailable to organizational
-                    users</Typography>
-            }
-            <Box
-                sx={{
-                    opacity: orgDisable ? .5 : 1,
-                    pointerEvents: orgDisable ? 'none' : 'auto',
-                    height: '100%',
-                    marginBottom: 1
-                }}
-            >
-                <MainCard title={"Plans"} sx={{height: '100%', marginBottom: 1}}>
-                    {trial &&
-                        <Grid item xs={12} sm={12}>
-                            <Box sx={{display: 'flex', justifyContent: 'center'}}>
-                                <Typography variant={"h3"} fontWeight={"light"}>Trial Ends
-                                    In: {trialDaysRemaining()}</Typography>
-                            </Box>
-                        </Grid>
+            {isLoading ? (
+                <LoadingOverlay isOpen={true}/>
+            ) : (
+                <Fragment>
+                    {orgDisable &&
+                        <Typography variant={"h3"} fontWeight={"light"}>This page is unavailable to organizational
+                            users</Typography>
                     }
-                    <Stack direction={"row"} spacing={2} justifyContent={"center"}>
-                        <Box>
-                            {userSubscriptionType === 2 &&
-                                <Typography variant={"h4"} fontWeight={"light"} gutterBottom>Current Plan</Typography>}
-                            {yearlyOptionRender()}
-                        </Box>
+                    <Box
+                        sx={{
+                            opacity: orgDisable ? .5 : 1,
+                            pointerEvents: orgDisable ? 'none' : 'auto',
+                            height: '100%',
+                            marginBottom: 1
+                        }}
+                    >
+                        <MainCard title={"Plans"} sx={{height: '100%', marginBottom: 1}}>
+                            {trial &&
+                                <Grid item xs={12} sm={12}>
+                                    <Box sx={{display: 'flex', justifyContent: 'center'}}>
+                                        <Typography variant={"h3"} fontWeight={"light"}>Trial Ends
+                                            In: {trialDaysRemaining()}</Typography>
+                                    </Box>
+                                </Grid>
+                            }
+                            <Stack direction={"row"} spacing={2} justifyContent={"center"}>
+                                <Box>
+                                    {userSubscriptionType === 2 &&
+                                        <Typography variant={"h4"} fontWeight={"light"} gutterBottom>Current
+                                            Plan</Typography>}
+                                    {yearlyOptionRender()}
+                                </Box>
 
-                        <Box>
-                            {userSubscriptionType === 3 &&
-                                <Typography variant={"h4"} fontWeight={"light"} gutterBottom>Current Plan</Typography>}
-                            {organizationalOptionRender()}
-                        </Box>
-                    </Stack>
-                </MainCard>
+                                <Box>
+                                    {userSubscriptionType === 3 &&
+                                        <Typography variant={"h4"} fontWeight={"light"} gutterBottom>Current
+                                            Plan</Typography>}
+                                    {organizationalOptionRender()}
+                                </Box>
+                            </Stack>
+                        </MainCard>
 
-            </Box>
-            <Button
-                disabled={!customerId}
-                variant={"outlined"}
-                onClick={handleManagePlanClick}
-                size={"large"}
-            >
-                Manage Plan
-            </Button>
+                    </Box>
+                    <Button
+                        disabled={!customerId}
+                        variant={"outlined"}
+                        onClick={handleManagePlanClick}
+                        size={"large"}
+                    >
+                        Manage Plan
+                    </Button>
+                </Fragment>
+            )}
         </Fragment>
 
     );

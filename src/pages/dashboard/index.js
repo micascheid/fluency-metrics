@@ -100,7 +100,6 @@ const DefaultDashboard = () => {
         window.addEventListener('beforeunload', beforeUnloadListener);
 
         return () => {
-            console.log("Get called here?");
             window.removeEventListener('beforeunload', beforeUnloadListener);
         }
     }, []);
