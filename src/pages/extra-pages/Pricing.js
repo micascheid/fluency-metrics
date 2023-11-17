@@ -29,7 +29,9 @@ const Pricing = () => {
     const subscriptionType = user ? user.subscription.subscription_status : null;
 
     const navigate = useNavigate();
-
+    if (user) {
+        console.log("subscription:", user);
+    }
     //Functions
     const handleContactUs = () => {
         navigate('/support')
