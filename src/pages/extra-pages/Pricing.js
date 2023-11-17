@@ -27,11 +27,8 @@ const Pricing = () => {
     const customerId = user ? user.subscription.stripe_id : null;
     const organizationalUser = user ? user.subscription.organization_id : null;
     const subscriptionType = user ? user.subscription.subscription_status : null;
-
     const navigate = useNavigate();
-    if (user) {
-        console.log("subscription:", user);
-    }
+
     //Functions
     const handleContactUs = () => {
         navigate('/support')
