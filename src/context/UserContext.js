@@ -15,8 +15,6 @@ export const UserProvider = ({children}) => {
     const [isBlocked, setIsBlocked] = useState(false);
     const [badHealth, setBadHealth] = useState(false);
     const [userLoadError, setUserLoadError] = useState(false);
-    const [registrationComplete, setRegistrationComplete] = useState(false);
-    const [openPricing, setOpenPricing] = useState(false);
     const navigate = useNavigate();
     const login = async (user) => {
         setIsLoading(true);
@@ -36,7 +34,6 @@ export const UserProvider = ({children}) => {
         signOut(auth).then(() => {
             navigate('/login');
             setUser(null);
-            setRegistrationComplete(false);
         });
         setUser(null);
     };
@@ -171,7 +168,6 @@ export const UserProvider = ({children}) => {
         setIsLoading,
         isBlocked,
         badHealth,
-        setRegistrationComplete,
         userLoadError
     };
 

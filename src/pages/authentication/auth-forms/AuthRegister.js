@@ -111,10 +111,7 @@ const AuthRegister = () => {
                 photoURL: ''
             });
 
-            // setIsRegistering(true);
-
             await addUserIfNotExists(user.uid, subscription_info);
-            // setRegistrationComplete(true);
             console.log({...user, ...subscription_info});
             setUser({...user, subscription: {...subscription_info}});
             navigate('/tool');
