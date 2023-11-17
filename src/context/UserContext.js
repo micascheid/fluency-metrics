@@ -20,8 +20,9 @@ export const UserProvider = ({children}) => {
         setIsLoading(true);
         try {
             const userRef = doc(db, 'users', user.uid);
-            const subscription = await getDoc(userRef);
-            setUser({...user, subscription: {...subscription}})
+            const data = await getDoc(userRef);
+            const subscription = data.data().subscription;
+            setUser({...user, subscription: subscription});
             setIsLoading(false);
         } catch (error) {
             setUserLoadError(true);
