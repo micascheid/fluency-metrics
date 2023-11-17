@@ -43,12 +43,13 @@ import {SUBSCRIPTION_STATUS} from "../../../constants";
 // ============================|| FIREBASE - REGISTER ||============================ //
 
 const AuthRegister = () => {
-    const {setRegistrationComplete} = useContext(UserContext);
+    const {setUser} = useContext(UserContext);
     const navigate = useNavigate();
     const [level, setLevel] = useState();
     const [showPassword, setShowPassword] = useState(false);
     const [isRegistering, setIsRegistering] = useState(false);
     const [isShowOrgInfoModal, setIsShowOrgInfoModal] = useState(false);
+    const [regError, setRegError] = useState(false);
     const termsOfService = "https://app.termly.io/document/terms-of-service/b16b9152-1772-4f08-b8f6-d2891f75917e";
     const privacyPolicy = "https://app.termly.io/document/privacy-policy/3f05d55c-d115-4406-99e3-97d039c224f6";
 
@@ -110,13 +111,13 @@ const AuthRegister = () => {
                 photoURL: ''
             });
 
-            setIsRegistering(true);
-
             await addUserIfNotExists(user.uid, subscription_info);
-            setRegistrationComplete(true);
+            console.log({...user, ...subscription_info});
+            setUser({...user, subscription: {...subscription_info}});
             navigate('/tool');
         } catch (error) {
             console.error("ProfileError during registration:", error);
+            setRegError(true);
             // Handle or display the error to the user.
         }
     };

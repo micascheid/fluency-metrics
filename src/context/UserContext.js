@@ -14,18 +14,26 @@ export const UserProvider = ({children}) => {
     const [isLoading, setIsLoading] = useState(true);
     const [isBlocked, setIsBlocked] = useState(false);
     const [badHealth, setBadHealth] = useState(false);
-    const [registrationComplete, setRegistrationComplete] = useState(false);
-    const [openPricing, setOpenPricing] = useState(false);
+    const [userLoadError, setUserLoadError] = useState(false);
     const navigate = useNavigate();
-    const login = (user) => {
-        setUser(user);
+    const login = async (user) => {
+        setIsLoading(true);
+        try {
+            const userRef = doc(db, 'users', user.uid);
+            const subscription = await getDoc(userRef);
+            setUser({...user, subscription: {...subscription}})
+            setIsLoading(false);
+        } catch (error) {
+            setUserLoadError(true);
+        }
+        setIsLoading(false);
+
     };
 
     const logout = () => {
         signOut(auth).then(() => {
             navigate('/login');
             setUser(null);
-            setRegistrationComplete(false);
         });
         setUser(null);
     };
@@ -104,6 +112,7 @@ export const UserProvider = ({children}) => {
             if (currentUser) {
                 const userRef = doc(db, 'users', currentUser.uid);
                 try {
+                    setIsLoading(true);
                     const userDoc = await getDoc(userRef);
                     if (userDoc.exists()) {
                         const userData = userDoc.data();
@@ -133,7 +142,9 @@ export const UserProvider = ({children}) => {
                     } else {
                         navigate('/profile-error')
                     }
+                    setIsLoading(false);
                 } catch (error) {
+
                 }
             } else {
                 navigate('/login');
@@ -145,44 +156,10 @@ export const UserProvider = ({children}) => {
         };
     }, []);
 
-    useEffect(() => {
-        // This will trigger every time 'user' changes.
-        // If necessary, add more dependencies to the dependency array.
-        if (registrationComplete) {
-            shouldBlock(user.uid).then(result => {
-                if (result) {
-                    console.log("Should be blocked");
-                    setIsBlocked(true);
-                }
-            });
-
-            checkBackendHealth().then(() => {
-                // Handle the result if needed.
-            });
-        }
-    }, [registrationComplete]);
-
-    useEffect(() => {
-        if (user) {
-            const userRef = doc(db, 'users', user.uid);
-            const unsubscribe = onSnapshot(userRef, (doc) => {
-                const userData = doc.data();
-                if (userData && userData.subscription) {
-                    setRegistrationComplete(true);
-                    // Also, you can set other user data here if needed
-                } else {
-                    setRegistrationComplete(false);
-                }
-            });
-
-            // Cleanup the listener on component unmount
-            return () => unsubscribe();
-        }
-    }, [user, db]);
-
 
     const contextValues = {
         user,
+        setUser,
         login,
         logout,
         workspacesIndex: workspacesIndex,
@@ -191,7 +168,7 @@ export const UserProvider = ({children}) => {
         setIsLoading,
         isBlocked,
         badHealth,
-        setRegistrationComplete
+        userLoadError
     };
 
     return (

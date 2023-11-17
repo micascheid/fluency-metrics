@@ -16,7 +16,7 @@ const LoadingOverlay = ({ isOpen }) => {
                 justifyContent="center"
             >
                 <Typography variant="h1" component="div" gutterBottom>
-                    Loading Tool...
+                    Loading...
                 </Typography>
                 <CircularProgress color="inherit" />
             </Box>

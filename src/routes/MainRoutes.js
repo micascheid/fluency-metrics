@@ -13,7 +13,6 @@ const DashboardDefault = Loadable(lazy(() => import('pages/dashboard')));
 
 // render - sample page
 const SupportPage = Loadable(lazy(() => import('pages/extra-pages/Support')));
-const PricingPage = Loadable(lazy(() => import('pages/extra-pages/Pricing')));
 // render - utilities
 
 
