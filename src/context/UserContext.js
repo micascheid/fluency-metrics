@@ -159,61 +159,6 @@ export const UserProvider = ({children}) => {
         };
     }, []);
 
-    // useEffect(() => {
-    //     // This will trigger every time 'user' changes.
-    //     // If necessary, add more dependencies to the dependency array.
-    //     if (registrationComplete) {
-    //         shouldBlock(user.uid).then(result => {
-    //             if (result) {
-    //                 console.log("Should be blocked");
-    //                 setIsBlocked(true);
-    //             }
-    //         });
-    //         const getSub = async () => {
-    //             setIsLoading(true);
-    //             const userRef = doc(db, 'users', user.uid);
-    //             try {
-    //                 setIsLoading(true);
-    //                 const userDoc = await getDoc(userRef);
-    //                 if (userDoc.exists()) {
-    //                     console.log("grabbing subscription data");
-    //                     const userData = userDoc.data();
-    //                     const userExtended = {
-    //                         ...user,
-    //                         subscription: userData.subscription
-    //                     }
-    //                     setUser(userExtended);
-    //                 }
-    //             } catch (error) {
-    //                 console.log("trouble setting user");
-    //             }
-    //             setIsLoading(false);
-    //         }
-    //         // getSub();
-    //         checkBackendHealth()
-    //     }
-    // }, [registrationComplete]);
-
-    // useEffect(() => {
-    //     if (user) {
-    //         const userRef = doc(db, 'users', user.uid);
-    //         const unsubscribe = onSnapshot(userRef, (doc) => {
-    //             const userData = doc.data();
-    //             if (userData && userData.subscription) {
-    //                 setRegistrationComplete(true);
-    //                 console.log("broken here?");
-    //                 // Also, you can set other user data here if needed
-    //
-    //             } else {
-    //                 setRegistrationComplete(false);
-    //             }
-    //         });
-    //
-    //         // Cleanup the listener on component unmount
-    //         return () => unsubscribe();
-    //     }
-    // }, [user, db]);
-
 
     const contextValues = {
         user,
